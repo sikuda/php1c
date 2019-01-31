@@ -325,7 +325,7 @@ class CodeStream {
 			}
 		}
 		$this->MatchOper(TokenStream::oper_closebracket, ')');
-		$this->MatchOper(TokenStream::oper_semicolon, ';');
+		//$this->MatchOper(TokenStream::oper_semicolon, ';');
 			 
 		if($this->beginCommonFunc < $index && $this->endCommonFunc > $index){
 			return callCommonFunction($context, $func, $arguments);

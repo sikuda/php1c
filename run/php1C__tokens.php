@@ -303,9 +303,9 @@ class TokenStream {
 			while( !$this->eol() ){
 				$this->move();
 				if($ch === "'"){
-					//only 20170101 or 20170101000000
-					if( strlen($value) == 14 || strlen($value) == 8){
-						if( !checkdate((int)(substr($value, 4, 2)),(int)(substr($value, 6, 2)),(int)(substr($value, 0, 4)))){
+					//только 194506240000 или 194506240000 или 19450624000000
+					if( strlen($value) == 14 || strlen($value) == 12 || strlen($value) == 8){
+						if( !checkdate(substr($value, 4, 2), substr($value, 6, 2),substr($value, 0, 4))){
 							throw new Exception("Неправильная константа типа Дата");	
 						}
 						return new Token(self::type_date, $value);

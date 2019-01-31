@@ -41,23 +41,6 @@ function toString1C($arg){
 }
 
 /**
-* Определение типа переменной 1С
-* @param any $arg
-* @return string Название типа переменной 1С ('string', 'number'(bool включено), 'Date1C', 'undefined')
-*/  
-// function type1C(&$arg){
-// 	if(is_string($arg)) return 'string';
-// 	elseif(is_numeric($arg)) return 'number';
-// 	elseif(is_bool($arg)){
-// 		if( $arg === true) $arg = 1;
-// 		else $arg = 0;
-// 		return 'number';
-// 	}
-// 	elseif(is_object($arg)) return get_class($arg);
-// 	return 'undefined';	
-// }
-
-/**
 * Сложение двух переменных в 1С
 * @param any $arg1
 * @param any $arg2
@@ -69,8 +52,8 @@ function add1C($arg1, $arg2){
 	elseif(is_bool($arg1) || is_numeric($arg1)){
 		if(is_bool($arg2) || is_numeric($arg2)) return $arg1+$arg2;
 	}
-	elseif(is_object($arg)){
-		if( (get_class($arg1) === 'Date1C') || (is_numeric($arg2) && !is_string($arg2))) $arg1->add($arg2);
+	elseif(is_object($arg1)){
+		if( (get_class($arg1) === 'Date1C') && is_numeric($arg2) && !is_string($arg2) ) return $arg1->add($arg2);
 	}
 	throw new Exception("Преобразование значения к типу Число не может быть выполнено");
 }
@@ -87,7 +70,7 @@ function sub1C($arg1, $arg2){
 		if(is_bool($arg2) || is_numeric($arg2)) return $arg1-$arg2;
 	}
 	elseif(is_object($arg)){
-		if( (get_class($arg1) === 'Date1C') || (is_numeric($arg2) && !is_string($arg2))) return $arg1->sub($arg2);
+		if( (get_class($arg1) === 'Date1C') && is_numeric($arg2) && !is_string($arg2) ) return $arg1->sub($arg2);
 	}	
 	throw new Exception("Преобразование значения к типу Число не может быть выполнено");
 }
@@ -246,7 +229,7 @@ function callCommonFunction($context=null, $key, $arguments){
 			return Message($arguments[0], $arguments[1]);
 			break;
 		default:
-			throw new Exception("Неизвестная функция ".$key."");
+			throw new Exception("Неизвестная общая функция ".$key."");
 		}	
 	}
 	else{

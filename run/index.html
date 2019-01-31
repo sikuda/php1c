@@ -1,0 +1,124 @@
+<!doctype html>
+<meta name=viewport content="width=device-width, initial-scale=1">
+<title>php and 1C</title>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+<link rel="stylesheet" href="../lib/codemirror.css">
+<script src="../lib/codemirror.js"></script>
+<script src="../mode/javascript/javascript.js"></script>
+<script src="../mode/1c/1c.js"></script>
+<script src="../mode/css/css.js"></script>
+<script src="../mode/clike/clike.js"></script>
+<script src="../mode/php/php.js"></script>
+<link rel="stylesheet" href="../theme/1c.css">
+<body onload="loadDocument()">
+  <div width="100%">
+    <textarea id="code" name="code" width="50%"></textarea>
+  </div>
+  <div align="center">
+    <input type="button" onclick="doExecute()"  value="Выполнить" style="font-size:1.5em"/>
+  </div> 
+  <br>
+  <div>
+    <textarea name="codeResult" id="codeResult"></textarea>
+  </div>  
+  <div align="center">
+    <input type="button" onclick="doCount()" value="Преобразовать в PHP" style="font-size:1.5em"/>
+  </div>
+  <br>
+  <div>
+    <textarea name="codePHP" id="codePHP"></textarea>
+  </div>  
+
+  <script type="text/javascript">
+    codeArea = document.getElementById('code');
+
+    var editor = CodeMirror.fromTextArea(codeArea, {
+      lineNumbers: true,
+      indentWithTabs: true,
+      styleActiveLine: true,
+      lineWrapping: true,
+      smartIndent: true,
+      electricChars:false,
+      autofocus: true,
+      indentUnit: 4,
+      readOnly: false,
+      highlightSelectionMatches: {showToken: /[0-9a-zA-Zа-яёА-ЯЁ&]/, annotateScrollbar: false},
+      mode: "text/x-1c",
+      theme: '1c'
+    });
+
+    //set
+    var content = "Дата = '2017.01.01' + (10/3+1/3+1/3);\nСообщить(Дата);";
+
+    editor.setValue(content);
+    for (var i =0; i< editor.lineCount(); i++) { editor.indentLine(i); }
+      editor.setSize("100%","30%");
+
+    var editorResult = CodeMirror.fromTextArea(document.getElementById("codeResult"), {
+      lineNumbers: true,
+      matchBrackets: false,
+      mode: "text",
+      indentUnit: 4,
+      indentWithTabs: true
+    });
+    editorResult.setSize("100%","30%");
+
+    var editorPHP = CodeMirror.fromTextArea(document.getElementById("codePHP"), {
+      lineNumbers: true,
+      matchBrackets: false,
+      mode: "application/x-httpd-php",
+      indentUnit: 4,
+      indentWithTabs: true
+    });
+    editorPHP.setSize("100%","30%");
+    
+    function doExecute(){
+      var context = editor.getValue();
+      var xhttp = new XMLHttpRequest();
+      xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+          var str = xhttp.responseText;
+          str = str.substring(2, str.length);
+          editorResult.setValue(str);
+        }
+      }        
+      var params = 'code=' + encodeURIComponent(context);
+      xhttp.open("POST", 'result.php', true)
+      xhttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded')
+      xhttp.send(params);
+    }
+
+    function doCount(){
+      var context = editor.getValue();
+      var xhttp2 = new XMLHttpRequest();
+      xhttp2.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+          var str = xhttp2.responseText;
+          str = str.substring(2, str.length);
+          editorPHP.setValue(str);
+
+          var res = 6/2(1+2);
+          editorPHP.setValue(res);
+        }
+      }        
+      var params = 'code=' + encodeURIComponent(context);
+      xhttp2.open("POST", 'resultPHP.php', true)
+      xhttp2.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded')
+      xhttp2.send(params);
+    }
+
+    function loadDocument(){
+      var xhttp = new XMLHttpRequest();
+      xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+          var str = xhttp.responseText;
+          str = str.substring(2, str.length);
+          editor.setValue(str);
+        }
+      }        
+      xhttp.open("GET", 'result.php?load=true', true)
+      xhttp.send();
+    }
+  </script>  
+</body>  
+
