@@ -1,5 +1,5 @@
 <?php
-require_once('php1C__run.php');
+require_once('src/php1C__run.php');
 
     $str = '';
 	if ($_SERVER["REQUEST_METHOD"] == "POST") {

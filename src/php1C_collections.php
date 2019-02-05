@@ -10,6 +10,61 @@
 */
 
 /**
+* Массив названий русских функций для работы с датой
+* @return string[] Массив названий функций работы с датой.
+*/
+function functions_Collections(){
+	return  array('ВГраница(', 'Вставить(', 'Добавить(', 'Количество(', 'Найти(', 'Очистить(','Получить(', 'Удалить(', 'Установить(');
+}
+/**
+* Массив названий английских функций для работы с датой. Соответстует элементам русским функций.
+* @return string[] Массив названий функций работы с датой.
+*/   
+function functionsPHP_Collections(){
+	return  array('UBound(',   'Insert(',   'Add(',      'Count(',      'Find(',  'Clear('  , 'Get(',      'Del(',     'Set(');
+}
+
+/**
+* Вызывает функции и функции объектов 1С работы с коллекциями
+*
+* @param object $context объект для вызова функции или null
+* @param string $key строка названии функции со скобкой
+* @param array $arguments аргументы функции в массиве
+* @return возвращает результат функции или выбрасывает исключение
+*/
+function callCollectionFunction($context=null, $key, $arguments){
+		if($context === null){
+		switch($key){
+		// case 'Message(':
+		// 	if(isset($arguments[2])) throw new Exception("Ожидается ) ");
+		// 	return Message($arguments[0], $arguments[1]);
+		default:
+			throw new Exception("Неизвестная функция работы с коллекциями ".$key."");
+		}	
+	}
+	else{
+		if( method_exists($context, substr($key, 0, -1) )){ 
+			switch($key){
+			case 'UBOUND(': return $context->UBOUND();
+			case 'INSERT(': return $context->INSERT($arguments[0], $arguments[1]);
+			case 'ADD(':    return $context->ADD($arguments[0]);
+			case 'COUNT(':  return $context->COUNT();
+			case 'FIND(':   return $context->FIND($arguments[0]);
+			case 'CLEAR(':  return $context->CLEAR();
+			case 'GET(':    return $context->GET($arguments[0]);	
+			case 'DEL(':    return $context->DEL($arguments[0]);
+			case 'SET(':    return $context->SET($arguments[0], $arguments[1]);
+			default:
+				throw new Exception("Нет обработки функции для объекта коллекции ".$key."");
+			}
+		}else{
+			throw new Exception("Не найдена функция у объекта коллекции  ".$key."");
+		}
+	}
+}
+
+
+/**
 * Класс для работы с массивом 1С
 *
 */
@@ -19,8 +74,11 @@ class Array1C{
 	*/
 	private $value; 
 
-	function __construct(){
+	function __construct($count=null){
 		$this->value = array();
+		if( $count > 0 ){
+			for ($i=0; $i < $count; $i++) $this->value[i] = null;
+		}	
 	}
 
 	function __toString(){
@@ -77,6 +135,14 @@ class Array1C{
 	}
 }
 
-function Array1C(){
-	return new Array1C();
+/**
+* Получение массива 1С (пока одномерного)
+*
+* @param array $cnt аргументы функции в массиве
+* @return возвращает новый объект массива 1С
+*
+*/
+function Array1C($cnt){
+	if( count($cnt) > 1 ) throw new Exception("Многомерные массивы пока не поддерживаются"); 
+	else return new Array1C($cnt[0]);
 }

@@ -5,7 +5,7 @@
 * Модуль для работы самой датой 1С и функциями для работы с датой
 * 
 * @author  sikuda admin@sikuda.ru
-* @version 0.1
+* @version 0.2
 */
 
 /**

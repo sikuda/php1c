@@ -1,6 +1,6 @@
 <?php
 /**
-* Дополнительный модуль для получения кода 1С
+* Дополнительный модуль для получения кода PHP из 1С
 * 
 * Модуль для работы с 1С 
 * Преобразование кода в код php
@@ -47,11 +47,7 @@ class CodeStream {
 	private $code = '';
 	private $codestack = array();
 
-	//pointer to handle error
-	private $row = 1;
-    private $col = 1;
-
-    const LetterRus = array('А','Б','В','Г','Д','Е','Ё' ,'Ж' ,'З','И','Й' ,'К','Л','М','Н','О','П','Р','С','Т','У','Ф','Х' ,'Ц','Ч' ,'Ш' ,'Щ'  ,'Ъ','Ы','Ь','Э' ,'Ю' ,'Я' ,'а','б','в','г','д','е','ё' ,'ж'  ,'з','и','й', 'к','л','м','н','о','п','р','с','т','у','ф','х' ,'ц','ч','ш' ,'щ'  ,'ъ','ы','ь','э' ,'ю' ,'я');
+	const LetterRus = array('А','Б','В','Г','Д','Е','Ё' ,'Ж' ,'З','И','Й' ,'К','Л','М','Н','О','П','Р','С','Т','У','Ф','Х' ,'Ц','Ч' ,'Ш' ,'Щ'  ,'Ъ','Ы','Ь','Э' ,'Ю' ,'Я' ,'а','б','в','г','д','е','ё' ,'ж'  ,'з','и','й', 'к','л','м','н','о','п','р','с','т','у','ф','х' ,'ц','ч','ш' ,'щ'  ,'ъ','ы','ь','э' ,'ю' ,'я');
 	const LetterEng = array('A','B','V','G','D','E','JO','ZH','Z','I','JJ','K','L','M','N','O','P','R','S','T','U','F','KH','C','CH','SH','SHH','' ,'Y','' ,'EH','YU','YA','a','b','v','g','d','e','jo','zh','z','i','jj','k','l','m','n','o','p','r','s','t','u','f','kh','c','ch','sh','shh','' ,'y','' ,'eh','yu','ya');
 
 
@@ -72,6 +68,8 @@ class CodeStream {
 		$this->Type = $token->type; 
 		$this->Look = $token->context; 
 		$this->Index = $token->index;
+		//$this->row   = $token->row;
+		//$this->col   = $token->col;
 		$this->itoken++;
 
 	}
@@ -116,6 +114,7 @@ class CodeStream {
 				$key = str_replace(self::LetterRus, self::LetterEng, $this->Look);
 				$this->code = "$".$key;	 
 			}	
+			if ($this->Type === TokenStream::type_string) $this->code = '"'.$this->Look.'"';
 			if ($this->Type === TokenStream::type_date) $this->code = 'Date1C("'.$this->Look.'")';
 						
 			if($this->Type === TokenStream::type_keyword){
@@ -157,8 +156,8 @@ class CodeStream {
 			//Оператор Новый и тип
 			elseif($index === TokenStream::oper_new) {
 				if( $this->Type === TokenStream::type_identification){
-					$this->code = $this->identypes['codePHP'][$this->Index].'()';
-					$this->GetChar();
+					$this->code = $this->getNewType();
+					//$this->GetChar();
 				} 
 				else throw new Exception('Ожидается идентификатор типа');
 			}
@@ -182,19 +181,38 @@ class CodeStream {
 				elseif($this->Type === TokenStream::type_number) throw new Exception('Неправильная константа типа число '.$this->Look);
 				else throw new Exception('Предполагается функция объекта '.$this->Look);
 			}	
-		    //}
 		}	
 	}
 
-    //Выдать идентификатор типа по названию или индексу
+    /**
+    *Выдать код нового объекта по индексу со всеми параметрами
+	*/
 	private function getNewType(){
-		switch ($this->Index) {
-			case 'МАССИВ': return 'Array1C()';
-			case 'ФАЙЛ': return 'File1C()';
-			default: 
-			    throw new Exception('Пока тип не определен '.$this->Look);
-			    break;
+		//определяем параметры конструктора
+		$index = $this->Index;
+		$look = $this->Look;
+		$args = '('; 
+		$this->GetChar();
+		if($this->Type === TokenStream::type_operator && $this->Index === TokenStream::oper_openbracket){
+			$this->MatchOper(TokenStream::oper_openbracket, '(');
+			$notfirst = false;
+			while( $this->Type !== TokenStream::type_operator || $this->Index !== TokenStream::oper_closebracket ){
+				if($notfirst){
+					if($this->Type !== TokenStream::type_operator || $this->Index !== TokenStream::oper_comma) throw new Exception('Ожидается запятая , ');
+					$args .= ',';
+					$this->GetChar();
+				}
+				else $notfirst = true;	
+				$this->code = $this->Expression7();
+				$args .= $this->code;
+				$this->code = '';
+			}
+			$this->MatchOper(TokenStream::oper_closebracket, ')');	
 		}
+		$args .= ')';
+		//echo TokenStream::identypes['codePHP'][$index];
+		if($index>=0) return $tokenStream->identypes['codePHP'][$index].$args; //return $look.$args;
+		else throw new Exception('Пока тип не определен '.$look);
 	}
 
 	/**
@@ -287,7 +305,11 @@ class CodeStream {
 	}
 
 	/**
-	* Получение кода функции с аргументами
+	* Разбор аргументов функции и ее возврат строки вызова функции
+	*
+	* $context - object or null Констекст вызова функции ( типа Массив.Добавить())
+	* $func    - string строкое название функции
+	* $index   - int индекс функции в обших массивах функций
 	*/
 	public function splitFunction($context=null, $func, $index=-1){
 		$args = ''; 
@@ -302,30 +324,21 @@ class CodeStream {
 				if($this->Type !== TokenStream::type_operator || $this->Index !== TokenStream::oper_comma) throw new Exception('Ожидается запятая , ');
 				$this->GetChar();
 				$this->code = $this->Expression7();
-				$args .= $this->code;
+				$args .= ','.$this->code;
 				$this->code = '';	
 			}
 		}
 		$this->MatchOper(TokenStream::oper_closebracket, ')');
-		//$this->MatchOper(TokenStream::oper_semicolon, ';');
-					
-		if($this->beginCommonFunc < $index && $this->endCommonFunc > $index){
-			$array = functionsPHP_Com();
-			return $array[$index].$args.");";
-		}
 		
-		if($this->beginDateFunc < $index && $this->endDateFunc > $index){
-			$array = functionsPHP_Date();
-			return $array[$index-1-$this->beginDateFunc].$args.");";	
-		}
-		return $key.$args.");";	
+		if($index!=-1) return $this->tokenStream->functions1С['clear'][$index].$args.")";
+		else return $key.$args.")";
 	}
 
 	/*
-	** Make code php 
+	** Основная функция получения кода на php 
 	**
-	** $handle - expected keyword to handle
-	** $other - old result of handle
+	** $handle - token_type(TokenStream) ожидаемое ключевое слово
+	** $other  - устаревший параметр
 	*/
 	public function continueCode($handle=-1, $other=false){	
 
@@ -335,6 +348,14 @@ class CodeStream {
 					$this->codePHP .= "\n";
 					$this->GetChar();
 					break;
+				//Пустые операторы	
+				case TokenStream::type_operator:
+						if($this->Index === TokenStream::oper_semicolon){
+							$this->codePHP .= ';';
+							$this->GetChar(); 
+						} 
+						else throw new Exception('Неопознанный оператор '.$this->Look);
+						break;	
 				case TokenStream::type_variable:
 					$key = str_replace(self::LetterRus, self::LetterEng, $this->Look);
 					array_push($this->codestack, $key);
@@ -358,6 +379,8 @@ class CodeStream {
 				case TokenStream::type_function:
 				case TokenStream::type_extfunction:
 					$this->codePHP .= $this->Expression7();
+					$this->MatchOper(TokenStream::oper_semicolon, ';');
+					$this->codePHP .= ";";
 					break;
 				case TokenStream::type_comments:
 					$this->codePHP .= $this->Look;
@@ -464,7 +487,7 @@ class CodeStream {
 					}
 					break;
 				default:
-					throw new Exception('Неопознанный оператор '.$this->Look);
+					throw new Exception('Неопознанный символ '.$this->Look);
 					break;
 			}
 		}
@@ -479,18 +502,12 @@ class CodeStream {
 
 		//Блок разбора по токеном
 		try{
-			$tokenStream = new TokenStream($buffer);
-			$tokenStream->CodeToTokens();
-			$this->tokens = &$tokenStream->tokens;
-			$this->functions_Common    = &$tokenStream->functions_Common;
-			$this->functionsPHP_Common = &$tokenStream->functionsPHP_Common;
-			$this->beginCommonFunc = $tokenStream->beginCommonFunc; 
-			$this->endCommonFunc = $tokenStream->endCommonFunc;
-			$this->beginDateFunc = $tokenStream->beginDateFunc;
-			$this->endDateFunc = $tokenStream->endDateFunc;
+			$this->tokenStream = new TokenStream($buffer);
+			$this->tokenStream->CodeToTokens();
+			$this->tokens = &$this->tokenStream->tokens;
 		}
 		catch (Exception $e) {
-			return ("{(".$this->row.")}: ".$e->getMessage()."\n"); //стиль ошибки 1С
+			return ("{(".$this->tokenStream->row.",".$this->tokenStream->col.")}: ".$e->getMessage()."\n"); //стиль ошибки 1С
 		}
 
 		//Блок выполнения
@@ -506,7 +523,7 @@ class CodeStream {
 		}
 		catch (Exception $e) {
 			$token = $this->tokens[$this->itoken-1];
-    		return ("{(".$this->row.")}: ".$e->getMessage()."\n"); //стиль ошибки 1С
+    		return ("{(".$token->row.",".$token->col.")}: ".$e->getMessage()."\n"); //стиль ошибки 1С
 		}
  	}
 }
@@ -519,12 +536,7 @@ class CodeStream {
 */
 function makeCode($buffer, $name_var=null){
 	$stream = new CodeStream();
-	try{
-		$result = $stream->makeCode($buffer);
-	}
-	catch (Exception $e) {
-		return ("{(".$this->row.")}: ".$e->getMessage()."\n"); //стиль ошибки 1С
-	}
+	$result = $stream->makeCode($buffer);
 	if($name_var!==null){
 	 	$output_array = array();
 	 	$result = "Пока не реализовано";

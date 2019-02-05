@@ -15,7 +15,7 @@ require_once('php1C_collections.php');
 * @return string[] Массив названий функций общей работы с 1С.
 */
 function functions_Com(){
-	return  array('Сообщить(', 'ВГраница(', 'Вставить(', 'Добавить(', 'Количество(', 'Найти(', 'Очистить(','Получить(', 'Удалить(', 'Установить(');
+	return  array('Сообщить(', 'Найти(', 'ЗначениеЗаполнено(' );
 }
 
 /**
@@ -23,7 +23,7 @@ function functions_Com(){
 * @return string[] Массив названий функций работы с датой.
 */   
 function functionsPHP_Com(){
-	return  array('Message(',  'UBound(',   'Insert(',   'Add(',      'Count(',      'Find(',  'Clear('  , 'Get(',      'Del(',     'Set(');
+	return  array('Message(',  'Find(',  'ValueIsFilled(');
 }
 
 /**
@@ -37,14 +37,14 @@ function toString1C($arg){
 		if($arg === true ) return "Да";
 		else return "Нет";
 	}
-	return (string)$arg; 
+	return strval($arg); 
 }
 
 /**
 * Сложение двух переменных в 1С
 * @param any $arg1
 * @param any $arg2
-* @return string Результат сложение в зависемости от типа переменных ('string', 'bool, 'Date1C')
+* @return any Результат сложение в зависемости от типа переменных (string, bool, Date1C)
 */
 function add1C($arg1, $arg2){
 
@@ -62,7 +62,7 @@ function add1C($arg1, $arg2){
 * Вычитание двух переменных в 1С
 * @param any $arg1
 * @param any $arg2
-* @return string Результат вычитания в зависемости от типа переменных ('string', 'number', 'Date1C', исключение)
+* @return float, Date1C Результат вычитания в зависемости от типа переменных (float, Date1C, исключение)
 */
 function sub1C($arg1, $arg2){
 
@@ -79,7 +79,7 @@ function sub1C($arg1, $arg2){
 * Умножение двух переменных в 1С
 * @param any $arg1
 * @param any $arg2
-* @return string Результат сложение в зависемости от типа переменных ('number' или исключение)
+* @return float Результат сложение в зависемости от типа переменных (float или исключение)
 */
 function mul1C($arg1, $arg2){
 
@@ -91,19 +91,22 @@ function mul1C($arg1, $arg2){
 * Деление двух переменных в 1С
 * @param any $arg1
 * @param any $arg2
-* @return string Результат сложение в зависемости от типа переменных ('number' или исключение)
+* @return float Результат сложение в зависемости от типа переменных (float или исключение)
 */
 function div1C($arg1, $arg2){
 
-	if(is_numeric($arg1) && !is_string($arg1) && is_numeric($arg2) && !is_string($arg2) ) return $arg1/$arg2;
+	if(is_numeric($arg1) && !is_string($arg1) && is_numeric($arg2) && !is_string($arg2) ){
+		if( $arg2 == 0) throw new Exception("Деление на 0");
+		else return $arg1/$arg2;	
+	} 
 	throw new Exception("Преобразование значения к типу Число не может быть выполнено");
 }
 
 /**
-* Операция преобразования bool d 0 или 1
+* Операция преобразования bool в 0 или 1
 * @param any $arg1
 * @param any $arg2
-* @return string Результат операции ИЛИ 
+* @return float преобразование bool в 0 или 1
 */
 function tran_bool($arg){
 	if($arg === true) return (float)1;
@@ -114,7 +117,7 @@ function tran_bool($arg){
 * Операция ИЛИ в 1С
 * @param any $arg1
 * @param any $arg2
-* @return string Результат операции ИЛИ 
+* @return bool Результат операции ИЛИ 
 */
 function or1C($arg1, $arg2){
 	if(is_bool($arg1)) $arg1 = tran_bool($arg1);
@@ -127,7 +130,7 @@ function or1C($arg1, $arg2){
 * Операция И в 1С
 * @param any $arg1
 * @param any $arg2
-* @return string Результат операции И 
+* @return bool Результат операции И 
 */
 function and1C($arg1, $arg2){
 	if(is_bool($arg1)) $arg1 = tran_bool($arg1);
@@ -140,7 +143,7 @@ function and1C($arg1, $arg2){
 * Операция Меньше в 1С
 * @param any $arg1
 * @param any $arg2
-* @return string Результат операции Меньше 
+* @return bool Результат операции Меньше 
 */
 function less1C($arg1, $arg2){
 	if(is_bool($arg1)) $arg1 = tran_bool($arg1);
@@ -153,7 +156,7 @@ function less1C($arg1, $arg2){
 * Операция Меньше или равно в 1С
 * @param any $arg1
 * @param any $arg2
-* @return string Результат операции Меньше или равно 
+* @return float Результат операции Меньше или равно 
 */
 function lessequal1C($arg1, $arg2){
 	if(is_bool($arg1)) $arg1 = tran_bool($arg1);
@@ -166,7 +169,7 @@ function lessequal1C($arg1, $arg2){
 * Операция Больше в 1С
 * @param any $arg1
 * @param any $arg2
-* @return string Результат операции Больше 
+* @return bool Результат операции Больше 
 */
 function more1C($arg1, $arg2){
 	if(is_bool($arg1)) $arg1 = tran_bool($arg1);
@@ -179,7 +182,7 @@ function more1C($arg1, $arg2){
 * Операция Больше или равно в 1С
 * @param any $arg1
 * @param any $arg2
-* @return string Результат операции Больше или равно 
+* @return bool Результат операции Больше или равно 
 */
 function morequal1C($arg1, $arg2){
 	if(is_bool($arg1)) $arg1 = tran_bool($arg1);
@@ -192,7 +195,7 @@ function morequal1C($arg1, $arg2){
 * Операция Равно в 1С
 * @param any $arg1
 * @param any $arg2
-* @return string Результат операции Равно 
+* @return bool Результат операции Равно 
 */
 function equal1C($arg1, $arg2){
 	if(is_bool($arg1)) $arg1 = tran_bool($arg1);
@@ -205,7 +208,7 @@ function equal1C($arg1, $arg2){
 * Операция Равно в 1С
 * @param any $arg1
 * @param any $arg2
-* @return string Результат операции Равно 
+* @return bool Результат операции Равно 
 */
 function notequal1C($arg1, $arg2){
 	if(is_bool($arg1)) $arg1 = tran_bool($arg1);
@@ -225,9 +228,15 @@ function notequal1C($arg1, $arg2){
 function callCommonFunction($context=null, $key, $arguments){
 	if($context === null){
 		switch($key){
-		case 'MESSAGE(':
+		case 'Message(':
+			if(isset($arguments[2])) throw new Exception("Ожидается ) ");
 			return Message($arguments[0], $arguments[1]);
-			break;
+		case 'Find(':
+			if(isset($arguments[2])) throw new Exception("Ожидается ) ");
+			return Find($arguments[0], $arguments[1]);
+		case 'ValueIsFilled(':
+			if(isset($arguments[1])) throw new Exception("Ожидается ) ");
+			return ValueIsFilled($arguments[0]);	
 		default:
 			throw new Exception("Неизвестная общая функция ".$key."");
 		}	
@@ -235,20 +244,12 @@ function callCommonFunction($context=null, $key, $arguments){
 	else{
 		if( method_exists($context, substr($key, 0, -1) )){ 
 			switch($key){
-			case 'UBOUND(': return $context->UBOUND();
-			case 'INSERT(': return $context->INSERT($arguments[0], $arguments[1]);
-			case 'ADD(':    return $context->ADD($arguments[0]);
-			case 'COUNT(':  return $context->COUNT();
-			case 'FIND(':   return $context->FIND($arguments[0]);
-			case 'CLEAR(':  return $context->CLEAR();
-			case 'GET(':    return $context->GET($arguments[0]);	
-			case 'DEL(':    return $context->DEL($arguments[0]);
-			case 'SET(':    return $context->SET($arguments[0], $arguments[1]);
+			//case 'UBOUND(': return $context->UBOUND();
 			default:
-				throw new Exception("Нет обработки функции для объекта  ".$key."");
+				throw new Exception("Нет обработки общей функции для объекта  ".$key."");
 			}
 		}else{
-			throw new Exception("Не найдена функция у объекта  ".$key."");
+			throw new Exception("Не найдена общая функция у объекта  ".$key."");
 		}
 	}
 }
@@ -263,5 +264,38 @@ function Message($mess='', $status=0){
 	echo $mess;
 }
 
-?>
+/**
+* Находит строку в строке
+* Хотя 1С считает эту функцию устаревшей, мы ее сделаем
+*
+* @param string $str строка в которой ищут
+* @param string $substr строка поиска(которую ищут)
+* @return возвращает позицию найденной строки начиная с 1. Если ничего не нашло возвратит 0
+*/
+function Find($str='', $substr=''){
+	$res = strpos($str, $substr);
+	if($res === false) return 0;
+	else return $res+1;
+}
+
+/**
+* Проверяет заполненность параметра по 1C
+*
+* @param string $str строка в которой ищут
+* @param string $substr строка поиска(которую ищут)
+* @return Истина если значение заполнено иначе ложь
+*/
+function ValueIsFilled($val){
+	if(is_object($val)){
+		switch (get_class($val)) {
+		 	case 'Date1C': return $val != "01.01.0001 00:00:00";
+		 	case 'Array1C': return ($val->COUNT()>0);	
+		 	default:
+		 		break;
+		 } 
+	}
+	return isset($val);	
+}
+
+
 

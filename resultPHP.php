@@ -1,5 +1,5 @@
 <?php
-require_once('php1C__code.php');
+require_once('src/php1C__code.php');
     $str = '';
 	if ($_SERVER["REQUEST_METHOD"] == "POST") {
     	$code = $_POST['code'];

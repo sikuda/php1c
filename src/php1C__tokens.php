@@ -16,22 +16,28 @@ namespace php1CTransfer;
 */
 use Exception;
 
+/*
+*  Для подключение всех списков функций подключаем 
+*/
+require_once( 'php1C_common.php');
+
+
 /**
 * Класс токена для обработки кода
 */
 class Token {
 	public $type = 0;
 	public $context = '';
-	public $index = 0;
+	public $index = -1;
 
 	//pointer to handle error
-	public $row = 1;
-    public $col = 1;
+	public $row = 0;
+    public $col = 0;
 	
 	function __construct($type = 0, $context = '', $index=-1){
 		$this->type = $type;
 		$this->context = $context;
-		$this->index = $index;
+		$this->index   = $index;
 	}
 }
 
@@ -54,8 +60,8 @@ class TokenStream {
 	private $pos = 0;
 
 	//pointer to handle error
-	private $row = 1;
-    private $col = 1;
+	public $row = 1;
+    public $col = 1;
 
     //types
     const type_end_code  = -1; 	
@@ -97,7 +103,7 @@ class TokenStream {
 	const oper_not          = 23;
 	const oper_new          = 25;
 	
-	//Letters 
+	//Russian Letters 
 	const LetterRusLower = array('а','б','в','г','д','е','ё' ,'ж' ,'з','и','й', 'к','л','м','н','о','п','р','с','т','у','ф','х','ц','ч','ш','щ','ъ','ы','ь','э','ю','я');
 	const LetterRusUpper = array('А','Б','В','Г','Д','Е','Ё' ,'Ж' ,'З','И','Й' ,'К','Л','М','Н','О','П','Р','С','Т','У','Ф','Х','Ц','Ч','Ш','Щ','Ъ','Ы','Ь','Э','Ю','Я'); 
 	const str_Identifiers = '/^[_A-Za-zА-Яа-яЁё][_0-9A-Za-zА-Яа-яЁё]*/u';
@@ -114,14 +120,15 @@ class TokenStream {
 		"code"    => array('МАССИВ','ФАЙЛ'),
 		"codePHP" => array('Array1C', 'File1C'),
 	);
-	const itype_array = 0;
-
-	public $functions_Common    = array();
-	public $functionsPHP_Common = array();
-	public $beginCommonFunc = -1, $endCommonFunc = -1;
-	public $beginDateFunc = -1, $endDateFunc = -1;
-
-
+	
+	public $functions1С = array(
+		"rus" => array(),  // функции по русски в верхнем регистре для поиска
+		"eng" => array(),  // функции по английски в вернем регистре для поиска
+		"clear" => array() // функции по английски как будет в коде 
+	);
+	public $indexFuncColl = -1;
+	public $indexFuncDate = -1;
+	public $indexFuncComm = -1;
 
 	/**
 	* Конструктор класса
@@ -131,33 +138,49 @@ class TokenStream {
 		//Копирование строки кода
 		$this->str = $str;
 
-		//Общие функции
-		$this->beginCommonFunc = count($this->functions_Common)-1; 
-		$array = functions_Com();
+		//Добавление в таблицы функций работы с коллекциями
+		$array = functions_Collections();
 		foreach ($array as $value) {
-			array_push($this->functions_Common, str_replace(self::LetterRusLower, self::LetterRusUpper, $value));
+			array_push($this->functions1С['rus'], str_replace(self::LetterRusLower, self::LetterRusUpper, $value));
 		}
-		$this->endCommonFunc = count($this->functions_Common);
-		$array = functionsPHP_Com();
+		$array = functionsPHP_Collections();
 		foreach ($array as $value) {
-			array_push($this->functionsPHP_Common, strtoupper($value));
+			array_push($this->functions1С['eng'], strtoupper($value));
 		}
+		foreach ($array as $value) {
+			array_push($this->functions1С['clear'], $value);
+		}
+		$this->indexFuncColl = count($this->functions1С['clear']);
 
-		//Функции работы с датами
-		$this->beginDateFunc = count($this->functions_Common)-1; 
+		//Добавление в таблицы функций работы с датами
 		$array = functions_Date();
 		foreach ($array as $value) {
-			array_push($this->functions_Common, str_replace(self::LetterRusLower, self::LetterRusUpper, $value));
+			array_push($this->functions1С['rus'], str_replace(self::LetterRusLower, self::LetterRusUpper, $value));
 		}
-		$this->endDateFunc = count($this->functions_Common);
 		$array = functionsPHP_Date();
 		foreach ($array as $value) {
-			array_push($this->functionsPHP_Common, strtoupper($value));
+			array_push($this->functions1С['eng'], strtoupper($value));
 		}
+		foreach ($array as $value) {
+			array_push($this->functions1С['clear'], $value);
+		}
+		$this->indexFuncDate = count($this->functions1С['clear']);
+
+		//Добавление в таблицы общих функций 
+		$array = functions_Com();
+		foreach ($array as $value) {
+			array_push($this->functions1С['rus'], str_replace(self::LetterRusLower, self::LetterRusUpper, $value));
+		}
+		$array = functionsPHP_Com();
+		foreach ($array as $value) {
+			array_push($this->functions1С['eng'], strtoupper($value));
+		}
+		foreach ($array as $value) {
+			array_push($this->functions1С['clear'], $value);
+		}
+		$this->indexFuncComm = count($this->functions1С['clear']);
 		unset($array);
 	}
-
-
 
 	/**
 	* Функции для разбора кода в токен
@@ -186,11 +209,6 @@ class TokenStream {
 		$this->pos+= $count;
 	}
 	
-	// private function setPosition($pos){
-	// 	$this->itoken = $pos;
-	// 	$this->GetChar();
-	// }
-
 	private function match($pattern){
 		$text = $this->future();
 		if( preg_match($pattern, $text) === 1 ) return true;
@@ -254,10 +272,8 @@ class TokenStream {
 
 		//Обработка новой строки
 		if( $this->eatSymbols("\n") ){
-		    //return new Token(self::type_newline, $this->current());
 		    $this->row++;
 			$this->col = 1;
-			//$this->start = $this->pos;
 			return new Token(self::type_newline, $this->current());
 		}
 				
@@ -363,22 +379,29 @@ class TokenStream {
 			elseif($current == 'И' ) return new Token(self::type_operator, 'И', self::oper_and);
 			elseif($current == 'НЕ' ) return new Token(self::type_operator, 'НЕ', self::oper_not);	
 			elseif($this->curr() == '('){
-				$this->move();
-				$key = array_search($current.'(', $this->functions_Common);
-				if( $key !== false ) return new Token(self::type_function, $current, $key); 
+				//Идентификатор типа  с аргументами
+				$key = array_search($current, $this->identypes['code']);
+				if( $key !== false ) return new Token(self::type_identification, $current, $key);
 				else{
-					$current = strtoupper($current);
-					$key = array_search($current.'(', $this->functionsPHP_Common);
+					$this->move();
+					//Общая функция на русском
+					$key = array_search($current.'(', $this->functions1С['rus']);
 					if( $key !== false ) return new Token(self::type_function, $current, $key); 
-					else return new Token(self::type_extfunction, $current);	
-				} 
+					else{
+						$current = strtoupper($current);
+						//Общая функция на английском
+						$key = array_search($current.'(', $this->functions1С['eng']);
+						if( $key !== false ) return new Token(self::type_function, $current, $key); 
+						else return new Token(self::type_extfunction, $current);	
+					} 
+				}
 		    } 
 			else{
 				//Ключевое слово
 				$key = array_search($current, self::keywords['code']);
 				if( $key !== false ) return new Token(self::type_keyword, $current,$key);
 				else{
-					//Идентификатор типа
+					//Идентификатор типа без скобок
 					$key = array_search($current, $this->identypes['code']);
 					if( $key !== false ) return new Token(self::type_identification, $current, $key);
 					//Переменная
@@ -410,7 +433,9 @@ class TokenStream {
 			$token = $this->readToken(); 
 			$key++;
 		}
-		$this->tokens[$key] = new Token(self::type_end_code);
+		$this->tokens[$key] = new Token(self::type_end_code);//,'',-1,$this->col,$this->row);
+		$this->tokens[$key]->col = $this->col;
+		$this->tokens[$key]->row = $this->row;
 		$this->start = 0;
 		$this->pos = 0;
 		$this->itoken = 0;
