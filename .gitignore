@@ -1,2 +1,2 @@
-src/*.sublime*
-src/*.settings
+*.sublime*
+*.settings
