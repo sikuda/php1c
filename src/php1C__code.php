@@ -92,7 +92,7 @@ class CodeStream {
 			$this->GetChar();
 		}
 		else{
-			throw new Exception('Ожидается  '.TokenStream::keywords['code'][$subtype]);
+			throw new Exception('Ожидается -'.TokenStream::keywords['code'][$subtype]);
 		}	
 	}
 
@@ -517,7 +517,17 @@ class CodeStream {
 			$this->GetChar();
 			if($this->Type !== TokenStream::type_end_code){
 				$this->continueCode();
-				return $this->codePHP;
+
+				$name = str_replace(self::LetterRus, self::LetterEng, $name_var);
+				if(isset($name_var)){
+
+				 	$output_array = array();
+				 	$this->codePHP .= 'echo '.$name;
+				 	exec($result, $output_array);
+				 	return $output_array[0];
+				 	//return $this->codePHP;
+				}
+				else return $this->codePHP;
 			}  
 			else return "\n Нет кода для выполнения \n";
 		}
@@ -537,16 +547,7 @@ class CodeStream {
 function makeCode($buffer, $name_var=null){
 	$stream = new CodeStream();
 	$result = $stream->makeCode($buffer);
-	if($name_var!==null){
-	 	$output_array = array();
-	 	$result = "Пока не реализовано";
-	 	//$name = str_replace(self::LetterRus, self::LetterEng, $name_var);
-	 	//$result .= 'echo '.$name;
-	 	//exec($result, $output_array);
-	 	//return $output_array[0];
-	 	return $result;
-	}
-	else return $result;
+	return $result;
 }
 
 

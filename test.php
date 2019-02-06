@@ -1,14 +1,14 @@
 <?php
-require_once('src/php1C__run.php');
-	//require_once('php1C__code.php');
-	$str = 'а = 1; b = 1; Для й=0 По 0 Цикл Пока a < 1 Цикл Пока b < 1 Цикл b = b + 1; КонецЦикла; a = a + 1; КонецЦикла Сообщить(1); КонецЦикла;'; 
+//require_once('src/php1C__run.php');
+	require_once('src/php1C__code.php');
+	$str = 'Результат = 0;Если Результат = 0 Тогда Результат = 1; Если Результат = 0 Тогда Результат = 5; Иначе Результат = 6; КонецЕсли; КонецЕсли;'; 
 	//$str = "Сообщить(Истина);"; 
 	//$result = php1CTransfer\runC""de(""str);
-	$result = test($str);
+	$result = test($str, "Результат");
 	//$result = php1CTransfer\makeCode($str);
-	//echo toString1C($result);
+	echo $result;
 
 	function test($str, $name=null){
-		return php1CTransfer\runCode($str, $name);	
+		return php1CTransfer\makeCode($str, $name);	
 	}
 ?>

@@ -311,7 +311,7 @@ class TokenStream {
 			else throw new Exception("Пропущен символ '\"' (двойная кавычка)");
 		}
 
-		//Обработка дат (строка '19450624') 
+		//Обработка дат (всяких там типа '19591015') 
 		if ($ch === "'") {
 			$this->move();
 			$ch = $this->curr();
@@ -319,7 +319,7 @@ class TokenStream {
 			while( !$this->eol() ){
 				$this->move();
 				if($ch === "'"){
-					//только 194506240000 или 194506240000 или 19450624000000
+					//только правильные даты 191711070000 или 194506240000 или 19450509000000
 					if( strlen($value) == 14 || strlen($value) == 12 || strlen($value) == 8){
 						if( !checkdate(substr($value, 4, 2), substr($value, 6, 2),substr($value, 0, 4))){
 							throw new Exception("Неправильная константа типа Дата");	

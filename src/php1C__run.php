@@ -97,7 +97,10 @@ class CodeStream {
 		if( $this->Type === TokenStream::type_operator && $this->Index === $subtype){ 
 			$this->GetChar();
 		}
-		else throw new Exception('Ожидается оператор '.$look);
+		else{
+		  //$this->itoken;		
+		  throw new Exception('Ожидается оператор '.$look);
+	}
 	}
 
 	/**
@@ -108,7 +111,7 @@ class CodeStream {
 			$this->GetChar();
 		}
 		else{
-			throw new Exception('Ожидается  '.TokenStream::keywords['code'][$subtype]);
+			throw new Exception('Ожидается '.TokenStream::keywords['code'][$subtype]);
 		}	
 	}
 
@@ -375,7 +378,8 @@ class CodeStream {
 		//		return true;
 		//}	
 		//if($handle === TokenStream::keyword_else && $this->Index === TokenStream::keyword_endif) return true;
-		if(($handle === TokenStream::keyword_then && $this->Index === TokenStream::keyword_endif) ||$this->Index === TokenStream::keyword_if) return true;
+		if($handle === TokenStream::keyword_then && 
+			 ($this->Index === TokenStream::keyword_if || $this->Index === TokenStream::keyword_elseif || $this->Index === TokenStream::keyword_else || $this->Index === TokenStream::keyword_endif)) return true;
 		return false;
 	}
 
@@ -398,14 +402,10 @@ class CodeStream {
 
 		while($this->Type !== TokenStream::type_end_code){
 
-			//testing
-			//echo '('.$this->Look.';h='.$handle.'v='.($this->isCircleOperation($handle)===true).')';
-			
 			//Проверка на необходимость выполнения кода
 			if( !$skip || ($skip && $this->Type===TokenStream::type_keyword && 
 				           	( $this->isIfOperation($handle) || $this->isCircleOperation($handle) )))
 			{
-				//echo '-ns-';
 				switch ($this->Type) {
 					case TokenStream::type_newline: 
 						$this->GetChar();
@@ -426,9 +426,6 @@ class CodeStream {
 								$this->variable[$key] = $value;
 								$this->MatchOper(TokenStream::oper_semicolon, ';');
 							}
-							// elseif ($this->Type === TokenStream::type_end_code) {
-							// 	$this->variable[$key] = $value;
-							// }
 							else throw new Exception('Ожидается ;');
 						}
 						else throw new Exception('Неизвестный оператор после переменной ');
@@ -447,47 +444,46 @@ class CodeStream {
 							//Если Тогда Иначе
 						 	case TokenStream::keyword_if:
 						 		$this->GetChar();
-						 		if($skip) $key = false;
+						 		if($skip) $this->continueCode(TokenStream::keyword_then, true, true);
 						 		else{
 						 			$key = $this->Expression7();
 						 			$this->MatchKeyword(TokenStream::keyword_then);
-						 		}	
-								$this->continueCode(TokenStream::keyword_then, !$key, $key);
+						 			$this->continueCode(TokenStream::keyword_then, !$key, $key);
+								}
 						 		break;
 						 	case TokenStream::keyword_elseif:
-						 		if($handle === TokenStream::keyword_then || $handle === TokenStream::keyword_elseif){
+						 		if($handle === TokenStream::keyword_then){
 						 			$this->MatchKeyword(TokenStream::keyword_elseif);
 						 			if($done) $skip = true;
 						 			else{
-						 				$key = $this->Expression7();
-						 				if($key) $done = true;
-							 			$this->MatchKeyword(TokenStream::keyword_then);
+							 				$key = $this->Expression7();
+							 				$this->MatchKeyword(TokenStream::keyword_then);
+							 				if($key){
+							 					$skip = false;
+							 					$done = true;
+							 				}
 							 		}
-							 		//if($done) $skip = true;
-						 			//elseif($key){ $skip = false; $done=true; }
-						 			//return $this->continueCode(TokenStream::keyword_elseif, $skip, $done);
 							 	}
 								else throw new Exception('Ожидается конструкция Если ... Тогда');
+								break;
 						 	case TokenStream::keyword_else:
-						  		if($handle === TokenStream::keyword_then || $handle === TokenStream::keyword_elseif){
+						  		if($handle === TokenStream::keyword_then){ 
 						 			$this->MatchKeyword(TokenStream::keyword_else);
-						 			if($done) $skip = true;
-						 			//else{ $skip = false; $done=true; } 
-						 			//return $this->continueCode(TokenStream::keyword_else, $skip, $done);
+						 			if($done!==$skip) $skip = !$skip;
+						 			$done = true;
 						 		}	
 						 		else throw new Exception('Ожидается конструкция Если ... Тогда(ИначеЕсли)');
+						 		break;
 						 	case TokenStream::keyword_endif:
-						 		if($handle===TokenStream::keyword_then || $handle === TokenStream::keyword_elseif || $handle===TokenStream::keyword_else){
+						 		if($handle === TokenStream::keyword_then){
 						 			$this->MatchKeyword(TokenStream::keyword_endif);
 						 			$this->MatchOper(TokenStream::oper_semicolon, ';');
-						 			$done = true;
-						 			return;
+						 			return true;
 						 		}
 						 		else throw new Exception('Ожидается конструкции Если ... Тогда(ИначеЕсли,Иначе)');
 						 		break;
 						 	//Циклы
 						 	case TokenStream::keyword_while:
-						 		//echo 'inwhile';
 						 		$startpos = $this->itoken;
 							 	$this->MatchKeyword(TokenStream::keyword_while);
 							 	if(!$skip){
@@ -504,9 +500,7 @@ class CodeStream {
 						 				if(++$it > self::MAX_ITERRATOR_IN_CIRCLE) throw new Exception('Я отработал максимальное значение циклов '.self::MAX_ITERRATOR_IN_CIRCLE); 
 						 			}
 						 		}
-						 		//echo 'inskip';
 						 		$this->continueCode(TokenStream::keyword_circle, true);
-						 		//echo 'outskip';
 						 		break;
 						 	case TokenStream::keyword_for:
 						 		$this->MatchKeyword(TokenStream::keyword_for);
@@ -541,7 +535,7 @@ class CodeStream {
 							 	$this->continueCode(TokenStream::keyword_circle, true);
 								break;	
 						 	case TokenStream::keyword_endcircle:
-						 		if($handle===TokenStream::keyword_circle){
+						 		if($handle === TokenStream::keyword_circle){
 						 			$this->MatchKeyword(TokenStream::keyword_endcircle);
 						 			$this->MatchOper(TokenStream::oper_semicolon,';');
 						 			return true;	
@@ -549,7 +543,7 @@ class CodeStream {
 						 		else throw new Exception('Ожидается начало конструкции Пока(Для) Цикл');
 						 		break;
 						 	case TokenStream::keyword_break:
-						 		if($handle===TokenStream::keyword_circle){
+						 		if($handle === TokenStream::keyword_circle){
 						 			$this->MatchKeyword(TokenStream::keyword_break);
 						 			return false; 	
 						 		}
