@@ -370,11 +370,12 @@ class CodeStream {
 	** $handle - token_type(TokenStream) обрабатываемая структура кода 
 	*/
 	private function isIfOperation($handle){
-		if($handle === TokenStream::keyword_then || $handle === TokenStream::keyword_elseif){
-			if($this->Index === TokenStream::keyword_elseif || $this->Index === TokenStream::keyword_else || $this->Index === TokenStream::keyword_endif) 
-				return true;
-		}	
-		if($handle === TokenStream::keyword_else && $this->Index === TokenStream::keyword_endif) return true;	
+		//if($handle === TokenStream::keyword_then || $handle === TokenStream::keyword_elseif){
+		//	if($this->Index === TokenStream::keyword_elseif || $this->Index === TokenStream::keyword_else || $this->Index === TokenStream::keyword_endif) 
+		//		return true;
+		//}	
+		//if($handle === TokenStream::keyword_else && $this->Index === TokenStream::keyword_endif) return true;
+		if(($handle === TokenStream::keyword_then && $this->Index === TokenStream::keyword_endif) ||$this->Index === TokenStream::keyword_if) return true;
 		return false;
 	}
 
@@ -446,27 +447,33 @@ class CodeStream {
 							//Если Тогда Иначе
 						 	case TokenStream::keyword_if:
 						 		$this->GetChar();
-						 		$key = $this->Expression7();
-						 		$this->MatchKeyword(TokenStream::keyword_then);
-						 		if($key) $this->continueCode(TokenStream::keyword_then, false, true);
-						 		else $this->continueCode(TokenStream::keyword_then, true, false);
+						 		if($skip) $key = false;
+						 		else{
+						 			$key = $this->Expression7();
+						 			$this->MatchKeyword(TokenStream::keyword_then);
+						 		}	
+								$this->continueCode(TokenStream::keyword_then, !$key, $key);
 						 		break;
 						 	case TokenStream::keyword_elseif:
 						 		if($handle === TokenStream::keyword_then || $handle === TokenStream::keyword_elseif){
 						 			$this->MatchKeyword(TokenStream::keyword_elseif);
-						 			$key = $this->Expression7();
-							 		$this->MatchKeyword(TokenStream::keyword_then);
-							 		if($done) $skip = true;
-						 			elseif($key){ $skip = false; $done=true; }
-						 			return $this->continueCode(TokenStream::keyword_elseif, $skip, $done);
+						 			if($done) $skip = true;
+						 			else{
+						 				$key = $this->Expression7();
+						 				if($key) $done = true;
+							 			$this->MatchKeyword(TokenStream::keyword_then);
+							 		}
+							 		//if($done) $skip = true;
+						 			//elseif($key){ $skip = false; $done=true; }
+						 			//return $this->continueCode(TokenStream::keyword_elseif, $skip, $done);
 							 	}
 								else throw new Exception('Ожидается конструкция Если ... Тогда');
 						 	case TokenStream::keyword_else:
 						  		if($handle === TokenStream::keyword_then || $handle === TokenStream::keyword_elseif){
 						 			$this->MatchKeyword(TokenStream::keyword_else);
 						 			if($done) $skip = true;
-						 			else{ $skip = false; $done=true; } 
-						 			return $this->continueCode(TokenStream::keyword_else, $skip, $done);
+						 			//else{ $skip = false; $done=true; } 
+						 			//return $this->continueCode(TokenStream::keyword_else, $skip, $done);
 						 		}	
 						 		else throw new Exception('Ожидается конструкция Если ... Тогда(ИначеЕсли)');
 						 	case TokenStream::keyword_endif:
@@ -474,6 +481,7 @@ class CodeStream {
 						 			$this->MatchKeyword(TokenStream::keyword_endif);
 						 			$this->MatchOper(TokenStream::oper_semicolon, ';');
 						 			$done = true;
+						 			return;
 						 		}
 						 		else throw new Exception('Ожидается конструкции Если ... Тогда(ИначеЕсли,Иначе)');
 						 		break;
