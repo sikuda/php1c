@@ -51,10 +51,10 @@ class CodeStream {
 	const LetterEng = array('A','B','V','G','D','E','JO','ZH','Z','I','JJ','K','L','M','N','O','P','R','S','T','U','F','KH','C','CH','SH','SHH','' ,'Y','' ,'EH','YU','YA','a','b','v','g','d','e','jo','zh','z','i','jj','k','l','m','n','o','p','r','s','t','u','f','kh','c','ch','sh','shh','' ,'y','' ,'eh','yu','ya');
 
 
-	public $functions_Common    = null;
-	public $functionsPHP_Common = null;
-	public $beginCommonFunc = -1, $endCommonFunc = -1;
-	public $beginDateFunc = -1, $endDateFunc = -1;
+	// public $functions_Common    = null;
+	// public $functionsPHP_Common = null;
+	// public $beginCommonFunc = -1, $endCommonFunc = -1;
+	// public $beginDateFunc = -1, $endDateFunc = -1;
 
 	/**
 	* Обработать один токен
@@ -330,7 +330,11 @@ class CodeStream {
 		}
 		$this->MatchOper(TokenStream::oper_closebracket, ')');
 		
-		if($index!=-1) return $this->tokenStream->functions1С['clear'][$index].$args.")";
+		if($index!=-1){
+			$func = $this->tokenStream->functions1С['clear'][$index];
+			if($func === 'Date(') return 'Date1C('.$args.")";
+			else return $this->tokenStream->functions1С['clear'][$index].$args.")";	
+		} 
 		else return $key.$args.")";
 	}
 
@@ -498,10 +502,13 @@ class CodeStream {
 	*
 	* @param string $buffer строка код для преобразоания
 	*/
-	function makeCode($buffer){
+	function makeCode($buffer, $name_var=null){
 
 		//Блок разбора по токеном
 		try{
+
+			if(isset($name_var)) $buffer .= 'Сообщить('.$name_var.');';
+
 			$this->tokenStream = new TokenStream($buffer);
 			$this->tokenStream->CodeToTokens();
 			$this->tokens = &$this->tokenStream->tokens;
@@ -516,16 +523,13 @@ class CodeStream {
 			$this->codePHP = '';
 			$this->GetChar();
 			if($this->Type !== TokenStream::type_end_code){
+
 				$this->continueCode();
 
 				$name = str_replace(self::LetterRus, self::LetterEng, $name_var);
 				if(isset($name_var)){
-
-				 	$output_array = array();
-				 	$this->codePHP .= 'echo '.$name;
-				 	exec($result, $output_array);
-				 	return $output_array[0];
-				 	//return $this->codePHP;
+				 	eval($this->codePHP);
+				 	return '';
 				}
 				else return $this->codePHP;
 			}  
@@ -546,7 +550,7 @@ class CodeStream {
 */
 function makeCode($buffer, $name_var=null){
 	$stream = new CodeStream();
-	$result = $stream->makeCode($buffer);
+	$result = $stream->makeCode($buffer, $name_var);
 	return $result;
 }
 

@@ -39,6 +39,9 @@ class CodeStream {
     public $tokenStream = null;
     public $tokens = array();
     private $itoken = 0;
+ //    private $indexFuncColl = -1;
+	// private $indexFuncDate = -1;
+	// private $indexFuncComm = -1;
 
     //array of variable
     public $variable = array();
@@ -353,18 +356,22 @@ class CodeStream {
 		$this->MatchOper(TokenStream::oper_closebracket, ')');
 		
 		if( $index >= 0){
-			if($index < $this->tokenStream->indexFuncComm){
+			//echo $index;
+			if($index < $this->tokenStream->indexFuncCom){
 				return callCommonFunction($context, $func, $arguments);
 			}
-			if($index < $this->TokenStream->indexFuncDate){
+			if($index < $this->tokenStream->indexFuncStr){
+				return callStringFunction($func, $arguments);
+			}
+			if($index < $this->tokenStream->indexFuncDate){
 				return callDateFunction($func, $arguments);
 			}
-			if($index < $this->TokenStream->indexFuncColl){
+			if($index < $this->tokenStream->indexFuncColl){
 				return callCollectionFunction($context, $func, $arguments);
 			}
+			throw new Exception("Неизвестный модуль для вызова функции ".$func."и ".$index);		
 		}
-
-		throw new Exception("Неизвестная функция ".$func."");
+		throw new Exception("Неизвестная функция ".$func." и ".$index);
 	}
 
 	/*
@@ -373,11 +380,6 @@ class CodeStream {
 	** $handle - token_type(TokenStream) обрабатываемая структура кода 
 	*/
 	private function isIfOperation($handle){
-		//if($handle === TokenStream::keyword_then || $handle === TokenStream::keyword_elseif){
-		//	if($this->Index === TokenStream::keyword_elseif || $this->Index === TokenStream::keyword_else || $this->Index === TokenStream::keyword_endif) 
-		//		return true;
-		//}	
-		//if($handle === TokenStream::keyword_else && $this->Index === TokenStream::keyword_endif) return true;
 		if($handle === TokenStream::keyword_then && 
 			 ($this->Index === TokenStream::keyword_if || $this->Index === TokenStream::keyword_elseif || $this->Index === TokenStream::keyword_else || $this->Index === TokenStream::keyword_endif)) return true;
 		return false;
@@ -385,6 +387,8 @@ class CodeStream {
 
 	/*
 	** Проверка на выполнение кода внутри конструкции while for ... 
+	**
+	** $handle - token_type(TokenStream) обрабатываемая структура кода 
 	*/
 	private function isCircleOperation($handle){
 		if( ($handle === TokenStream::keyword_circle && $this->Index === TokenStream::keyword_endcircle) || $this->Index === TokenStream::keyword_while  || $this->Index === TokenStream::keyword_for) return true;	
@@ -396,9 +400,11 @@ class CodeStream {
 	**
 	** $handle - token_type(TokenStream) конструкция внутри которой работает код(keyword_circle, keyword_then)
 	** $skip   - bool флаг невыполнения кода и пропуска 
-	** $done   - bool Флаг выполения условия в конструкциях ИначеЕсли Иначе, в 1С исполняется только первое на условию
+	** $done   - bool Флаг выполения условия в конструкциях ИначеЕсли Иначе, в 1С исполняется только первое по условию
 	*/
 	public function continueCode($handle=-1, $skip= false, $done=false){	
+
+		$arguments = array(); //to do
 
 		while($this->Type !== TokenStream::type_end_code){
 
@@ -598,6 +604,10 @@ class CodeStream {
 			$this->tokenStream = new TokenStream($buffer);
 			$this->tokenStream->CodeToTokens();
 			$this->tokens = &$this->tokenStream->tokens;
+
+			// $this->indexFuncColl = $this->tokenStream->indexFuncColl;
+			// $this->indexFuncDate = 35;//$this->tokenStream->indexFuncDate;
+ 		// 	$this->indexFuncComm = $this->tokenStream->indexFuncComm;
 		}
 		catch (Exception $e) {
 			return ("{(".$this->tokenStream->row.",".$this->tokenStream->col.")}: ".$e->getMessage()."\n"); //стиль ошибки 1С

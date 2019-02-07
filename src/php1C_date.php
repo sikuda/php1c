@@ -24,6 +24,49 @@ function functionsPHP_Date(){
 }	
 
 /**
+* Вызывает функцию работы с датой
+*
+* @param string $key строка названии функции со скобкой
+* @param array $arguments аргументы функции в массиве
+* @return возвращает результат функции или выбрасывает исключение
+*/
+function callDateFunction($key, $arguments){
+	switch($key){
+		case 'Date(': return Date1C($arguments[0], $arguments[1], $arguments[2], $arguments[3], $arguments[4], $arguments[5], $arguments[6]);
+		case 'CurrentDate(': return CurrentDate($arguments[0]);
+		case 'Year(': return Year($arguments[0]);
+		case 'Month(': return Month($arguments[0]);
+		case 'Day(': return Day($arguments[0]);
+		case 'Hour(': return Hour($arguments[0]);
+		case 'Minute(': return Minute($arguments[0]);
+		case 'Second(': return Second($arguments[0]);
+		case 'BegOfYear(': return BegOfYear($arguments[0]);
+		case 'BegOfQuarter(': return BegOfQuarter($arguments[0]);
+		case 'BegOfMonth(': return BegOfMonth($arguments[0]);
+		case 'BegOfWeek(': return BegOfWeek($arguments[0]);
+		case 'BegOfDay(': return BegOfDay($arguments[0]);
+		case 'BegOfHour(': return BegOfHour($arguments[0]);
+		case 'BegOfMinute(': return BegOfMinute($arguments[0]);
+		case 'EndOfYear(': return EndOfYear($arguments[0]);
+		case 'EndOfQuarter(': return EndOfQuarter($arguments[0]);
+		case 'EndOfMonth(': return EndOfMonth($arguments[0]);
+		case 'EndOfWeek(': return  EndOfWeek($arguments[0]);
+		case 'EndOfDay(': return EndOfDay($arguments[0]);
+		case 'EndOfHour(': return EndOfHour($arguments[0]);
+		case 'EndOfMinute(': return EndOfMinute($arguments[0]);
+		case 'WeekOfYear(': return WeekOfYear($arguments[0]);
+		case 'DayOfYear(': return DayOfYear($arguments[0]);
+		case 'WeekDay(': return WeekDay($arguments[0]);
+		case 'AddMonth(': return AddMonth($arguments[0], $arguments[1]);
+		default:
+			throw new Exception("Неизвестная функция работы с датой ".$key."");
+			break;
+	}
+}	
+
+// ----------------------------------------------------------------------------------------------------------------------
+
+/**
 * Класс для работы с датой 1С
 *
 * Основной класс для работы с датой 1С. Капсулирует работу с операторами для даты и хранит внутреннее представление даты.
@@ -116,7 +159,7 @@ function Date1C($str, $month=1, $day=1, $hour=0, $minute=0, $second=0){
 *
 * @return Date1C 
 */
-function CurrentDate( $arg ){
+function CurrentDate( $arg=null ){
 	if(isset($arg)) throw new Exception("Ожидается символ ')'");
 	else return new Date1C(date("YmdHis"));
 }
@@ -405,45 +448,3 @@ function AddMonth( $date, $int_month=0 ){
 	} 
 }
 
-/**
-* Вызывает функцию работы с датой
-*
-* @param string $key строка названии функции со скобкой
-* @param array $arguments аргументы функции в массиве
-* @return возвращает результат функции или выбрасывает исключение
-*/
-function callDateFunction($key, $arguments){
-	switch($key){
-		case 'DATE(': return Date1C($arguments[0], $arguments[1], $arguments[2], $arguments[3], $arguments[4], $arguments[5], $arguments[6]);
-		case 'CURRENTDATE(': return CurrentDate($arguments[0]);
-		case 'YEAR(': return Year($arguments[0]);
-		case 'MONTH(': return Month($arguments[0]);
-		case 'DAY(': return Day($arguments[0]);
-		case 'HOUR(': return Hour($arguments[0]);
-		case 'MINUTE(': return Minute($arguments[0]);
-		case 'SECOND(': return Second($arguments[0]);
-		case 'BEGOFYEAR(': return BegOfYear($arguments[0]);
-		case 'BEGOFQUARTER(': return BegOfQuarter($arguments[0]);
-		case 'BEGOFMONTH(': return BegOfMonth($arguments[0]);
-		case 'BEGOFWEEK(': return BegOfWeek($arguments[0]);
-		case 'BEGOFDAY(': return BegOfDay($arguments[0]);
-		case 'BEGOFHOUR(': return BegOfHour($arguments[0]);
-		case 'BEGOFMINUTE(': return BegOfMinute($arguments[0]);
-		case 'ENDOFYEAR(': return EndOfYear($arguments[0]);
-		case 'ENDOFQUARTER(': return EndOfQuarter($arguments[0]);
-		case 'ENDOFMONTH(': return EndOfMonth($arguments[0]);
-		case 'ENDOFWEEK(': return  EndOfWeek($arguments[0]);
-		case 'ENDOFDAY(': return EndOfDay($arguments[0]);
-		case 'ENDOFHOUR(': return EndOfHour($arguments[0]);
-		case 'ENDOFMINUTE(': return EndOfMinute($arguments[0]);
-		case 'WEEKOFYEAR(': return WeekOfYear($arguments[0]);
-		case 'DAYOFYEAR(': return DayOfYear($arguments[0]);
-		case 'WEEKDAY(': return WeekDay($arguments[0]);
-		case 'ADDMONTH(': return AddMonth($arguments[0], $arguments[1]);
-		default:
-			throw new Exception("Неизвестная функция работы с датой ".$key."");
-			break;
-	}
-}	
-
-?>

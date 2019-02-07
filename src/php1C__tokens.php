@@ -126,9 +126,10 @@ class TokenStream {
 		"eng" => array(),  // функции по английски в вернем регистре для поиска
 		"clear" => array() // функции по английски как будет в коде 
 	);
-	public $indexFuncColl = -1;
+	public $indexFuncCom = -1;
+	public $indexFuncStr = -1;
 	public $indexFuncDate = -1;
-	public $indexFuncComm = -1;
+	public $indexFuncColl = -1;
 
 	/**
 	* Конструктор класса
@@ -138,48 +139,34 @@ class TokenStream {
 		//Копирование строки кода
 		$this->str = $str;
 
-		//Добавление в таблицы функций работы с коллекциями
-		$array = functions_Collections();
-		foreach ($array as $value) {
-			array_push($this->functions1С['rus'], str_replace(self::LetterRusLower, self::LetterRusUpper, $value));
-		}
-		$array = functionsPHP_Collections();
-		foreach ($array as $value) {
-			array_push($this->functions1С['eng'], strtoupper($value));
-		}
-		foreach ($array as $value) {
-			array_push($this->functions1С['clear'], $value);
-		}
-		$this->indexFuncColl = count($this->functions1С['clear']);
-
-		//Добавление в таблицы функций работы с датами
-		$array = functions_Date();
-		foreach ($array as $value) {
-			array_push($this->functions1С['rus'], str_replace(self::LetterRusLower, self::LetterRusUpper, $value));
-		}
-		$array = functionsPHP_Date();
-		foreach ($array as $value) {
-			array_push($this->functions1С['eng'], strtoupper($value));
-		}
-		foreach ($array as $value) {
-			array_push($this->functions1С['clear'], $value);
-		}
-		$this->indexFuncDate = count($this->functions1С['clear']);
-
 		//Добавление в таблицы общих функций 
-		$array = functions_Com();
-		foreach ($array as $value) {
-			array_push($this->functions1С['rus'], str_replace(self::LetterRusLower, self::LetterRusUpper, $value));
+		$this->indexFuncCom  = $this->AddModule( functions_Com(),  functionsPHP_Com());
+		$this->indexFuncStr  = $this->AddModule( functions_String(),  functionsPHP_String());
+		$this->indexFuncDate = $this->AddModule( functions_Date(), functionsPHP_Date());
+		$this->indexFuncColl = $this->AddModule( functions_Collections(), functionsPHP_Collections());
+	}
+
+	/**
+	* Добавление функций модуля в общую таблицу функций
+	*
+    * @param $funcRus array массив русских названий функций
+    * @param $funcEng array массив английских названий функций
+    * @return int возвращаем верхнюю границу модуля в общем списке 
+	*/
+	private function AddModule( $funcRus, $funcEng ){
+		if(is_array($funcRus) && is_array($funcEng) ){
+			foreach ($funcRus as $value) {
+				array_push($this->functions1С['rus'], str_replace(self::LetterRusLower, self::LetterRusUpper, $value));
+			}
+			$array = functionsPHP_Com();
+			foreach ($funcEng as $value) {
+				array_push($this->functions1С['eng'], strtoupper($value));
+			}
+			foreach ($funcEng as $value) {
+				array_push($this->functions1С['clear'], $value);
+			}
 		}
-		$array = functionsPHP_Com();
-		foreach ($array as $value) {
-			array_push($this->functions1С['eng'], strtoupper($value));
-		}
-		foreach ($array as $value) {
-			array_push($this->functions1С['clear'], $value);
-		}
-		$this->indexFuncComm = count($this->functions1С['clear']);
-		unset($array);
+		return count($this->functions1С['clear']);
 	}
 
 	/**
@@ -311,7 +298,7 @@ class TokenStream {
 			else throw new Exception("Пропущен символ '\"' (двойная кавычка)");
 		}
 
-		//Обработка дат (всяких там типа '19591015') 
+		//Обработка дат (всяких неправильных дат типа '19090101-000000' или '19591015T00:00:00') 
 		if ($ch === "'") {
 			$this->move();
 			$ch = $this->curr();

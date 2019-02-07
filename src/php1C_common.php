@@ -6,9 +6,10 @@
 * 
 * @author  sikuda admin@sikuda.ru
 */
+require_once('php1C_string.php');
 require_once('php1C_date.php');
-require_once('php1C_file.php');
 require_once('php1C_collections.php');
+require_once('php1C_file.php');
 
 /**
 * Массив названий русских функций для общей работы с 1С
@@ -217,42 +218,7 @@ function notequal1C($arg1, $arg2){
 	throw new Exception("Операции сравнения равно допустима только для значений совпадающих примитивных типов (Булево-Число, Строка, Дата)");
 }
 
-/**
-* Вызывает общие функции и функции объектов 1С 
-*
-* @param object $context объект для вызова функции или null
-* @param string $key строка названии функции со скобкой
-* @param array $arguments аргументы функции в массиве
-* @return возвращает результат функции или выбрасывает исключение
-*/
-function callCommonFunction($context=null, $key, $arguments){
-	if($context === null){
-		switch($key){
-		case 'Message(':
-			if(isset($arguments[2])) throw new Exception("Ожидается ) ");
-			return Message($arguments[0], $arguments[1]);
-		case 'Find(':
-			if(isset($arguments[2])) throw new Exception("Ожидается ) ");
-			return Find($arguments[0], $arguments[1]);
-		case 'ValueIsFilled(':
-			if(isset($arguments[1])) throw new Exception("Ожидается ) ");
-			return ValueIsFilled($arguments[0]);	
-		default:
-			throw new Exception("Неизвестная общая функция ".$key."");
-		}	
-	}
-	else{
-		if( method_exists($context, substr($key, 0, -1) )){ 
-			switch($key){
-			//case 'UBOUND(': return $context->UBOUND();
-			default:
-				throw new Exception("Нет обработки общей функции для объекта  ".$key."");
-			}
-		}else{
-			throw new Exception("Не найдена общая функция у объекта  ".$key."");
-		}
-	}
-}
+// ---------------------- Общие функции -----------------------------
 
 /**
 * Выводит сообщение через echo
@@ -297,5 +263,40 @@ function ValueIsFilled($val){
 	return isset($val);	
 }
 
-
+/**
+* Вызывает общие функции и функции объектов 1С 
+*
+* @param object $context объект для вызова функции или null
+* @param string $key строка названии функции со скобкой
+* @param array $arguments аргументы функции в массиве
+* @return возвращает результат функции или выбрасывает исключение
+*/
+function callCommonFunction($context=null, $key, $arguments){
+	if($context === null){
+		switch($key){
+		case 'Message(':
+			if(isset($arguments[2])) throw new Exception("Ожидается ) ");
+			return Message($arguments[0], $arguments[1]);
+		case 'Find(':
+			if(isset($arguments[2])) throw new Exception("Ожидается ) ");
+			return Find($arguments[0], $arguments[1]);
+		case 'ValueIsFilled(':
+			if(isset($arguments[1])) throw new Exception("Ожидается ) ");
+			return ValueIsFilled($arguments[0]);	
+		default:
+			throw new Exception("Неизвестная общая функция ".$key."");
+		}	
+	}
+	else{
+		if( method_exists($context, substr($key, 0, -1) )){ 
+			switch($key){
+			//case 'UBOUND(': return $context->UBOUND();
+			default:
+				throw new Exception("Нет обработки общей функции для объекта  ".$key."");
+			}
+		}else{
+			throw new Exception("Не найдена общая функция у объекта  ".$key."");
+		}
+	}
+}
 
