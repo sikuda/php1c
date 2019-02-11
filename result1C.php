@@ -12,8 +12,6 @@ require_once('src/php1C__run.php');
 	if ($_SERVER["REQUEST_METHOD"] == "POST") {
     	$code = file_get_contents('php://input');
 
-
-
     	//echo $code;
     	$str = php1CTransfer\runCode($code, "Результат"); 
 	}	

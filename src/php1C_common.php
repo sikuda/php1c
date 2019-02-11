@@ -42,6 +42,15 @@ function toString1C($arg){
 }
 
 /**
+* Преобразует аргумент в число 
+* @param stirng $arg число как строка
+* @return (string or float) Возвращем значение числа как в 1С (string - для чисел повышенной точности, float - если повышенная точность не важна
+*/  
+function toNumber1C($arg){
+	return floatval($arg);
+}
+
+/**
 * Сложение двух переменных в 1С
 * @param any $arg1
 * @param any $arg2

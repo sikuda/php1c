@@ -23,7 +23,7 @@ require_once( 'php1C_common.php');
 
 
 /**
-* Класс токена для обработки кода
+* Класс токена - элемент кода
 */
 class Token {
 	public $type = 0;
@@ -43,10 +43,7 @@ class Token {
 
 
 /**
-* Класс обработки потока кода 1С
-*
-* Основной класс обработки кода 1С. Предназначен для обработки код и имеет два результата 
-* Выполняет код 1С или преобразует код в код php
+* Класс обработки потока кода 1С в массив токенов
 */
 class TokenStream {
 
@@ -110,10 +107,10 @@ class TokenStream {
 
 	//Ключевые слова - type_keyword
 	const keywords = array( 
-		"code"    => array('НЕОПРЕДЕЛЕНО', 'ИСТИНА','ЛОЖЬ', 'ЕСЛИ', 'ТОГДА', 'ИНАЧЕЕСЛИ', 'ИНАЧЕ',   'КОНЕЦЕСЛИ','ПОКА',  'ДЛЯ', 'КАЖДОГО', 'ПО','В', 'ЦИКЛ','КОНЕЦЦИКЛА','ПРЕРВАТЬ','ПРОДОЛЖИТЬ'),
-		"codePHP" => array('Undefined',    'true',  'false','if(',  '){',    '} elseif {','} else {','}',        'while(','for(','foreach(','',  'in','){',  '}',         'break',   'continue'),
+		"code"    => array('НЕОПРЕДЕЛЕНО', 'ИСТИНА','ЛОЖЬ', 'ЕСЛИ', 'ТОГДА', 'ИНАЧЕЕСЛИ', 'ИНАЧЕ',   'КОНЕЦЕСЛИ','ПОКА',  'ДЛЯ', 'КАЖДОГО', 'ПО','В', 'ЦИКЛ','КОНЕЦЦИКЛА', 'ПРЕРВАТЬ','ПРОДОЛЖИТЬ', 'ФУНКЦИЯ', 'ПРОЦЕДУРА', 'КОНЕЦФУНКЦИИ', 'КОНЕЦПРОЦЕДУРЫ', 'ВОЗВРАТ', 'ПЕРЕМ'),
+		"codePHP" => array('Undefined',    'true',  'false','if(',  '){',    '} elseif {','} else {','}',        'while(','for(','foreach(','',  'in','){',            '}',         'break',   'continue',   'function', 'function', '}',            '}',         'return',  'var'),
 	);
-	const keyword_undefined = 0; const keyword_true = 1; const keyword_false = 2; const keyword_if = 3; const keyword_then = 4; const keyword_elseif = 5; const keyword_else = 6; const keyword_endif = 7; const keyword_while = 8; const keyword_for = 9; const keyword_foreach = 10; const keyword_to = 11; const keyword_in = 12; const keyword_circle = 13; const keyword_endcircle = 14; const keyword_break = 15;  const keyword_continue = 16; 
+	const keyword_undefined = 0; const keyword_true = 1; const keyword_false = 2; const keyword_if = 3; const keyword_then = 4; const keyword_elseif = 5; const keyword_else = 6; const keyword_endif = 7; const keyword_while = 8; const keyword_for = 9; const keyword_foreach = 10; const keyword_to = 11; const keyword_in = 12; const keyword_circle = 13; const keyword_endcircle = 14; const keyword_break = 15;  const keyword_continue = 16; const keyword_function = 17; const keyword_procedure = 18; const  keyword_endfunction = 19; const keyword_endprocedure = 20; const keyword_return=21; const keyword_var=22;
 
 	//Индентификаторы типов - type_identification
 	public $identypes = array(
@@ -216,15 +213,8 @@ class TokenStream {
 	}
 	private function eatSymbols($pattern) {
 		$start = $this->pos;
-		//$curr = $this->curr();
 		$pattern = '/['.$pattern.']/';
 		while ( preg_match($pattern, $this->curr())) { $this->pos++; }
-		// if( $curr !== '' && $pattern !== '' ){
-		// 	while (strpos($pattern, $curr) !== false) { 
-		// 		$this->pos++; 
-		// 		$curr = $this->curr();
-		// 	}
-		// }
 		return $this->pos > $start;
 	}
 
@@ -259,10 +249,10 @@ class TokenStream {
 
 		//Обработка новой строки
 		if( $this->eatSymbols("\n") ){
-		    $this->row++;
-			$this->col = 1;
-			return new Token(self::type_newline, $this->current());
-		}
+		    $this->row+= ($this->pos - $this->start);
+		 	$this->col = 1;
+		 	return new Token(self::type_newline, $this->current());
+		 }
 				
 		$ch = $this->curr();
 		$prev = $this->prev(); 

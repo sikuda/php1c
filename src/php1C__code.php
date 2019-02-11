@@ -335,7 +335,7 @@ class CodeStream {
 			if($func === 'Date(') return 'Date1C('.$args.")";
 			else return $this->tokenStream->functions1С['clear'][$index].$args.")";	
 		} 
-		else return $key.$args.")";
+		else return $func.'('.$args.")";
 	}
 
 	/*
@@ -458,10 +458,8 @@ class CodeStream {
 							$this->MatchKeyword(TokenStream::keyword_to);
 					 		$this->code = $this->Expression7();
 					 		$this->codePHP .= '$'.$iterator.'<='.$this->code. ';';
-							//$this->code = '';
 							$this->MatchKeyword(TokenStream::keyword_circle);
 					 		$this->codePHP .= $this->code . '$'.$iterator.'++){';
-					 		//$this->code = '';
 					 		$this->continueCode(TokenStream::keyword_circle);
 					 		break;	
 					 	case TokenStream::keyword_endcircle:
@@ -484,6 +482,37 @@ class CodeStream {
 					 			$this->MatchKeyword(TokenStream::keyword_continue);
 					 			$this->codePHP .= 'continue;';
 					  		}	
+					 		break;
+					 	case TokenStream::keyword_var:
+					 		$this->GetChar();
+					 		if($this->Type === TokenStream::type_variable){ 
+					 			$key = str_replace(self::LetterRus, self::LetterEng, $this->Look);
+					 			$this->GetChar();
+					 			$this->MatchOper(TokenStream::oper_semicolon, ';');
+								$this->codePHP .= '$'.$key.' = null;';
+							}
+					 		else throw new Exception('Ожидается имя переменной');
+					 		break;
+					 	case TokenStream::keyword_function:
+					 	case TokenStream::keyword_procedure:
+					 		$this->GetChar();
+					 		if($this->Type === TokenStream::type_extfunction){
+					 			$key = str_replace(self::LetterRus, self::LetterEng, $this->Look);
+								//$this->GetChar();
+								$this->codePHP .= 'function '.$this->splitFunction(null, $key, -1).'{';
+							}
+					 		else throw new Exception('Ожидается название функции или процедуры');
+					 		break;
+					 	case TokenStream::keyword_return:
+					 		$this->codePHP .= 'return ';
+					 		$this->GetChar();
+					 		$this->codePHP .= $this->Expression7().';';
+							$this->MatchOper(TokenStream::oper_semicolon, ';');
+							break;	
+					 	case TokenStream::keyword_endfunction:
+					 	case TokenStream::keyword_endprocedure:
+					 		$this->GetChar();
+					 		$this->codePHP .= '}';
 					 		break;	
 					 	default:
 					 		throw new Exception('Нет соответствия ключевому слову '.TokenStream::keywords['code'][$this->Index]);
