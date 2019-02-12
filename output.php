@@ -1,7 +1,15 @@
 <?php 
 require_once( 'php1C_common.php');
 
-{(1,13)}: Неизвестный оператор после переменной sdfssdPerem
+$Rezultat = null;
+function VVA($d,$YA){
+$Rezultat=add1C($d,$YA);
+}
+VVA(1,2);
+$Rezultat=CharCode("Жук");
+Message($Rezultat);
+//заработало, надо тестировать
+
 
 
  ?>

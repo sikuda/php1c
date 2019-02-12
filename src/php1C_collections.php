@@ -77,10 +77,13 @@ class Array1C{
 	private $value; 
 
 	function __construct($count=null){
-		$this->value = array();
-		if( $count > 0 ){
-			for ($i=0; $i < $count; $i++) $this->value[i] = null;
-		}	
+		if(is_array($count)) $this->value = $count;
+		else{	
+			$this->value = array();
+			if( $count > 0 ){
+				for ($i=0; $i < $count; $i++) $this->value[i] = null;
+			}	
+		}
 	}
 
 	function __toString(){

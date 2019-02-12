@@ -107,10 +107,10 @@ class TokenStream {
 
 	//Ключевые слова - type_keyword
 	const keywords = array( 
-		"code"    => array('НЕОПРЕДЕЛЕНО', 'ИСТИНА','ЛОЖЬ', 'ЕСЛИ', 'ТОГДА', 'ИНАЧЕЕСЛИ', 'ИНАЧЕ',   'КОНЕЦЕСЛИ','ПОКА',  'ДЛЯ', 'КАЖДОГО', 'ПО','В', 'ЦИКЛ','КОНЕЦЦИКЛА', 'ПРЕРВАТЬ','ПРОДОЛЖИТЬ', 'ФУНКЦИЯ', 'ПРОЦЕДУРА', 'КОНЕЦФУНКЦИИ', 'КОНЕЦПРОЦЕДУРЫ', 'ВОЗВРАТ', 'ПЕРЕМ'),
-		"codePHP" => array('Undefined',    'true',  'false','if(',  '){',    '} elseif {','} else {','}',        'while(','for(','foreach(','',  'in','){',            '}',         'break',   'continue',   'function', 'function', '}',            '}',         'return',  'var'),
+		"code"    => array('НЕОПРЕДЕЛЕНО', 'ИСТИНА','ЛОЖЬ', 'ЕСЛИ', 'ТОГДА', 'ИНАЧЕЕСЛИ', 'ИНАЧЕ',   'КОНЕЦЕСЛИ','ПОКА',  'ДЛЯ', 'КАЖДОГО', 'ПО','В', 'ЦИКЛ','КОНЕЦЦИКЛА', 'ПРЕРВАТЬ','ПРОДОЛЖИТЬ', 'ФУНКЦИЯ', 'ПРОЦЕДУРА', 'КОНЕЦФУНКЦИИ', 'КОНЕЦПРОЦЕДУРЫ', 'ВОЗВРАТ', 'ПЕРЕМ', 'СИМВОЛЫ'),
+		"codePHP" => array('Undefined',    'true',  'false','if(',  '){',    '} elseif {','} else {','}',        'while(','for(','foreach(','',  'in','){',            '}',         'break',   'continue',   'function', 'function', '}',            '}',              'return',  'var'  , 'CHARS'),
 	);
-	const keyword_undefined = 0; const keyword_true = 1; const keyword_false = 2; const keyword_if = 3; const keyword_then = 4; const keyword_elseif = 5; const keyword_else = 6; const keyword_endif = 7; const keyword_while = 8; const keyword_for = 9; const keyword_foreach = 10; const keyword_to = 11; const keyword_in = 12; const keyword_circle = 13; const keyword_endcircle = 14; const keyword_break = 15;  const keyword_continue = 16; const keyword_function = 17; const keyword_procedure = 18; const  keyword_endfunction = 19; const keyword_endprocedure = 20; const keyword_return=21; const keyword_var=22;
+	const keyword_undefined = 0; const keyword_true = 1; const keyword_false = 2; const keyword_if = 3; const keyword_then = 4; const keyword_elseif = 5; const keyword_else = 6; const keyword_endif = 7; const keyword_while = 8; const keyword_for = 9; const keyword_foreach = 10; const keyword_to = 11; const keyword_in = 12; const keyword_circle = 13; const keyword_endcircle = 14; const keyword_break = 15;  const keyword_continue = 16; const keyword_function = 17; const keyword_procedure = 18; const  keyword_endfunction = 19; const keyword_endprocedure = 20; const keyword_return=21; const keyword_var=22; const keyword_chars=23;
 
 	//Индентификаторы типов - type_identification
 	public $identypes = array(

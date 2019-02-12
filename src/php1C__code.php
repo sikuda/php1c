@@ -97,6 +97,34 @@ class CodeStream {
 	}
 
 	/**
+	* Получить символ из перечисления символов СИМВОЛЫ
+	*/
+	private function getCharSymbol(){
+		$this->GetChar();
+		$this->MatchOper(TokenStream::oper_point, '.');
+		if($this->Type === TokenStream::type_variable){
+			switch ($this->Look) {
+				case 'ВК'  :
+				case 'CR'  : return chr(13);
+				case 'ВТаб':
+				case 'VTab': return chr(11);
+				case 'НПП' : 
+				case 'NBSp': return chr(160);
+				case 'ПС'  :
+				case 'LF'  : return char(10);
+				case 'ПФ'  :
+				case 'FF'  : return chr(12);
+				case 'Таб'  : 
+				case 'Tab'  : return chr(9);
+				default:
+					throw new Exception('Неопределенный символ '.$this->Look);
+					break;
+			}
+		}
+		else throw new Exception('Ожидается перечисление символ, а не '.$this->Look);
+	}
+
+	/**
 	* Первичный преобразователь кода
 	*/
 	private function Factor(){
@@ -118,9 +146,21 @@ class CodeStream {
 			if ($this->Type === TokenStream::type_date) $this->code = 'Date1C("'.$this->Look.'")';
 						
 			if($this->Type === TokenStream::type_keyword){
-				if($this->Index == TokenStream::keyword_undefined) $this->code = null;
-				if($this->Index == TokenStream::keyword_true) $this->code = "true";
-				if($this->Index == TokenStream::keyword_false) $this->code = "false";
+				switch ($this->Index) {
+				 	case TokenStream::keyword_undefined:
+				 		$this->code = null;
+				 		break;
+					case TokenStream::keyword_true: 
+					    $this->code = true; 
+					    break;
+                    case TokenStream::keyword_false:
+                        $this->code = false;
+                        break;
+                    //Специальные ключевые слова Символы
+                    case TokenStream::keyword_chars:
+                    	$this->code = $this->getCharSymbol();
+                    	break;	    
+				 } 
 			}
 
 			if( $this->Type === TokenStream::type_function ){
@@ -536,7 +576,7 @@ class CodeStream {
 		//Блок разбора по токеном
 		try{
 
-			if(isset($name_var)) $buffer .= 'Сообщить('.$name_var.');';
+			if(isset($name_var)) $buffer .= 'Сообщить(toString1C('.$name_var.'));';
 
 			$this->tokenStream = new TokenStream($buffer);
 			$this->tokenStream->CodeToTokens();

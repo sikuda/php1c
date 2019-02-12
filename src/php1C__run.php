@@ -119,6 +119,35 @@ class CodeStream {
 	}
 
 	/**
+	* Получить символ из перечисления символов СИМВОЛЫ
+	*/
+	private function getCharSymbol(){
+		$this->GetChar();
+		$this->MatchOper(TokenStream::oper_point, '.');
+		if($this->Type === TokenStream::type_variable){
+			switch ($this->Look) {
+				case 'ВК'  :
+				case 'CR'  : return chr(13);
+				case 'ВТаб':
+				case 'VTab': return chr(11);
+				case 'НПП' : 
+				case 'NBSp': return chr(160);
+				case 'ПС'  :
+				case 'LF'  : return char(10);
+				case 'ПФ'  :
+				case 'FF'  : return chr(12);
+				case 'Таб'  : 
+				case 'Tab'  : return chr(9);
+				default:
+					throw new Exception('Неопределенный символ '.$this->Look);
+					break;
+			}
+		}
+		else throw new Exception('Ожидается перечисление символ, а не '.$this->Look);
+	}
+
+
+	/**
 	* Первичный выполнятор примитивных выражений 
 	*/
 	private function Factor(){
@@ -144,9 +173,21 @@ class CodeStream {
 			if ($this->Type === TokenStream::type_number) $this->D0 = toNumber1C($this->D0);
 			
 			if($this->Type === TokenStream::type_keyword){
-				if($this->Index == TokenStream::keyword_undefined) $this->D0 = null;
-				if($this->Index == TokenStream::keyword_true) $this->D0 = true;
-				if($this->Index == TokenStream::keyword_false) $this->D0 = false;
+				switch ($this->Index) {
+				 	case TokenStream::keyword_undefined:
+				 		$this->D0 = null;
+				 		break;
+					case TokenStream::keyword_true: 
+					    $this->D0 = true; 
+					    break;
+                    case TokenStream::keyword_false:
+                        $this->D0 = false;
+                        break;
+                    //Специальные ключевые слова Символы
+                    case TokenStream::keyword_chars:
+                    	$this->D0 = $this->getCharSymbol();
+                    	break;	    
+				 } 
 			}
 
 			if($this->Type === TokenStream::type_operator){

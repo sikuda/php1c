@@ -4,18 +4,11 @@
 * 
 * TO DO!!! 
 * 
-* 
+* Только функции с высокой точностью
 * @author  sikuda admin@sikuda.ru
 */
-require_once('php1C_date.php');
-require_once('php1C_file.php');
-require_once('php1C_collections.php');
 
-/**
-* Определение типа переменной 1С
-* @param any $arg
-* @return string Название типа переменной 1С ('string', 'number'(bool включено), 'Date1C', 'undefined')
-*/  
+
 
 /**
 * Сложение двух переменных в 1С
