@@ -105,17 +105,17 @@ class CodeStream {
 		if($this->Type === TokenStream::type_variable){
 			switch ($this->Look) {
 				case 'ВК'  :
-				case 'CR'  : return chr(13);
+				case 'CR'  : return 'chr(13)';
 				case 'ВТаб':
-				case 'VTab': return chr(11);
+				case 'VTab': return 'chr(11)';
 				case 'НПП' : 
-				case 'NBSp': return chr(160);
+				case 'NBSp': return 'chr(160)';
 				case 'ПС'  :
-				case 'LF'  : return char(10);
+				case 'LF'  : return 'char(10)';
 				case 'ПФ'  :
-				case 'FF'  : return chr(12);
+				case 'FF'  : return 'chr(12)';
 				case 'Таб'  : 
-				case 'Tab'  : return chr(9);
+				case 'Tab'  : return 'chr(9)';
 				default:
 					throw new Exception('Неопределенный символ '.$this->Look);
 					break;
@@ -148,18 +148,19 @@ class CodeStream {
 			if($this->Type === TokenStream::type_keyword){
 				switch ($this->Index) {
 				 	case TokenStream::keyword_undefined:
-				 		$this->code = null;
+				 		$this->code = 'null';
 				 		break;
 					case TokenStream::keyword_true: 
-					    $this->code = true; 
+					    $this->code = 'true'; 
 					    break;
                     case TokenStream::keyword_false:
-                        $this->code = false;
+                        $this->code = 'false';
                         break;
                     //Специальные ключевые слова Символы
                     case TokenStream::keyword_chars:
                     	$this->code = $this->getCharSymbol();
-                    	break;	    
+                    	$this->GetChar();
+                    	return;	    
 				 } 
 			}
 
@@ -208,7 +209,7 @@ class CodeStream {
 		elseif($type === TokenStream::type_variable){
 			$key = str_replace(self::LetterRus, self::LetterEng, $look);
 			$this->code = "$".$key;
-			//Обработка свойств и функций объекта
+			//Обработка свойств и функций объекта через точку
 		    while( $this->Type === TokenStream::type_operator && $this->Index === TokenStream::oper_point){
 		    	$this->GetChar();
 		    	//функции объекта
@@ -220,7 +221,13 @@ class CodeStream {
 				elseif($this->Type === TokenStream::type_variable) throw new Exception('Свойства объекта пока не работают '.$this->Look);
 				elseif($this->Type === TokenStream::type_number) throw new Exception('Неправильная константа типа число '.$this->Look);
 				else throw new Exception('Предполагается функция объекта '.$this->Look);
-			}	
+			}
+			//Обработка квдратных скобок
+			if( $this->Type === TokenStream::type_operator && $this->Index === TokenStream::oper_opensqbracket){
+				$this->GetChar();
+				$this->code = '$'.$key.'->GET('.$this->Expression7().')';
+				$this->MatchOper(TokenStream::oper_closesqbracket, ']');
+			}		
 		}	
 	}
 

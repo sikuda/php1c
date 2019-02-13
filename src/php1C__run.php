@@ -186,7 +186,8 @@ class CodeStream {
                     //Специальные ключевые слова Символы
                     case TokenStream::keyword_chars:
                     	$this->D0 = $this->getCharSymbol();
-                    	break;	    
+                    	$this->GetChar();
+                    	return;	    
 				 } 
 			}
 
@@ -254,6 +255,13 @@ class CodeStream {
 		    	//свойства объекта	
 				elseif($this->Type === TokenStream::type_variable) throw new Exception('Свойства объекта пока не работают '.$this->Look);
 				else throw new Exception('Предполагается функция или свойство объекта '.$look);
+			}
+			//Обработка квдратных скобок
+			if( $this->Type === TokenStream::type_operator && $this->Index === TokenStream::oper_opensqbracket){
+				$this->GetChar();
+				$value = $this->Expression7();
+				$this->D0 = $this->variable[$key]->GET($value);
+				$this->MatchOper(TokenStream::oper_closesqbracket, ']');
 			}	
 		}	
 	}

@@ -77,13 +77,12 @@
       xhttp.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200) {
           var str = xhttp.responseText;
-          //str = str.substring(2, str.length);
           editorResult.setValue(str);
         }
       }        
-      var params = 'code=' + encodeURIComponent(context);
-      xhttp.open("POST", 'result.php', true)
-      xhttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded')
+      var params = context;
+      xhttp.open("POST", 'result1C.php', true)
+      xhttp.setRequestHeader('Content-Type', 'text-plain');
       xhttp.send(params);
     }
 

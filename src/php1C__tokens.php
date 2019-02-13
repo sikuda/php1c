@@ -99,6 +99,8 @@ class TokenStream {
 	const oper_and          = 22;
 	const oper_not          = 23;
 	const oper_new          = 25;
+	const oper_opensqbracket  = 26;
+	const oper_closesqbracket = 27;
 	
 	//Russian Letters 
 	const LetterRusLower = array('а','б','в','г','д','е','ё' ,'ж' ,'з','и','й', 'к','л','м','н','о','п','р','с','т','у','ф','х','ц','ч','ш','щ','ъ','ы','ь','э','ю','я');
@@ -312,7 +314,7 @@ class TokenStream {
 		}
 
 		//обработка операторов
-		if ( strpos("()+-/*.=;,<>?", $ch) !== false){
+		if ( strpos("()+-/*.=;,<>?[]", $ch) !== false){
 			$this->move();
 			if($ch=='<'){
 				if( $this->curr()=='>'){
@@ -343,6 +345,8 @@ class TokenStream {
 				case '<': return new Token(self::type_operator, '<', self::oper_less);
 				case '>': return new Token(self::type_operator, '>', self::oper_more);
 				case '?': return new Token(self::type_operator, '?', self::oper_question);
+				case '[': return new Token(self::type_operator, '[', self::oper_opensqbracket);
+				case ']': return new Token(self::type_operator, ']', self::oper_closesqbracket);
 			}
 			throw new Exception('Неизвестный оператор '.$ch);	
 		}

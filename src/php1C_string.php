@@ -22,7 +22,7 @@ function functions_String(){
 * @return string[] Массив названий функций работы со строками.
 */   
 function functionsPHP_String(){
-	return array('StrLen(',  'TrimL(','TrimR(','TrimLR(','Left(','Right(','Mid(','StrFind(','Lower(','Upper(','Title(','Char(','CharCode(',   'IsBlankString(','StrReplace(', 'StrLineCount(', 'StrGetLine(',       'StrOccurrenceCount(','StrCompare(', 'StrStartsWith(', 'StrEndsWith(',        'StrSplit(', 'StrConcat(');
+	return array('StrLen(',  'TrimL(','TrimR(','TrimLR(','Left(','Right(','Mid(','StrFind(','Lower(','Upper(','Title(','Char(','CharCode(',   'IsBlankString(','StrReplace(', 'StrLineCount(', 'StrGetLine(',      'StrOccurrenceCount(','StrCompare(', 'StrStartsWith(', 'StrEndsWith(',                     'StrSplit(', 'StrConcat(');
 }	
 
 /**
@@ -177,15 +177,23 @@ function Upper( $arg ){
 	return strtoupper($arg);
 }
 
-//TODO
 /**
 * Возращает строку все первые буквы слов в верхнем регистре
 *
-* @param  string начальная cтрока 
+* @param  string $str начальная cтрока 
 * @return string полученная строка 
 */
-function Title( $arg ){
-	return false;
+function Title( $str ){
+	$len = strlen($str);
+	$str = strtoupper(substr($str,0,1)).substr($str,1);
+	for ($i=0; $i < $len; $i++) {
+		if($i<($len-1)){ 
+			if( strpos("\r\n\t ", substr($str,$i,1)) !== false) 
+				$str = substr($str,0,$i+1).strtoupper(substr($str,$i+1,1)).substr($str,$i+2);
+			else $str = substr($str,0,$i+1).strtolower(substr($str,$i+1,1)).substr($str,$i+2);
+		}	
+	}
+	return $str;
 }
 
 /**

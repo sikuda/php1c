@@ -6,7 +6,7 @@ function VVA($d,$YA){
 $Rezultat=add1C($d,$YA);
 }
 VVA(1,2);
-$Rezultat=CharCode("Жук");
+$Rezultat=StrSplit("одын два три"," ",true);$Rezultat=$Rezultat->GET(1);
 Message($Rezultat);
 //заработало, надо тестировать
 
