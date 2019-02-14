@@ -116,19 +116,24 @@ class TokenStream {
 
 	//Индентификаторы типов - type_identification
 	public $identypes = array(
-		"code"    => array('МАССИВ','ФАЙЛ'),
-		"codePHP" => array('Array1C', 'File1C'),
+		"rus" => array(), // типы по русски в верхнем регистре для поиска	
+        "eng" => array(), // типы по английски в вернем регистре для поиска
+        "php" => array()  // типы по английски как будет в коде			
 	);
+	public $indexTypesColl = -1; 
 	
 	public $functions1С = array(
 		"rus" => array(),  // функции по русски в верхнем регистре для поиска
 		"eng" => array(),  // функции по английски в вернем регистре для поиска
 		"clear" => array() // функции по английски как будет в коде 
 	);
+	//Индексы функций модулей
 	public $indexFuncCom = -1;
 	public $indexFuncStr = -1;
 	public $indexFuncDate = -1;
 	public $indexFuncColl = -1;
+
+
 
 	/**
 	* Конструктор класса
@@ -138,11 +143,37 @@ class TokenStream {
 		//Копирование строки кода
 		$this->str = $str;
 
+		//Добавление в таблицы общих типов
+		$this->indexTypesColl  = $this->AddTypes( typesRUS_Collection(),  typesENG_Collection(), typesPHP_Collection());
+
 		//Добавление в таблицы общих функций 
 		$this->indexFuncCom  = $this->AddModule( functions_Com(),  functionsPHP_Com());
 		$this->indexFuncStr  = $this->AddModule( functions_String(),  functionsPHP_String());
 		$this->indexFuncDate = $this->AddModule( functions_Date(), functionsPHP_Date());
 		$this->indexFuncColl = $this->AddModule( functions_Collections(), functionsPHP_Collections());
+	}
+
+	/**
+	* Добавление типов в общую таблицу типов
+	*
+    * @param $typesRus array массив русских названий типов
+    * @param $typesEng array массив английских названий типов
+    * @param $typesPHP array массив английских названий типов в PHP
+    * @return int возвращаем верхнюю границу модуля в общем списке 
+	*/
+	private function AddTypes( $typesRus, $typesEng, $typesPHP ){
+		if(is_array($typesRus) && is_array($typesEng) && is_array($typesPHP) ){
+			foreach ($typesRus as $value) {
+				array_push($this->identypes['rus'], str_replace(self::LetterRusLower, self::LetterRusUpper, $value));
+			}
+			foreach ($typesEng as $value) {
+				array_push($this->identypes['eng'], strtoupper($value));
+			}
+			foreach ($typesPHP as $value) {
+				array_push($this->identypes['php'], $value);
+			}
+		}
+		return count($this->identypes['php']);
 	}
 
 	/**
@@ -157,7 +188,6 @@ class TokenStream {
 			foreach ($funcRus as $value) {
 				array_push($this->functions1С['rus'], str_replace(self::LetterRusLower, self::LetterRusUpper, $value));
 			}
-			$array = functionsPHP_Com();
 			foreach ($funcEng as $value) {
 				array_push($this->functions1С['eng'], strtoupper($value));
 			}
@@ -361,32 +391,35 @@ class TokenStream {
 			elseif($current == 'НЕ' ) return new Token(self::type_operator, 'НЕ', self::oper_not);	
 			elseif($this->curr() == '('){
 				//Идентификатор типа  с аргументами
-				$key = array_search($current, $this->identypes['code']);
+				$key = array_search($current, $this->identypes['rus']);
 				if( $key !== false ) return new Token(self::type_identification, $current, $key);
+				$key = array_search($current, $this->identypes['eng']);
+				if( $key !== false ) return new Token(self::type_identification, $current, $key);
+				$this->move();
+				//Общая функция на русском
+				$key = array_search($current.'(', $this->functions1С['rus']);
+				if( $key !== false ) return new Token(self::type_function, $current, $key); 
 				else{
-					$this->move();
-					//Общая функция на русском
-					$key = array_search($current.'(', $this->functions1С['rus']);
+					$current = strtoupper($current);
+					//Общая функция на английском
+					$key = array_search($current.'(', $this->functions1С['eng']);
 					if( $key !== false ) return new Token(self::type_function, $current, $key); 
-					else{
-						$current = strtoupper($current);
-						//Общая функция на английском
-						$key = array_search($current.'(', $this->functions1С['eng']);
-						if( $key !== false ) return new Token(self::type_function, $current, $key); 
-						else return new Token(self::type_extfunction, $current);	
-					} 
-				}
+					else return new Token(self::type_extfunction, $current);	
+				} 
 		    } 
 			else{
+				//Индентификатор без аргументов
 				//Ключевое слово
 				$key = array_search($current, self::keywords['code']);
 				if( $key !== false ) return new Token(self::type_keyword, $current,$key);
 				else{
 					//Идентификатор типа без скобок
-					$key = array_search($current, $this->identypes['code']);
+					$key = array_search($current, $this->identypes['rus']);
+					if( $key !== false ) return new Token(self::type_identification, $current, $key);
+					$key = array_search($current, $this->identypes['eng']);
 					if( $key !== false ) return new Token(self::type_identification, $current, $key);
 					//Переменная
-					else return new Token(self::type_variable, $this->current()); 
+					return new Token(self::type_variable, $this->current()); 
 				} 
 			}
 		}

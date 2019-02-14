@@ -51,11 +51,6 @@ class CodeStream {
 	const LetterEng = array('A','B','V','G','D','E','JO','ZH','Z','I','JJ','K','L','M','N','O','P','R','S','T','U','F','KH','C','CH','SH','SHH','' ,'Y','' ,'EH','YU','YA','a','b','v','g','d','e','jo','zh','z','i','jj','k','l','m','n','o','p','r','s','t','u','f','kh','c','ch','sh','shh','' ,'y','' ,'eh','yu','ya');
 
 
-	// public $functions_Common    = null;
-	// public $functionsPHP_Common = null;
-	// public $beginCommonFunc = -1, $endCommonFunc = -1;
-	// public $beginDateFunc = -1, $endDateFunc = -1;
-
 	/**
 	* Обработать один токен
 	*/
@@ -258,7 +253,7 @@ class CodeStream {
 		}
 		$args .= ')';
 		//echo TokenStream::identypes['codePHP'][$index];
-		if($index>=0) return $tokenStream->identypes['codePHP'][$index].$args; //return $look.$args;
+		if($index>=0) return $this->tokenStream->identypes['php'][$index].$args; //return $look.$args;
 		else throw new Exception('Пока тип не определен '.$look);
 	}
 

@@ -10,6 +10,30 @@
 */
 
 /**
+* Массив названий русских типов для работы с коллекциями
+* @return array of string - Массив названий функций работы с коллекциями.
+*/
+function typesRUS_Collection(){
+	return array('Массив');
+}
+
+/**
+* Массив названий английских типов для работы с коллекциями
+* @return array of string - Массив названий функций работы с коллекциями.
+*/
+function typesENG_Collection(){
+	return array('Array');
+}
+
+/**
+* Массив названий типов для работы с коллекциями переименовании
+* @return array of string - Массив названий функций работы с коллекциями или пустые.
+*/
+function typesPHP_Collection(){
+	return array('Array1C');
+}
+
+/**
 * Массив названий русских функций для работы с датой
 * @return string[] Массив названий функций работы с датой.
 */
@@ -147,7 +171,8 @@ class Array1C{
 * @return возвращает новый объект массива 1С
 *
 */
-function Array1C($cnt){
+function Array1C($cnt=null){
+	if( $cnt === null) return new Array1C();
 	if( count($cnt) > 1 ) throw new Exception("Многомерные массивы пока не поддерживаются"); 
 	else return new Array1C($cnt[0]);
 }
