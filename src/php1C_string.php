@@ -7,6 +7,17 @@
 * @author  sikuda admin@sikuda.ru
 * @version 0.1
 */
+
+/**
+* Подключаем пространство имен
+*/
+namespace php1C;
+
+/**
+* Используем стандартные исключения
+*/
+use Exception;
+
 require_once('php1C_collections.php'); //для функций СтрРазделить, СтрСоединить
 
 /**
@@ -372,7 +383,7 @@ function StrSplit($str, $spliter, $andempty){
 	if(!$andempty){
 		$array = array_filter($array, function($var){ return (!isset($var) || (strlen($var)==0));} );
 	}
-	return new Array1C($array);
+	return new Array1C(null, $array);
 
 }
 

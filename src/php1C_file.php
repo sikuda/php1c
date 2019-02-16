@@ -10,6 +10,16 @@
 * @version 0.1
 */
 //require_once( '.\php1C_date.php'); //todo
+/**
+* Подключаем пространство имен
+*/
+namespace php1C;
+
+/**
+* Используем стандартные исключения
+*/
+use Exception;
+
 
 class File1C {
 	private $fileName;

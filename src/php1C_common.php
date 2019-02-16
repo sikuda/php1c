@@ -6,6 +6,20 @@
 * 
 * @author  sikuda admin@sikuda.ru
 */
+
+/**
+* Подключаем пространство имен
+*/
+namespace php1C;
+
+/**
+* Используем стандартные исключения
+*/
+use Exception;
+
+/*
+*  Подключаем все модули
+*/
 require_once('php1C_string.php');
 require_once('php1C_date.php');
 require_once('php1C_collections.php');

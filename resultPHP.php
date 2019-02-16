@@ -4,7 +4,7 @@ require_once('src/php1C__code.php');
 	if ($_SERVER["REQUEST_METHOD"] == "POST") {
     	$code = $_POST['code'];
 		if($code){
-			$str = php1CTransfer\makeCode($code);
+			$str = php1C\makeCode($code);
 			$output = fopen("output.php", 'w') or die("Can't open file output.php");
 			fputs($output, "<?php \nrequire_once( 'php1C_common.php');\n\n");
 			fputs($output, $str);

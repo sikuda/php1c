@@ -10,7 +10,7 @@ require_once('src/php1C__code.php');
     	$code = file_get_contents('php://input');
 
     	//echo $code;
-    	$str = php1CTransfer\makeCode($code, "Результат"); 
+    	$str = php1C\makeCode($code, "Результат"); 
 	}	
 	echo $str;
 ?>

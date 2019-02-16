@@ -8,7 +8,7 @@ require_once('src/php1C__run.php');
 			$input = fopen("input.txt", 'w') or die("Can't open file input.txt");
 			fputs($input, $code);
     		fclose($input);
-    		$str = php1CTransfer\runCode($code); 
+    		$str = php1C\runCode($code); 
 		} 
 	}	
 	else{

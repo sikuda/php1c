@@ -10,6 +10,16 @@
 */
 
 /**
+* Подключаем пространство имен
+*/
+namespace php1C;
+
+/**
+* Используем стандартные исключения
+*/
+use Exception;
+
+/**
 * Массив названий русских типов для работы с коллекциями
 * @return array of string - Массив названий функций работы с коллекциями.
 */
@@ -57,7 +67,7 @@ function functionsPHP_Collections(){
 * @return возвращает результат функции или выбрасывает исключение
 */
 function callCollectionFunction($context=null, $key, $arguments){
-		if($context === null){
+	if($context === null){
 		switch($key){
 		// case 'Message(':
 		// 	if(isset($arguments[2])) throw new Exception("Ожидается ) ");
@@ -69,15 +79,16 @@ function callCollectionFunction($context=null, $key, $arguments){
 	else{
 		if( method_exists($context, substr($key, 0, -1) )){ 
 			switch($key){
-			case 'UBOUND(': return $context->UBOUND();
-			case 'INSERT(': return $context->INSERT($arguments[0], $arguments[1]);
-			case 'ADD(':    return $context->ADD($arguments[0]);
-			case 'COUNT(':  return $context->COUNT();
-			case 'FIND(':   return $context->FIND($arguments[0]);
-			case 'CLEAR(':  return $context->CLEAR();
-			case 'GET(':    return $context->GET($arguments[0]);	
-			case 'DEL(':    return $context->DEL($arguments[0]);
-			case 'SET(':    return $context->SET($arguments[0], $arguments[1]);
+			case 'UBound(': return $context->UBound();
+			case 'Insert(': return $context->Insert($arguments[0], $arguments[1]);
+			case 'Add(':    return $context->Add($arguments[0]);
+			case 'Count(':  return $context->Count();
+			case 'Find(':   return $context->Find($arguments[0]);
+			case 'Clear(':  return $context->Clear();
+			case 'Get(':    return $context->Get($arguments[0]);	
+			case 'Del(':    return $context->Del($arguments[0]);
+			case 'Set(':    return $context->Set($arguments[0], $arguments[1]);
+			case 'Property': return $context->Property($arguments[0], $arguments[1]);
 			default:
 				throw new Exception("Нет обработки функции для объекта коллекции ".$key."");
 			}
@@ -98,15 +109,21 @@ class Array1C{
 	/**
 	* @var array внутренее хранение массива
 	*/
-	private $value; 
+	private $value; //array of PHP 
 
-	function __construct($count=null){
-		if(is_array($count)) $this->value = $count;
+	function __construct($counts=null, $copy=null){
+
+		if(is_array($copy)) $this->value = $copy;
 		else{	
 			$this->value = array();
-			if( $count > 0 ){
-				for ($i=0; $i < $count; $i++) $this->value[i] = null;
-			}	
+			$cnt = 0;
+			if(!is_null($counts) && is_array($counts)){
+				//if( count($counts) > 1 ) throw new Exception("Многомерные массивы пока не поддерживаются";
+				$cnt = $counts[0];
+				if( is_numeric($cnt) && $cnt > 0 ){
+					for ($i=0; $i < $cnt; $i++) $this->value[i] = null;
+				}
+			} 
 		}
 	}
 
@@ -114,53 +131,105 @@ class Array1C{
 		return "Массив";
 	}
 
-	function UBOUND(){
+	function UBound(){
 		//tocheck
 		$key = array_key_last($this->value);
 		if( is_null($key) ) return -1;
 		else return $key; 
 	}
 
-	function INSERT($index, $val){
-		if(isset($val)) $val = new undefined1C;
+	function Insert($index, $val){
+		if(isset($val)) $val = null;
 		$this->value[$index] = $val;
 	}
 
-	function ADD($val){
+	function Add($val){
 		//tocheck
 		$this->value[] = $val;
 		return $this;
 	}
 
-	function COUNT(){
+	function Count(){
 		return count($this->value);
 	}
 
-	function FIND($val){
+	function Find($val){
 		//tocheck
 		$key = array_search($val, $this->value);
 		if($key === FALSE) return new undefined1C();
 		else return $key;
 	}
 
-	function CLEAR(){
+	function Clear(){
 		//tocheck
 		unset($this->value);
 		$this->value = array();
 		//return array_filter($this->value, function(){ return FALSE;});
 	}
 
-	function GET($index){
+	function Get($index){
 		return $this->value[$index];
 	}
 
-	function DEL($index){
+	function Del($index){
 		array_splice($this->value, $index, 1);
 	    //unset($this->value[$index]);
 	}
 
-	function SET($index, $val){
+	function Set($index, $val){
 		$this->value[$index] = $val;
+	}
+}
+
+//TODO
+/**
+* Класс для работы со структурой 1С
+*
+*/
+class Structure1C{
+	/**
+	* @var array внутренее хранение массива
+	*/
+	private $value; //array of PHP 
+
+	function __construct($count=null){
+
+		if(is_array($count)) $this->value = $count;
+		else{	
+			$this->value = array();
+		}
+	}
+
+	function __toString(){
+		return "Структура";
+	}
+
+	function Insert($index, $val){
+		if(isset($val)) $val = new undefined1C;
+		$this->value[$index] = $val;
+	}
+
+	function Count(){
+		return count($this->value);
+	}
+
+	function Property($val){
+		//tocheck
+		$key = array_search($val, $this->value);
+		if($key === FALSE) return new undefined1C();
+		else return $key;
+	}
+
+	function Clear(){
+		//tocheck
+		unset($this->value);
+		$this->value = array();
+		//return array_filter($this->value, function(){ return FALSE;});
+	}
+
+	function Del($index){
+		array_splice($this->value, $index, 1);
+	    //unset($this->value[$index]);
 	}
 }
 
@@ -171,8 +240,6 @@ class Array1C{
 * @return возвращает новый объект массива 1С
 *
 */
-function Array1C($cnt=null){
-	if( $cnt === null) return new Array1C();
-	if( count($cnt) > 1 ) throw new Exception("Многомерные массивы пока не поддерживаются"); 
-	else return new Array1C($cnt[0]);
+function Structure1C($cnt=null){
+	if( $cnt === null) return new Structure1C();
 }

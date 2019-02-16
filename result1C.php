@@ -13,7 +13,7 @@ require_once('src/php1C__run.php');
     	$code = file_get_contents('php://input');
 
     	//echo $code;
-    	$str = php1CTransfer\runCode($code, "Результат"); 
+    	$str = php1C\runCode($code, "Результат"); 
 	}	
 	echo $str;
 ?>
