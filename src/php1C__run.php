@@ -208,7 +208,7 @@ class CodeStream {
 			        $this->Index !== TokenStream::oper_semicolon) throw new Exception("Не унарный оператор ".$this->Look);
 			}
 			if( $this->Type === TokenStream::type_function ){
-				$func = $this->tokenStream->functions1С['clear'][$this->Index];
+				$func = $this->tokenStream->functions1С['php'][$this->Index];
 				$this->D0 = $this->callFunction( null, $func, $this->Index);
 			 	return;
 			}
@@ -255,7 +255,7 @@ class CodeStream {
 		    	$this->GetChar();
 		    	//функции объекта
 		    	if( $this->Type === TokenStream::type_function ){
-		    		$func = $this->tokenStream->functions1С['clear'][$this->Index];
+		    		$func = $this->tokenStream->functions1С['php'][$this->Index];
 		    		$this->D0 = $this->callFunction( $key, $func, $this->Index);
 		    	}
 		    	//свойства объекта	
@@ -406,7 +406,7 @@ class CodeStream {
 	/**
 	* Разбор аргументов функции и выполнение кода функции 
 	*
-	* @param $context null or object - контекст вызова функции
+	* @param $context string имя переменной контекста
 	* @param $func string название функции
 	* @param $index int индекс функции в таблице распознаных функций
 	*/
@@ -418,7 +418,7 @@ class CodeStream {
 			//echo $index;
 			if(isset($context)){
 				if($this->variable[$context] === null ){
-					if($this->lvariable[$context] === null )throw new Exception('Не определена переменная '.$context);
+					if($this->lvariable[$context] === null )throw new Exception('Не определена  переменная '.$context);
 					else $context = $this->lvariable[$context];
 				} 
 		    	else $context = $this->variable[$context];
@@ -434,6 +434,7 @@ class CodeStream {
 				return callDateFunction($func, $args);
 			}
 			if($index < $this->tokenStream->indexFuncColl){
+				//echo 'cnt='.$context.'func='.$func;
 				return callCollectionFunction($context, $func, $args);
 			}
 			throw new Exception("Неизвестный модуль для вызова функции ".$func); //."и ".$index);		
@@ -531,8 +532,9 @@ class CodeStream {
 							}
 							elseif($this->Index === TokenStream::oper_point){
 								$this->GetChar();
-								$func = $this->tokenStream->functions1С['clear'][$this->Index];
+								$func = $this->tokenStream->functions1С['php'][$this->Index];
 								$this->D0 = $this->callFunction( $key, $func, $this->Index);
+								//echo '>'.$this->D0.'<';
 							}
 							else throw new Exception('Неизвестный оператор после переменной ');
 						}

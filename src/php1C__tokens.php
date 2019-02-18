@@ -125,7 +125,7 @@ class TokenStream {
 	public $functions1С = array(
 		"rus" => array(),  // функции по русски в верхнем регистре для поиска
 		"eng" => array(),  // функции по английски в вернем регистре для поиска
-		"clear" => array() // функции по английски как будет в коде 
+		"php" => array() // функции по английски как будет в коде 
 	);
 	//Индексы функций модулей
 	public $indexFuncCom = -1;
@@ -190,12 +190,10 @@ class TokenStream {
 			}
 			foreach ($funcEng as $value) {
 				array_push($this->functions1С['eng'], strtoupper($value));
-			}
-			foreach ($funcEng as $value) {
-				array_push($this->functions1С['clear'], $value);
+				array_push($this->functions1С['php'], $value);
 			}
 		}
-		return count($this->functions1С['clear']);
+		return count($this->functions1С['php']);
 	}
 
 	/**

@@ -88,7 +88,7 @@ function callCollectionFunction($context=null, $key, $arguments){
 			case 'Get(':    return $context->Get($arguments[0]);	
 			case 'Del(':    return $context->Del($arguments[0]);
 			case 'Set(':    return $context->Set($arguments[0], $arguments[1]);
-			case 'Property': return $context->Property($arguments[0], $arguments[1]);
+			case 'Property(': return $context->Property($arguments[0], $arguments[1]);
 			default:
 				throw new Exception("Нет обработки функции для объекта коллекции ".$key."");
 			}
@@ -100,6 +100,9 @@ function callCollectionFunction($context=null, $key, $arguments){
 
 
 //---------------------------------------------------------------------------------------------------------
+function Array1C($args=null){
+	return new Array1C($args);
+}
 
 /**
 * Класс для работы с массивом 1С
@@ -117,8 +120,8 @@ class Array1C{
 		else{	
 			$this->value = array();
 			$cnt = 0;
-			if(!is_null($counts) && is_array($counts)){
-				//if( count($counts) > 1 ) throw new Exception("Многомерные массивы пока не поддерживаются";
+			if(is_array($counts) && (count($counts)>0)){
+				//if( count($counts) > 1 ) throw new Exception("Многомерные массивы пока не поддерживаются");
 				$cnt = $counts[0];
 				if( is_numeric($cnt) && $cnt > 0 ){
 					for ($i=0; $i < $cnt; $i++) $this->value[i] = null;
@@ -132,14 +135,14 @@ class Array1C{
 	}
 
 	function UBound(){
-		//tocheck
-		$key = array_key_last($this->value);
-		if( is_null($key) ) return -1;
-		else return $key; 
+		//$key = array_key_last($this->value); //php7.3
+		$key = count($this->value);
+		if(is_null($key) ) return -1;
+		else return $key-1;  
 	}
 
 	function Insert($index, $val){
-		if(isset($val)) $val = null;
+		//if(!isset($val)) $val = null;
 		$this->value[$index] = $val;
 	}
 

@@ -77,7 +77,7 @@ function add1C($arg1, $arg2){
 		if(is_bool($arg2) || is_numeric($arg2)) return $arg1+$arg2;
 	}
 	elseif(is_object($arg1)){
-		if( (get_class($arg1) === 'Date1C') && is_numeric($arg2) && !is_string($arg2) ) return $arg1->add($arg2);
+		if( (get_class($arg1) === 'php1C\Date1C') && is_numeric($arg2) && !is_string($arg2) ) return $arg1->add($arg2);
 	}
 	throw new Exception("Преобразование значения к типу Число не может быть выполнено");
 }
@@ -94,7 +94,7 @@ function sub1C($arg1, $arg2){
 		if(is_bool($arg2) || is_numeric($arg2)) return $arg1-$arg2;
 	}
 	elseif(is_object($arg)){
-		if( (get_class($arg1) === 'Date1C') && is_numeric($arg2) && !is_string($arg2) ) return $arg1->sub($arg2);
+		if( (get_class($arg1) === 'php1C\Date1C') && is_numeric($arg2) && !is_string($arg2) ) return $arg1->sub($arg2);
 	}	
 	throw new Exception("Преобразование значения к типу Число не может быть выполнено");
 }
@@ -172,7 +172,7 @@ function and1C($arg1, $arg2){
 function less1C($arg1, $arg2){
 	if(is_bool($arg1)) $arg1 = tran_bool($arg1);
 	if(is_bool($arg2)) $arg2 = tran_bool($arg2);
-	if(is_numeric($arg1) || is_string($arg1) || (is_object($arg1) && get_class($arg1) === 'Date1C')) return $arg1 < $arg2;
+	if(is_numeric($arg1) || is_string($arg1) || (is_object($arg1) && get_class($arg1) === 'php1C\Date1C')) return $arg1 < $arg2;
 	throw new Exception("Операции сравнения на больше-меньше допустимы только для значений совпадающих примитивных типов (Булево, Число, Строка, Дата)");
 }
 
@@ -185,7 +185,7 @@ function less1C($arg1, $arg2){
 function lessequal1C($arg1, $arg2){
 	if(is_bool($arg1)) $arg1 = tran_bool($arg1);
 	if(is_bool($arg2)) $arg2 = tran_bool($arg2);
-	if(is_numeric($arg1) || is_string($arg1) || (is_object($arg1) && get_class($arg1) === 'Date1C')) return $arg1 <= $arg2;
+	if(is_numeric($arg1) || is_string($arg1) || (is_object($arg1) && get_class($arg1) === 'php1C\Date1C')) return $arg1 <= $arg2;
 	throw new Exception("Операции сравнения на меньше или равно допустима только для значений совпадающих примитивных типов (Булево-Число, Строка, Дата)");
 }
 
@@ -211,7 +211,7 @@ function more1C($arg1, $arg2){
 function morequal1C($arg1, $arg2){
 	if(is_bool($arg1)) $arg1 = tran_bool($arg1);
 	if(is_bool($arg2)) $arg2 = tran_bool($arg2);
-	if(is_numeric($arg1) || is_string($arg1) || (is_object($arg1) && get_class($arg1) === 'Date1C')) return $arg1 >= $arg2;
+	if(is_numeric($arg1) || is_string($arg1) || (is_object($arg1) && get_class($arg1) === 'php1C\Date1C')) return $arg1 >= $arg2;
 	throw new Exception("Операции сравнения на больше или равно допустима только для значений совпадающих примитивных типов (Булево-Число, Строка, Дата)");
 }
 
@@ -224,7 +224,7 @@ function morequal1C($arg1, $arg2){
 function equal1C($arg1, $arg2){
 	if(is_bool($arg1)) $arg1 = tran_bool($arg1);
 	if(is_bool($arg2)) $arg2 = tran_bool($arg2);
-	if(is_numeric($arg1) || is_string($arg1) || (is_object($arg1) && get_class($arg1) === 'Date1C')) return $arg1 === $arg2;
+	if(is_numeric($arg1) || is_string($arg1) || (is_object($arg1) && get_class($arg1) === 'php1C\Date1C')) return $arg1 === $arg2;
 	throw new Exception("Операции сравнения равно допустима только для значений совпадающих примитивных типов (Булево-Число, Строка, Дата)");
 }
 
@@ -237,7 +237,7 @@ function equal1C($arg1, $arg2){
 function notequal1C($arg1, $arg2){
 	if(is_bool($arg1)) $arg1 = tran_bool($arg1);
 	if(is_bool($arg2)) $arg2 = tran_bool($arg2);
-	if(is_numeric($arg1) || is_string($arg1) || (is_object($arg1) && get_class($arg1) === 'Date1C')) return $arg1 !== $arg2;
+	if(is_numeric($arg1) || is_string($arg1) || (is_object($arg1) && get_class($arg1) === 'php1C\Date1C')) return $arg1 !== $arg2;
 	throw new Exception("Операции сравнения равно допустима только для значений совпадающих примитивных типов (Булево-Число, Строка, Дата)");
 }
 
@@ -250,7 +250,7 @@ function notequal1C($arg1, $arg2){
 * @param integer $status (пока не используется)
 */
 function Message($mess='', $status=0){
-	echo $mess;
+	echo toString1C($mess);
 }
 
 /**
@@ -277,8 +277,8 @@ function Find($str='', $substr=''){
 function ValueIsFilled($val){
 	if(is_object($val)){
 		switch (get_class($val)) {
-		 	case 'Date1C': return $val != "01.01.0001 00:00:00";
-		 	case 'Array1C': return ($val->COUNT()>0);	
+		 	case 'php1C\Date1C': return $val != "01.01.0001 00:00:00";
+		 	case 'php1C\Array1C': return ($val->Count()>0);	
 		 	default:
 		 		break;
 		 } 
@@ -313,7 +313,7 @@ function callCommonFunction($context=null, $key, $arguments){
 	else{
 		if( method_exists($context, substr($key, 0, -1) )){ 
 			switch($key){
-			//case 'UBOUND(': return $context->UBOUND();
+			case 'Find(':   return $context->Find($arguments[0]);
 			default:
 				throw new Exception("Нет обработки общей функции для объекта  ".$key."");
 			}
