@@ -102,9 +102,9 @@ class TokenStream {
 	const oper_opensqbracket  = 26;
 	const oper_closesqbracket = 27;
 	
-	//Russian Letters 
-	const LetterRusLower = array('а','б','в','г','д','е','ё' ,'ж' ,'з','и','й', 'к','л','м','н','о','п','р','с','т','у','ф','х','ц','ч','ш','щ','ъ','ы','ь','э','ю','я');
-	const LetterRusUpper = array('А','Б','В','Г','Д','Е','Ё' ,'Ж' ,'З','И','Й' ,'К','Л','М','Н','О','П','Р','С','Т','У','Ф','Х','Ц','Ч','Ш','Щ','Ъ','Ы','Ь','Э','Ю','Я'); 
+
+	const LetterRus = array('А','Б','В','Г','Д','Е','Ё' ,'Ж' ,'З','И','Й' ,'К','Л','М','Н','О','П','Р','С','Т','У','Ф','Х' ,'Ц','Ч' ,'Ш' ,'Щ'  ,'Ъ','Ы','Ь','Э' ,'Ю' ,'Я' ,'а','б','в','г','д','е','ё' ,'ж'  ,'з','и','й', 'к','л','м','н','о','п','р','с','т','у','ф','х' ,'ц','ч','ш' ,'щ'  ,'ъ','ы','ь','э' ,'ю' ,'я');
+	const LetterEng = array('A','B','V','G','D','E','JO','ZH','Z','I','JJ','K','L','M','N','O','P','R','S','T','U','F','KH','C','CH','SH','SHH','' ,'Y','' ,'EH','YU','YA','a','b','v','g','d','e','jo','zh','z','i','jj','k','l','m','n','o','p','r','s','t','u','f','kh','c','ch','sh','shh','' ,'y','' ,'eh','yu','ya');
 	const str_Identifiers = '/^[_A-Za-zА-Яа-яЁё][_0-9A-Za-zА-Яа-яЁё]*/u';
 
 	//Ключевые слова - type_keyword
@@ -164,7 +164,7 @@ class TokenStream {
 	private function AddTypes( $typesRus, $typesEng, $typesPHP ){
 		if(is_array($typesRus) && is_array($typesEng) && is_array($typesPHP) ){
 			foreach ($typesRus as $value) {
-				array_push($this->identypes['rus'], str_replace(self::LetterRusLower, self::LetterRusUpper, $value));
+				array_push($this->identypes['rus'], strtoupper($value));
 			}
 			foreach ($typesEng as $value) {
 				array_push($this->identypes['eng'], strtoupper($value));
@@ -186,7 +186,7 @@ class TokenStream {
 	private function AddModule( $funcRus, $funcEng ){
 		if(is_array($funcRus) && is_array($funcEng) ){
 			foreach ($funcRus as $value) {
-				array_push($this->functions1С['rus'], str_replace(self::LetterRusLower, self::LetterRusUpper, $value));
+				array_push($this->functions1С['rus'], strtoupper($value));
 			}
 			foreach ($funcEng as $value) {
 				array_push($this->functions1С['eng'], strtoupper($value));
@@ -381,8 +381,7 @@ class TokenStream {
 	    
 		//Обработка переменных, ключевых слов или функций
 		if( $this->matchMove(self::str_Identifiers)){
-			//$current = mb_strtoupper($this->current());
-			$current = str_replace(self::LetterRusLower, self::LetterRusUpper, $this->current());
+			$current = strtoupper($this->current());
 			if($current == 'НОВЫЙ' ) return new Token(self::type_operator, 'НОВЫЙ', self::oper_new);
 			elseif($current == 'ИЛИ' ) return new Token(self::type_operator, 'ИЛИ', self::oper_or);
 			elseif($current == 'И' ) return new Token(self::type_operator, 'И', self::oper_and);
@@ -390,20 +389,20 @@ class TokenStream {
 			elseif($this->curr() == '('){
 				//Идентификатор типа  с аргументами
 				$key = array_search($current, $this->identypes['rus']);
-				if( $key !== false ) return new Token(self::type_identification, $current, $key);
+				if( $key !== false ) return new Token(self::type_identification, $this->identypes['php'][$key], $key);
 				$key = array_search($current, $this->identypes['eng']);
-				if( $key !== false ) return new Token(self::type_identification, $current, $key);
+				if( $key !== false ) return new Token(self::type_identification,  $this->identypes['php'][$key], $key);
 				$this->move();
 				//Общая функция на русском
 				$key = array_search($current.'(', $this->functions1С['rus']);
 				if( $key !== false ) return new Token(self::type_function, $current, $key); 
 				else{
-					$current = strtoupper($current);
 					//Общая функция на английском
 					$key = array_search($current.'(', $this->functions1С['eng']);
 					if( $key !== false ) return new Token(self::type_function, $current, $key); 
-					else return new Token(self::type_extfunction, $current);	
-				} 
+					else return new Token(self::type_extfunction, str_replace(self::LetterRus, self::LetterEng, $current));	
+				}
+				throw new Exception('Непонятная функция ('.$current.')'); 
 		    } 
 			else{
 				//Индентификатор без аргументов
@@ -416,8 +415,8 @@ class TokenStream {
 					if( $key !== false ) return new Token(self::type_identification, $current, $key);
 					$key = array_search($current, $this->identypes['eng']);
 					if( $key !== false ) return new Token(self::type_identification, $current, $key);
-					//Переменная
-					return new Token(self::type_variable, $this->current()); 
+					//Переменная не переводим на английский
+					return new Token(self::type_variable, $current); 
 				} 
 			}
 		}

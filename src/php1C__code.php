@@ -47,9 +47,6 @@ class CodeStream {
 	private $code = '';
 	private $codestack = array();
 
-	const LetterRus = array('А','Б','В','Г','Д','Е','Ё' ,'Ж' ,'З','И','Й' ,'К','Л','М','Н','О','П','Р','С','Т','У','Ф','Х' ,'Ц','Ч' ,'Ш' ,'Щ'  ,'Ъ','Ы','Ь','Э' ,'Ю' ,'Я' ,'а','б','в','г','д','е','ё' ,'ж'  ,'з','и','й', 'к','л','м','н','о','п','р','с','т','у','ф','х' ,'ц','ч','ш' ,'щ'  ,'ъ','ы','ь','э' ,'ю' ,'я');
-	const LetterEng = array('A','B','V','G','D','E','JO','ZH','Z','I','JJ','K','L','M','N','O','P','R','S','T','U','F','KH','C','CH','SH','SHH','' ,'Y','' ,'EH','YU','YA','a','b','v','g','d','e','jo','zh','z','i','jj','k','l','m','n','o','p','r','s','t','u','f','kh','c','ch','sh','shh','' ,'y','' ,'eh','yu','ya');
-
 	/**
 	* Обработать один токен
 	*/
@@ -98,18 +95,18 @@ class CodeStream {
 		$this->MatchOper(TokenStream::oper_point, '.');
 		if($this->Type === TokenStream::type_variable){
 			switch ($this->Look) {
-				case 'ВК'  :
+				case 'VK'  : //ВК
 				case 'CR'  : return 'chr(13)';
-				case 'ВТаб':
-				case 'VTab': return 'chr(11)';
-				case 'НПП' : 
-				case 'NBSp': return 'chr(160)';
-				case 'ПС'  :
+				case 'VTAB': //ВТаб
+				case 'VTAB': return 'chr(11)';
+				case 'NPP' : //НПП
+				case 'NBSP': return 'chr(160)';
+				case 'PS'  : //'ПС'
 				case 'LF'  : return 'chr(10)';
-				case 'ПФ'  :
+				case 'PF'  : //ПФ
 				case 'FF'  : return 'chr(12)';
-				case 'Таб'  : 
-				case 'Tab'  : return 'chr(9)';
+				case 'TAB' : //Таб
+				case 'TAB' : return 'chr(9)';
 				default:
 					throw new Exception('Неопределенный символ '.$this->Look);
 					break;
@@ -134,7 +131,7 @@ class CodeStream {
 			//$this->codePHP .= 'f'.$this->Look.'-'.$this->Type.'f';
 			$this->code = $this->Look;
 			if($this->Type === TokenStream::type_variable){
-				$key = str_replace(self::LetterRus, self::LetterEng, $this->Look);
+				$key = $this->Look;
 				$this->code = "$".$key; 
 			}	
 			if ($this->Type === TokenStream::type_string) $this->code = '"'.$this->Look.'"';
@@ -163,7 +160,7 @@ class CodeStream {
 			 	return;
 			}
 			if( $this->Type === TokenStream::type_extfunction){
-				$func = str_replace(self::LetterRus, self::LetterEng, $this->Look);
+				$func = str_replace(TokenStream::LetterRus, TokenStream::LetterEng, $this->Look);
 				$this->code = $this->splitFunction( null, $func);
 				return;
 			}	
@@ -193,30 +190,33 @@ class CodeStream {
 					$this->code = $this->getNewType();
 					//$this->GetChar();
 				} 
-				else throw new Exception('Ожидается идентификатор типа');
+				else throw new Exception('Ожидается идентификатор типа, а не '.$this->Look);
 			}
 			elseif( $this->Type === TokenStream::type_operator && ( $index === TokenStream::oper_mult || $index === TokenStream::oper_div )){
 				throw new Exception('Двойной оператор '.$this->getOperator($this->code));	
 			}	
 		}
 		elseif($type === TokenStream::type_variable){
-			$key = str_replace(self::LetterRus, self::LetterEng, $look);
-			//$this->code = "$".$key;
-			//$this->code .= '$123'.$look;
+			$key = $look;
+			$this->code = "$".$key;
 			//Обработка свойств и функций объекта через точку
 		    while( $this->Type === TokenStream::type_operator && $this->Index === TokenStream::oper_point){
 		    	$this->GetChar();
 		    	//функции объекта
 		    	if( $this->Type === TokenStream::type_function ){
 		    		//$this->codePHP .= '+'.$this->Look.$this->Index.'+';
-		    		$this->code = '$'.$key.'->'.$this->splitFunction( $this->code, $this->Look, $this->Index);
+		    		$this->code = $this->code.'->'.$this->splitFunction( $key, $this->Look, $this->Index);
+		    		return;
 		    	}
 		    	//свойства объекта	
-				elseif($this->Type === TokenStream::type_variable) throw new Exception('Свойства объекта пока не работают '.$this->Look);
+				elseif($this->Type === TokenStream::type_variable){
+					$this->code = $this->code.'->Get('.$this->Look.')';
+					$this->GetChar();
+				}	
 				elseif($this->Type === TokenStream::type_number) throw new Exception('Неправильная константа типа число '.$this->Look);
 				else throw new Exception('Предполагается функция объекта '.$this->Look);
 			}
-			//Обработка квдратных скобок
+			//Обработка квадратных скобок
 			if( $this->Type === TokenStream::type_operator && $this->Index === TokenStream::oper_opensqbracket){
 				$this->GetChar();
 				$this->code = '$'.$key.'->GET('.$this->Expression7().')';
@@ -226,13 +226,15 @@ class CodeStream {
 	}
 
     /**
-    *Выдать код нового объекта по индексу со всеми параметрами
+    * Выдать код нового объекта по индексу со всеми параметрами
 	*/
 	private function getNewType(){
 		//определяем параметры конструктора
 		$index = $this->Index;
 		$look = $this->Look;
-		$args = '('; 
+		//$args = '(';
+		//Количество переменных не определено - засовываем переменные в массив 
+		$args = '(array(';
 		$this->GetChar();
 		if($this->Type === TokenStream::type_operator && $this->Index === TokenStream::oper_openbracket){
 			$this->MatchOper(TokenStream::oper_openbracket, '(');
@@ -250,7 +252,7 @@ class CodeStream {
 			}
 			$this->MatchOper(TokenStream::oper_closebracket, ')');	
 		}
-		$args .= ')';
+		$args .= '))';
 		if($index>=0) return 'php1C\\'.$this->tokenStream->identypes['php'][$index].$args; 
 		else throw new Exception('Пока тип не определен '.$look);
 	}
@@ -353,6 +355,7 @@ class CodeStream {
 	*/
 	public function splitFunction($context=null, $func, $index=-1){
 		$args = ''; 
+		//$args = 'array(';
 		$this->GetChar();
 		//разбор аргументов функции		
 		if($this->Type !== TokenStream::type_operator || $this->Index !== TokenStream::oper_closebracket){
@@ -368,6 +371,7 @@ class CodeStream {
 				$this->code = '';	
 			}
 		}
+		//$args .= ')';
 		$this->MatchOper(TokenStream::oper_closebracket, ')');
 		
 		if($index!=-1){
@@ -409,7 +413,7 @@ class CodeStream {
 						break;
 				//Переменная - присвоение или функция			
 				case TokenStream::type_variable:
-					$key = str_replace(self::LetterRus, self::LetterEng, $this->Look);
+					$key = $this->Look;
 					//$this->codePHP .= '!'.$key.'!';
 					$this->GetChar();
 					if( $this->Type === TokenStream::type_operator){
@@ -507,7 +511,7 @@ class CodeStream {
 					 		$this->codePHP .= "for(";
 					 		//Пока только шаблона Для перем=
 					 		if($this->Type !== TokenStream::type_variable) throw new Exception('Ожидается имя переменной');
-					 		$iterator = str_replace(self::LetterRus, self::LetterEng, $this->Look);
+					 		$iterator = $this->Look;
 							$this->GetChar();
 							if( $this->Type === TokenStream::type_operator && $this->Index === TokenStream::oper_equal ){
 								$this->codePHP .= '$'.$iterator.'=';
@@ -547,7 +551,7 @@ class CodeStream {
 					 	case TokenStream::keyword_var:
 					 		$this->GetChar();
 					 		if($this->Type === TokenStream::type_variable){ 
-					 			$key = str_replace(self::LetterRus, self::LetterEng, $this->Look);
+					 			$key = $this->Look;
 					 			$this->GetChar();
 					 			$this->MatchOper(TokenStream::oper_semicolon, ';');
 								$this->codePHP .= '$'.$key.' = null;';
@@ -558,7 +562,7 @@ class CodeStream {
 					 	case TokenStream::keyword_procedure:
 					 		$this->GetChar();
 					 		if($this->Type === TokenStream::type_extfunction){
-					 			$key = str_replace(self::LetterRus, self::LetterEng, $this->Look);
+					 			$key = str_replace(TokenStream::LetterRus, TokenStream::LetterEng, $this->Look);
 								//$this->GetChar();
 								$this->codePHP .= 'function '.$this->splitFunction(null, $key, -1).'{';
 							}
@@ -597,7 +601,7 @@ class CodeStream {
 		//Блок разбора по токеном
 		try{
 			//php1C'.'\\'.'
-			if(isset($name_var)) $buffer .= 'Сообщить('.$name_var.');';
+			if(isset($name_var)) $buffer .= chr(10).'Сообщить('.$name_var.');';
 
 			$this->tokenStream = new TokenStream($buffer);
 			$this->tokenStream->CodeToTokens();
@@ -616,9 +620,8 @@ class CodeStream {
 
 				$this->continueCode();
 
-				$name = str_replace(self::LetterRus, self::LetterEng, $name_var);
+				$name = strtoupper(str_replace(TokenStream::LetterRus, TokenStream::LetterEng, $name_var));
 				if(isset($name_var)){
-					//eval("echo '12';");
 					eval($this->codePHP);
 				 	return '';
 				}

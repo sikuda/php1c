@@ -2,8 +2,8 @@
 /**
 * Модуль работы c универсальными коллекциями значений 1С
 * 
-* Модуль для работы с массивами,  в 1С и функциями для работы с ними
-* для будущего (структурами, соответствиями, списком значений, таблица значений)
+* Модуль для работы с массивами, структурами  в 1С и функциями для работы с ними
+* для будущего (соответствиями, списком значений, таблица значений)
 * 
 * @author  sikuda admin@sikuda.ru
 * @version 0.1
@@ -24,7 +24,7 @@ use Exception;
 * @return array of string - Массив названий функций работы с коллекциями.
 */
 function typesRUS_Collection(){
-	return array('Массив');
+	return array('Массив','Структура');
 }
 
 /**
@@ -32,7 +32,7 @@ function typesRUS_Collection(){
 * @return array of string - Массив названий функций работы с коллекциями.
 */
 function typesENG_Collection(){
-	return array('Array');
+	return array('Array','Structure');
 }
 
 /**
@@ -40,7 +40,7 @@ function typesENG_Collection(){
 * @return array of string - Массив названий функций работы с коллекциями или пустые.
 */
 function typesPHP_Collection(){
-	return array('Array1C');
+	return array('Array1C','Structure1C');
 }
 
 /**
@@ -48,15 +48,32 @@ function typesPHP_Collection(){
 * @return string[] Массив названий функций работы с датой.
 */
 function functions_Collections(){
-	return  array('ВГраница(', 'Вставить(', 'Добавить(', 'Количество(', 'Найти(', 'Очистить(','Получить(', 'Удалить(', 'Установить(');
+	return  array('ВГраница(', 'Вставить(', 'Добавить(', 'Количество(', 'Найти(', 'Очистить(','Получить(', 'Удалить(', 'Установить(','Свойство(');
 }
 /**
 * Массив названий английских функций для работы с датой. Соответстует элементам русским функций.
 * @return string[] Массив названий функций работы с датой.
 */   
 function functionsPHP_Collections(){
-	return  array('UBound(',   'Insert(',   'Add(',      'Count(',      'Find(',  'Clear('  , 'Get(',      'Del(',     'Set(');
+	return  array('UBound(',   'Insert(',   'Add(',      'Count(',      'Find(',  'Clear('  , 'Get(',      'Del(',     'Set(',       'Property(');
 }
+
+/**
+* Вызывает функции и функции объектов 1С работы с коллекциями
+*
+* @param string $key строка названии функции со скобкой
+* @param array $arguments аргументы функции в массиве
+* @return возвращает результат функции или выбрасывает исключение
+*/
+function callCollectionType($key, $arguments){
+	switch ($key) {
+		case 'Array1C': return Array1C($arguments);
+		case 'Structure1C': return Structure1C($arguments);
+		default:
+			throw new Exception('Пока тип в коллекциях не определен '.$key);
+			break;
+	}
+}	
 
 /**
 * Вызывает функции и функции объектов 1С работы с коллекциями
@@ -69,9 +86,8 @@ function functionsPHP_Collections(){
 function callCollectionFunction($context=null, $key, $arguments){
 	if($context === null){
 		switch($key){
-		// case 'Message(':
-		// 	if(isset($arguments[2])) throw new Exception("Ожидается ) ");
-		// 	return Message($arguments[0], $arguments[1]);
+		//case 'func(':
+		//	break;
 		default:
 			throw new Exception("Неизвестная функция работы с коллекциями ".$key."");
 		}	
@@ -135,7 +151,6 @@ class Array1C{
 	}
 
 	function UBound(){
-		//$key = array_key_last($this->value); //php7.3
 		$key = count($this->value);
 		if(is_null($key) ) return -1;
 		else return $key-1;  
@@ -184,6 +199,17 @@ class Array1C{
 	}
 }
 
+/**
+* Получение структуры 1С 
+*
+* @param array $cnt аргументы функции в массиве
+* @return возвращает новый объект массива 1С
+*
+*/
+function Structure1C($args=null){
+	return new Structure1C($args);
+}
+
 //TODO
 /**
 * Класс для работы со структурой 1С
@@ -195,11 +221,19 @@ class Structure1C{
 	*/
 	private $value; //array of PHP 
 
-	function __construct($count=null){
+	function __construct($args=null,$copy=null){
 
-		if(is_array($count)) $this->value = $count;
+		if(is_array($copy)) $this->value = $copy;
 		else{	
 			$this->value = array();
+			if( (count($args) > 0) && is_string($args[0])){
+				$keys = explode(',',$args[0]);
+				for ($i=0; $i < count($keys); $i++) {
+					$k = strtoupper(trim ($keys[$i]));
+					if(!isset($args[$i+1])) $this->value[$k] = null;
+					else $this->value[$k] = $args[$i+1];
+				}
+			}
 		}
 	}
 
@@ -207,42 +241,34 @@ class Structure1C{
 		return "Структура";
 	}
 
-	function Insert($index, $val){
-		if(isset($val)) $val = new undefined1C;
-		$this->value[$index] = $val;
+	function Insert($key, $val=null){
+		$this->value[strtoupper($key)] = $val;
 	}
 
 	function Count(){
 		return count($this->value);
 	}
 
-	function Property($val){
-		//tocheck
-		$key = array_search($val, $this->value);
-		if($key === FALSE) return new undefined1C();
-		else return $key;
+	function Property($key){
+		$key = strtoupper($key);
+		if( array_key_exists($key, $this->value) === FALSE) return false;
+		else return true;	
 	}
 
 	function Clear(){
 		//tocheck
 		unset($this->value);
 		$this->value = array();
-		//return array_filter($this->value, function(){ return FALSE;});
 	}
 
-	function Del($index){
-		array_splice($this->value, $index, 1);
+	function Del($key){
+		//array_splice($this->value, $key, 1);
 	    //unset($this->value[$index]);
 	}
+
+	//Для получения данных через точку
+	function Get($key){
+		return $this->value[$key];
+	}
 }
 
-/**
-* Получение массива 1С (пока одномерного)
-*
-* @param array $cnt аргументы функции в массиве
-* @return возвращает новый объект массива 1С
-*
-*/
-function Structure1C($cnt=null){
-	if( $cnt === null) return new Structure1C();
-}

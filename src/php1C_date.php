@@ -45,7 +45,10 @@ function functionsPHP_Date(){
 function callDateFunction($key, $arguments){
 	switch($key){
 		case 'Date(': return Date1C($arguments[0], $arguments[1], $arguments[2], $arguments[3], $arguments[4], $arguments[5], $arguments[6]);
-		case 'CurrentDate(': return CurrentDate($arguments[0]);
+		case 'CurrentDate(': 
+			if(isset($arguments[0])) throw new Exception("Ожидается символ ')'");
+			else return CurrentDate();
+			break;
 		case 'Year(': return Year($arguments[0]);
 		case 'Month(': return Month($arguments[0]);
 		case 'Day(': return Day($arguments[0]);
@@ -172,8 +175,7 @@ function Date1C($str, $month=1, $day=1, $hour=0, $minute=0, $second=0){
 * @return Date1C 
 */
 function CurrentDate( $arg=null ){
-	if(isset($arg)) throw new Exception("Ожидается символ ')'");
-	else return new Date1C(date("YmdHis"));
+	return new Date1C(date("YmdHis"));
 }
 
 /**

@@ -1,9 +1,9 @@
 <?php 
 require_once( 'php1C_common.php');
 
-$Rezultat = null;
-function SLOZHENIE($d,$YA){
-$Rezultat=php1C\add1C(php1C\add1C("4",$d),$YA);
+$РЕЗУЛЬТАТ = null;
+function SLOZHENIE($D,$Я){
+$РЕЗУЛЬТАТ=php1C\add1C(php1C\add1C("4",$D),$Я);
 }
 SLOZHENIE(1,2);
 
