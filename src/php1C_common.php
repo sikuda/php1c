@@ -93,7 +93,7 @@ function sub1C($arg1, $arg2){
 	if(is_bool($arg1) || is_numeric($arg1)){
 		if(is_bool($arg2) || is_numeric($arg2)) return $arg1-$arg2;
 	}
-	elseif(is_object($arg)){
+	elseif(is_object($arg1)){
 		if( (get_class($arg1) === 'php1C\Date1C') && is_numeric($arg2) && !is_string($arg2) ) return $arg1->sub($arg2);
 	}	
 	throw new Exception("Преобразование значения к типу Число не может быть выполнено");
@@ -107,7 +107,7 @@ function sub1C($arg1, $arg2){
 */
 function mul1C($arg1, $arg2){
 
-	if(is_numeric($arg1) && !is_string($arg1) && is_numeric($arg2) && !is_string($arg2) ) return $arg1*$arg2;
+	if((is_bool($arg1) || is_numeric($arg1)) && !is_string($arg1) && (is_bool($arg2) || is_numeric($arg2)) && !is_string($arg2) ) return $arg1*$arg2;
 	throw new Exception("Преобразование значения к типу Число не может быть выполнено");
 }
 
@@ -119,7 +119,7 @@ function mul1C($arg1, $arg2){
 */
 function div1C($arg1, $arg2){
 
-	if(is_numeric($arg1) && !is_string($arg1) && is_numeric($arg2) && !is_string($arg2) ){
+	if((is_bool($arg1) || is_numeric($arg1)) && !is_string($arg1) && (is_bool($arg2) || is_numeric($arg2)) && !is_string($arg2) ){
 		if( $arg2 == 0) throw new Exception("Деление на 0");
 		else return $arg1/$arg2;	
 	} 

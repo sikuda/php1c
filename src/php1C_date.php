@@ -133,7 +133,7 @@ class Date1C {
     */
 	public function sub($seconds){
 		$seconds = intval($seconds);
-		if($seconds<0) $this->value = $this->value->sub( new DateInterval('PT'.$seconds.'S'));
+		if($seconds>0) $this->value = $this->value->sub( new DateInterval('PT'.$seconds.'S'));
 		else $this->value = $this->value->add( new DateInterval('PT'.-$seconds.'S'));
 		return $this;
 	}

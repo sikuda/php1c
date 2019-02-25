@@ -77,8 +77,6 @@ class CodeStream {
 		$this->Type  = $token->type; 
 		$this->Look  = $token->context; 
 		$this->Index = $token->index;
-		//$this->row   = $token->row;
-		//$this->col   = $token->col;
 		$this->itoken++;
 	}
 
@@ -97,10 +95,7 @@ class CodeStream {
 		if( $this->Type === TokenStream::type_operator && $this->Index === $subtype){ 
 			$this->GetChar();
 		}
-		else{
-		  //$this->itoken;		
-		  throw new Exception('Ожидается оператор '.$look);
-	}
+		else  throw new Exception('Ожидается оператор '.$look);
 	}
 
 	/**
@@ -110,9 +105,7 @@ class CodeStream {
 		if( $this->Type === TokenStream::type_keyword && $this->Index === $subtype){ 
 			$this->GetChar();
 		}
-		else{
-			throw new Exception('Ожидается '.TokenStream::keywords['code'][$subtype]);
-		}	
+		else throw new Exception('Ожидается '.TokenStream::keywords['code'][$subtype]);
 	}
 
 	/**
@@ -148,9 +141,14 @@ class CodeStream {
 	*/
 	private function getVariable(){
 		$key = $this->Look;
-  		if($this->variable[$key] === null ){
-			if($this->lvariable[$key] === null )throw new Exception('Не определена переменная '.$this->Look);
-			else return $this->lvariable[$key];
+		//echo 'key='.$key.'f='.$this->inFunction;
+  		if( !array_key_exists($key, $this->variable)){
+  			if(isset($this->inFunction)){
+  				if(!array_key_exists($key, $this->lvariable)) 
+  					throw new Exception('Не определена переменная '.$this->Look.'  в функции '.$this->inFunction);
+				else return $this->lvariable[$key];
+			}
+			else throw new Exception('Не определена переменная '.$this->Look);
 		} 
     	else return $this->variable[$key];	
 	}
@@ -262,7 +260,7 @@ class CodeStream {
 				}	
 				else throw new Exception('Предполагается функция или свойство '.$this->Look.' объекта '.$look);
 			}
-			//Обработка квдратных скобок
+			//Обработка квадратных скобок
 			if( $this->Type === TokenStream::type_operator && $this->Index === TokenStream::oper_opensqbracket){
 				$this->GetChar();
 				$value = $this->Expression7();
@@ -402,21 +400,33 @@ class CodeStream {
 	}
 
 	/**
+	* Получение текущего контекста по ключу переменной 
+	*
+	* @param $key string имя переменной контекста
+	* @return any текущий контекст по ключу или D0
+	*/
+	private function getContext($key=''){
+		if(!empty($key)){
+			if($this->variable[$key] === null ){
+				if($this->lvariable[$key] === null )throw new Exception('Не определена  переменная '.$key);
+				else return $this->lvariable[$key];
+			} 
+		    else return $this->variable[$key];
+	    }
+	    else return $this->D0;
+	}
+
+	/**
 	* Получение свойства объекта через точку 
 	*
 	* @param $context string имя переменной контекста
 	* @param $func string название функции
 	* @param $index int индекс функции в таблице распознаных функций
 	*/
-	private function callProperty($context){
+	private function callProperty($key){
 
+		$context = $this->getContext($key);
 		if(isset($context)){
-			if($this->variable[$context] === null ){
-				if($this->lvariable[$context] === null )throw new Exception('Не определена  переменная '.$context);
-				else $context = $this->lvariable[$context];
-			} 
-		   	else $context = $this->variable[$context];
-
 			$args = array( 0 => $this->Look);
 		   	return callCollectionFunction($context, 'Get(', $args);
 	    }
@@ -435,15 +445,8 @@ class CodeStream {
 		$this->splitArguments($args);
 		
 		if( $index >= 0){
-			//echo $index;
-			if(isset($context)){
-				if($this->variable[$context] === null ){
-					if($this->lvariable[$context] === null )throw new Exception('Не определена  переменная '.$context);
-					else $context = $this->lvariable[$context];
-				} 
-		    	else $context = $this->variable[$context];
-	    	}
-
+			if(is_string($context)) $context = $this->getContext($context);
+			
 	    	if($index < $this->tokenStream->indexFuncCom){
 				return callCommonFunction($context, $func, $args);
 			}
@@ -468,6 +471,7 @@ class CodeStream {
 			$startpos = $this->itoken-1;
 			$this->itoken = $this->beginFunction[$func]-1;
 			$this->GetChar();
+			$this->inFunction = $func;
 			$this->continueCode(TokenStream::keyword_function);
 			$this->lvariable = $lvariable;
 			$this->itoken = $startpos;
@@ -533,29 +537,45 @@ class CodeStream {
 						if($this->Index === TokenStream::oper_semicolon) $this->GetChar(); 
 						else throw new Exception('Неопознанный оператор '.$this->Look);
 						break;
+					//Работа с переменными	
 					case TokenStream::type_variable:
-						//$var = $this->getVariable();
 						$key = $this->Look;
+						$context = null;
+						$func = '';
 						$this->GetChar();
 						if( $this->Type === TokenStream::type_operator){
+
+							while($this->Index === TokenStream::oper_point){
+								$context = $this->getContext($key);
+								$this->GetChar();
+								//функция объекта
+								if( $this->Type === TokenStream::type_function ){
+									$func = $this->tokenStream->functions1С['php'][$this->Index];
+									$this->D0 = $this->callFunction( $key, $func, $this->Index);   		
+								}
+		    					//свойства объекта	
+								elseif($this->Type === TokenStream::type_variable){
+									$func = $this->Look;
+									$this->D0 = $this->callProperty($key);
+									$this->GetChar();
+								}
+								$key = ''; //переходи к текущему контексту
+							}
+
 						    if($this->Index === TokenStream::oper_equal){
 						 		//Оператор присвоения переменной
 						 		$this->GetChar();
 								$value = $this->Expression7();
 								if( $this->Type === TokenStream::type_operator && $this->Index === TokenStream::oper_semicolon){
-									if($this->inFunction) $this->lvariable[$key] = $value;
-									else $this->variable[$key] = $value;
+									if(isset($context)) $this->D0 = $context->SET($func, $value);
+									else{
+										if( $this->inFunction && !array_key_exists($key, $this->variable)) $this->lvariable[$key] = $value;
+										else $this->variable[$key] = $value;
+									}
 									$this->MatchOper(TokenStream::oper_semicolon, ';');
 								}
 								else throw new Exception('Ожидается ;');
 							}
-							elseif($this->Index === TokenStream::oper_point){
-								$this->GetChar();
-								$func = $this->tokenStream->functions1С['php'][$this->Index];
-								$this->D0 = $this->callFunction( $key, $func, $this->Index);
-								//echo '>'.$this->D0.'<';
-							}
-							else throw new Exception('Неизвестный оператор после переменной ');
 						}
 						else throw new Exception('Неизвестный не оператор после переменной ');
 						break;
@@ -697,55 +717,54 @@ class CodeStream {
 								}
 						 		else throw new Exception('Ожидается имя переменной');
 							 	break;
-							 	//Разбор описание функции или процедуры	
-							 	case TokenStream::keyword_function:
-							 	case TokenStream::keyword_procedure:
-							 		$this->GetChar();
-							 		if($this->Type === TokenStream::type_extfunction){
-							 			$func = str_replace(TokenStream::LetterRus, TokenStream::LetterEng, $this->Look);
-							 			if($skip) throw new Exception('Вложенных функций не допускается');
-							 			//инициализация переменных функции в массив $this->argsFunction[$func]
-							 			$this->inFunction = $func;
-							 			$this->argsFunction[$func] = array();
-							 			$this->GetChar();
-							 			if($this->Type !== TokenStream::type_operator || $this->Index !== TokenStream::oper_closebracket){
-											
-											//разбор переменных
+							//Разбор описание функции или процедуры	
+						 	case TokenStream::keyword_function:
+						 	case TokenStream::keyword_procedure:
+						 		$this->GetChar();
+						 		if($this->Type === TokenStream::type_extfunction){
+						 			$func = str_replace(TokenStream::LetterRus, TokenStream::LetterEng, $this->Look);
+						 			if($skip) throw new Exception('Вложенных функций не допускается');
+						 			//инициализация переменных функции в массив $this->argsFunction[$func]
+						 			$this->argsFunction[$func] = array();
+						 			$this->GetChar();
+						 			if($this->Type !== TokenStream::type_operator || $this->Index !== TokenStream::oper_closebracket){
+										
+										//разбор переменных
+										if($this->Type !== TokenStream::type_variable) throw new Exception('Ожидается переменная функции или процедуры'.$this->Look);
+										$this->argsFunction[$func][] = $this->Look;
+										$this->GetChar();
+										while( $this->Type !== TokenStream::type_operator || $this->Index !== TokenStream::oper_closebracket ){
+											if($this->Type !== TokenStream::type_operator || $this->Index !== TokenStream::oper_comma) throw new Exception('Ожидается запятая , ');
+											$this->GetChar();
 											if($this->Type !== TokenStream::type_variable) throw new Exception('Ожидается переменная функции или процедуры'.$this->Look);
 											$this->argsFunction[$func][] = $this->Look;
 											$this->GetChar();
-											while( $this->Type !== TokenStream::type_operator || $this->Index !== TokenStream::oper_closebracket ){
-												if($this->Type !== TokenStream::type_operator || $this->Index !== TokenStream::oper_comma) throw new Exception('Ожидается запятая , ');
-												$this->GetChar();
-												if($this->Type !== TokenStream::type_variable) throw new Exception('Ожидается переменная функции или процедуры'.$this->Look);
-												$this->argsFunction[$func][] = $this->Look;
-												$this->GetChar();
-											}
 										}
-										$this->MatchOper(TokenStream::oper_closebracket, ')');
-										$this->beginFunction[$func] = $this->itoken;
-							 			$this->continueCode(TokenStream::keyword_function, true, true);
-							 		}
-							 		else throw new Exception('Ожидается название функции или процедуры');
-							 		break;
-							 	case TokenStream::keyword_return:
-							 		if(!$skip){
-							 			$this->inFunction = null;
-							 			return $this->D0;
-							 		} 
-							  	 	break;	
-							 	case TokenStream::keyword_endfunction:
-							 	case TokenStream::keyword_endprocedure:
-							 		$this->GetChar();
-							 		$this->inFunction = null;
-							 		if($skip) return;
-							 		else return $this->D0;
-							 		break;
- 								 default:
-									throw new Exception('Нет соответствия ключевому слову '.TokenStream::keywords['code'][$this->Index]);
-									break;	
-								}
-								break;
+									}
+									$this->MatchOper(TokenStream::oper_closebracket, ')');
+									$this->beginFunction[$func] = $this->itoken;
+						 			$this->continueCode(TokenStream::keyword_function, true, true);
+						 		}
+						 		else throw new Exception('Ожидается название функции или процедуры');
+						 		break;
+						 	case TokenStream::keyword_return:
+						 		if(!$skip){
+						 			$this->inFunction = null;
+						 			return $this->D0;
+						 		} 
+						  	 	break;	
+						 	case TokenStream::keyword_endfunction:
+						 	case TokenStream::keyword_endprocedure:
+						 		$this->GetChar();
+						 		$this->inFunction = null;
+						 		if($skip) return;
+						 		else return $this->D0;
+						 		break;
+								 default:
+								throw new Exception('Нет соответствия ключевому слову '.TokenStream::keywords['code'][$this->Index]);
+								break;	
+							}
+							break;
 					default:
 						throw new Exception('Неопознанный оператор '.$this->Look);
 						break;

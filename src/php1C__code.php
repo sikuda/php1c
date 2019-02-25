@@ -59,8 +59,6 @@ class CodeStream {
 		$this->Type = $token->type; 
 		$this->Look = $token->context; 
 		$this->Index = $token->index;
-		//$this->row   = $token->row;
-		//$this->col   = $token->col;
 		$this->itoken++;
 
 	}
@@ -414,9 +412,25 @@ class CodeStream {
 				//Переменная - присвоение или функция			
 				case TokenStream::type_variable:
 					$key = $this->Look;
-					//$this->codePHP .= '!'.$key.'!';
+					$context = '$'.$key;
+					$curr = '';
 					$this->GetChar();
 					if( $this->Type === TokenStream::type_operator){
+
+						while($this->Index === TokenStream::oper_point){
+							if(!empty($curr)) $context .= '->'.$curr;
+							$this->GetChar();
+							//функция объекта
+							if( $this->Type === TokenStream::type_function ){
+								$curr = $this->splitFunction($key, $this->Look, $this->Index);   		
+							}
+	    					//свойства объекта	
+							elseif($this->Type === TokenStream::type_variable){
+								$curr = $this->Look;
+								$this->GetChar();
+							}
+							$key = ''; //переходи к текущему контексту
+						}	
 
 						if($this->Index === TokenStream::oper_equal){
 					 		//Оператор присвоения переменной
@@ -424,24 +438,30 @@ class CodeStream {
 					 		$value = $this->Expression7();
 							//$this->codePHP .= 'v'.$value.'v';
 							if( $this->Type === TokenStream::type_operator && $this->Index === TokenStream::oper_semicolon){
-								$this->code = '$'.$key."=".$value.';';
-								$this->MatchOper(TokenStream::oper_semicolon, ';');
-								$this->codePHP .= $this->code;
+								if(!empty($curr)){
+									$this->codePHP .= $context.'->SET('.$curr.', '.$value.')';
+								}
+								else{ 
+									$this->code = '$'.$key."=".$value.';';
+									$this->MatchOper(TokenStream::oper_semicolon, ';');
+									$this->codePHP .= $this->code;
+								}
 							}
 							//elseif ($this->Type === TokenStream::type_end_code) {
 							//		$this->variable[$key] = $value;
 							//}
 							else throw new Exception('Ожидается ;');
 						}
-						elseif ($this->Index === TokenStream::oper_point) {
-							$this->codePHP .= '$'.$key.'->';
-							$this->GetChar();
-							if($this->Type === TokenStream::type_function){
-								$this->codePHP .=$this->splitFunction($key, $this->Look, $this->Index);
-							}
-							else throw new Exception('Ожидается функция поле точки');
-						}
-						else throw new Exception('Неизвестный оператор после переменной ');
+						// elseif ($this->Index === TokenStream::oper_point) {
+						// 	$this->codePHP .= '$'.$key.'->';
+						// 	$this->GetChar();
+						// 	if($this->Type === TokenStream::type_function){
+						// 		$this->codePHP .=$this->splitFunction($key, $this->Look, $this->Index);
+						// 	}
+						// 	else throw new Exception('Ожидается функция поле точки');
+						// }
+						// else throw new Exception('Неизвестный оператор после переменной ');
+						else $this->codePHP .= $context.'->'.$curr;
 					}	
 					else throw new Exception('Неизвестный не оператор после переменной '.$key);
 					break;

@@ -190,8 +190,8 @@ class Array1C{
 	}
 
 	function Del($index){
-		array_splice($this->value, $index, 1);
-	    //unset($this->value[$index]);
+		//array_splice($this->value, $index, 1);
+	    unset($this->value[$index]);
 	}
 
 	function Set($index, $val){
@@ -210,10 +210,8 @@ function Structure1C($args=null){
 	return new Structure1C($args);
 }
 
-//TODO
 /**
 * Класс для работы со структурой 1С
-*
 */
 class Structure1C{
 	/**
@@ -251,8 +249,7 @@ class Structure1C{
 
 	function Property($key){
 		$key = strtoupper($key);
-		if( array_key_exists($key, $this->value) === FALSE) return false;
-		else return true;	
+		return array_key_exists($key, $this->value);
 	}
 
 	function Clear(){
@@ -262,13 +259,21 @@ class Structure1C{
 	}
 
 	function Del($key){
-		//array_splice($this->value, $key, 1);
-	    //unset($this->value[$index]);
+		$key = strtoupper($key);
+		unset($this->value[$key]);
 	}
 
 	//Для получения данных через точку
 	function Get($key){
+		$key = strtoupper($key);
 		return $this->value[$key];
 	}
+
+	//Для установки данных через точку
+	function Set($key, $val=null){
+		$key = strtoupper($key);
+		if(array_key_exists($key, $this->value)) $this->value[$key] = $val;
+		else throw new Exception("Не найден ключ структуры ".$key);
+	}	
 }
 
