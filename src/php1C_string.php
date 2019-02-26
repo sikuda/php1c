@@ -8,14 +8,8 @@
 * @version 0.1
 */
 
-/**
-* Подключаем пространство имен
-*/
-namespace php1C;
 
-/**
-* Используем стандартные исключения
-*/
+namespace php1C;
 use Exception;
 
 require_once('php1C_collections.php'); //для функций СтрРазделить, СтрСоединить

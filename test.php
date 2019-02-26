@@ -6,8 +6,30 @@
 	//eval('php1C\Message(123);');
 	//eval('$Mass=php1C\Array1C();$Mass->Add("Печкин");$Rezultat=$Mass->GET(0);php1C\Message($Rezultat);');
 
-	$str = 'стр = Новый Структура("ДатаСтр"); Стр.ДатаСтр = ТекущаяДата(); Результат = Стр.ДатаСтр;'; 
+	$str = 'Результат = Log(180000000);'; 
 	//$result = php1C\makeCode($str, "Результат");
 	$result = php1C\runCode($str, "Результат");
 	echo $result;
+
+
+
+// 	{
+//     "folders":
+//     [
+//         {
+//             "follow_symlinks": true,
+//             "path": "."
+//         }
+//     ],
+//     "settings": {
+//         "xdebug": {
+//             "url": "http://code1c.localhost/wp-content/plugins/codemirror1C/run/test.php",
+//             "host": "code1c.localhost",
+//             "break_on_start": false,
+//             "launch_browser": true,
+//             "close_on_stop": true,
+//             "super_globals": true,    
+//         }
+//     }
+// }
 ?>

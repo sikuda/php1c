@@ -18,8 +18,9 @@ namespace php1C;
 use Exception;
 
 /*
-*  Подключаем все модули
+*  Подключаем все модули для 1С
 */
+require_once('php1C_number.php');
 require_once('php1C_string.php');
 require_once('php1C_date.php');
 require_once('php1C_collections.php');
@@ -30,7 +31,7 @@ require_once('php1C_file.php');
 * @return string[] Массив названий функций общей работы с 1С.
 */
 function functions_Com(){
-	return  array('Сообщить(', 'Найти(', 'ЗначениеЗаполнено(' );
+	return  array('Сообщить(', 'Найти(', 'ЗначениеЗаполнено(', 'Тип(', 'ТипЗнч(' );
 }
 
 /**
@@ -38,7 +39,50 @@ function functions_Com(){
 * @return string[] Массив названий функций работы с датой.
 */   
 function functionsPHP_Com(){
-	return  array('Message(',  'Find(',  'ValueIsFilled(');
+	return  array('Message(',  'Find(',  'ValueIsFilled(',    'Type(','TypeOf(');
+}
+
+/**
+* Вызывает общие функции и функции объектов 1С 
+*
+* @param object $context объект для вызова функции или null
+* @param string $key строка названии функции со скобкой
+* @param array $arguments аргументы функции в массиве
+* @return возвращает результат функции или выбрасывает исключение
+*/
+function callCommonFunction($context=null, $key, $arguments){
+	if($context === null){
+		switch($key){
+		case 'Message(':
+			if(isset($arguments[2])) throw new Exception("Ожидается ) ");
+			return Message($arguments[0], $arguments[1]);
+		case 'Find(':
+			if(isset($arguments[2])) throw new Exception("Ожидается ) ");
+			return Find($arguments[0], $arguments[1]);
+		case 'ValueIsFilled(':
+			if(isset($arguments[1])) throw new Exception("Ожидается ) ");
+			return ValueIsFilled($arguments[0]);
+		case 'Type(':
+			if(isset($arguments[1])) throw new Exception("Ожидается ) ");
+			return Type($arguments[0]);
+		case 'TypeOf(':
+			if(isset($arguments[1])) throw new Exception("Ожидается ) ");
+			return TypeOf($arguments[0]);
+		default:
+			throw new Exception("Неизвестная общая функция ".$key."");
+		}	
+	}
+	else{
+		if( method_exists($context, substr($key, 0, -1) )){ 
+			switch($key){
+			case 'Find(':   return $context->Find($arguments[0]);
+			default:
+				throw new Exception("Нет обработки общей функции для объекта  ".$key."");
+			}
+		}else{
+			throw new Exception("Не найдена общая функция у объекта  ".$key."");
+		}
+	}
 }
 
 /**
@@ -286,40 +330,48 @@ function ValueIsFilled($val){
 	return isset($val);	
 }
 
-/**
-* Вызывает общие функции и функции объектов 1С 
-*
-* @param object $context объект для вызова функции или null
-* @param string $key строка названии функции со скобкой
-* @param array $arguments аргументы функции в массиве
-* @return возвращает результат функции или выбрасывает исключение
+/*
+* Класс для работы с типами 1С
 */
-function callCommonFunction($context=null, $key, $arguments){
-	if($context === null){
-		switch($key){
-		case 'Message(':
-			if(isset($arguments[2])) throw new Exception("Ожидается ) ");
-			return Message($arguments[0], $arguments[1]);
-		case 'Find(':
-			if(isset($arguments[2])) throw new Exception("Ожидается ) ");
-			return Find($arguments[0], $arguments[1]);
-		case 'ValueIsFilled(':
-			if(isset($arguments[1])) throw new Exception("Ожидается ) ");
-			return ValueIsFilled($arguments[0]);	
-		default:
-			throw new Exception("Неизвестная общая функция ".$key."");
-		}	
-	}
-	else{
-		if( method_exists($context, substr($key, 0, -1) )){ 
-			switch($key){
-			case 'Find(':   return $context->Find($arguments[0]);
-			default:
-				throw new Exception("Нет обработки общей функции для объекта  ".$key."");
-			}
-		}else{
-			throw new Exception("Не найдена общая функция у объекта  ".$key."");
-		}
+class Type1C{
+	/**
+	* @var string строка описание типа
+	*/
+	private $val; 
+
+    function __construct($str = '') {
+		$this->val = $str;
+	}	
+
+	function __toString(){
+		return $this->val;
 	}
 }
+
+/**
+* ТипЗнч - Возвращает тип значения 1C
+*
+* @param  any $val объект для получения типа
+* @return object Type1C 
+*/
+function TypeOf($val){
+
+	$str = "Неопределено";
+	if(is_bool($val)) $str = "Булево"; 
+	elseif(is_numeric($val)) $str = "Число"; 
+	elseif(is_string($val)) $str = "Строка"; 
+	elseif(is_object($val)) $str = $val->__toString();
+	return new Type1C($str);
+
+}
+
+/**
+* Тип - Возвращает тип 1С по его описанию в строке
+*
+* @param string $str строка описание типа
+* @return object Type1C 
+*/
+function Type($str){
+	return new Type1C($str);
+}	
 

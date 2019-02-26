@@ -9,14 +9,7 @@
 * @version 0.1
 */
 
-/**
-* Подключаем пространство имен
-*/
 namespace php1C;
-
-/**
-* Используем стандартные исключения
-*/
 use Exception;
 
 /**
@@ -93,17 +86,17 @@ class CodeStream {
 		$this->MatchOper(TokenStream::oper_point, '.');
 		if($this->Type === TokenStream::type_variable){
 			switch ($this->Look) {
-				case 'VK'  : //ВК
+				case 'ВК'  : 
 				case 'CR'  : return 'chr(13)';
-				case 'VTAB': //ВТаб
+				case 'ВТаб': //
 				case 'VTAB': return 'chr(11)';
-				case 'NPP' : //НПП
+				case 'НПП' : //
 				case 'NBSP': return 'chr(160)';
-				case 'PS'  : //'ПС'
+				case 'ПС'  : //''
 				case 'LF'  : return 'chr(10)';
-				case 'PF'  : //ПФ
+				case 'ПФ'  : //
 				case 'FF'  : return 'chr(12)';
-				case 'TAB' : //Таб
+				case 'Таб' : //
 				case 'TAB' : return 'chr(9)';
 				default:
 					throw new Exception('Неопределенный символ '.$this->Look);
@@ -376,8 +369,11 @@ class CodeStream {
 			$func = $this->tokenStream->functions1С['php'][$index];
 			//$this->codePHP .= 's'.$context.'->'.$func.'s';
 			switch ($func) {
-				case 'Date(': return 'php1C\Date1C('.$args.")";
-				case 'StrLen(': return 'php1C\StrLength('.$args.")";			
+				//обработка совпадения функций
+				case 'Date(': return 'php1C\Date1C('.$args.')';
+				case 'StrLen(': return 'php1C\StrLength('.$args.')';
+				case 'Round(': return 'php1C\Round1C('.$args.')';
+				case 'Log(': return 'php1C\Log1C('.$args.')';		
 				default:
 					if(isset($context)) return $this->tokenStream->functions1С['php'][$index].$args.")";
 					else return 'php1C\\'.$this->tokenStream->functions1С['php'][$index].$args.")";

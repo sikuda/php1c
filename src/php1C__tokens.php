@@ -6,14 +6,7 @@
 * @version 0.1
 */
 
-/**
-* Подключаем пространство имен
-*/
 namespace php1C;
-
-/**
-* Используем стандартные исключения
-*/
 use Exception;
 
 /*
@@ -130,10 +123,9 @@ class TokenStream {
 	//Индексы функций модулей
 	public $indexFuncCom = -1;
 	public $indexFuncStr = -1;
+	public $indexFuncNum = -1;
 	public $indexFuncDate = -1;
 	public $indexFuncColl = -1;
-
-
 
 	/**
 	* Конструктор класса
@@ -149,6 +141,7 @@ class TokenStream {
 		//Добавление в таблицы общих функций 
 		$this->indexFuncCom  = $this->AddModule( functions_Com(),  functionsPHP_Com());
 		$this->indexFuncStr  = $this->AddModule( functions_String(),  functionsPHP_String());
+		$this->indexFuncNum  = $this->AddModule( functions_Number(),  functionsPHP_Number());
 		$this->indexFuncDate = $this->AddModule( functions_Date(), functionsPHP_Date());
 		$this->indexFuncColl = $this->AddModule( functions_Collections(), functionsPHP_Collections());
 	}

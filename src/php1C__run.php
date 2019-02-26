@@ -116,17 +116,17 @@ class CodeStream {
 		$this->MatchOper(TokenStream::oper_point, '.');
 		if($this->Type === TokenStream::type_variable){
 			switch ($this->Look) {
-				case 'VK'  : //ВК
+				case 'ВК'  : //
 				case 'CR'  : return chr(13);
-				case 'VTAB': //ВТаб
+				case 'ВТаб': //
 				case 'VTab': return chr(11);
-				case 'NPP' : //НПП
+				case 'НПП' : //
 				case 'NBSP': return chr(160);
-				case 'PS'  : //'ПС'
+				case 'ПС'  : //''
 				case 'LF'  : return char(10);
-				case 'PF'  : //ПФ
+				case 'ПФ'  : //
 				case 'FF'  : return chr(12);
-				case 'TAB'  : //Таб
+				case 'Таб'  : //Т
 				case 'TAB'  : return chr(9);
 				default:
 					throw new Exception('Неопределенный символ '.$this->Look);
@@ -453,11 +453,13 @@ class CodeStream {
 			if($index < $this->tokenStream->indexFuncStr){
 				return callStringFunction($func, $args);
 			}
+			if($index < $this->tokenStream->indexFuncNum){
+				return callNumberFunction($func, $args);
+			}
 			if($index < $this->tokenStream->indexFuncDate){
 				return callDateFunction($func, $args);
 			}
 			if($index < $this->tokenStream->indexFuncColl){
-				//echo 'cnt='.$context.'func='.$func;
 				return callCollectionFunction($context, $func, $args);
 			}
 			throw new Exception("Неизвестный модуль для вызова функции ".$func); //."и ".$index);		
@@ -770,7 +772,7 @@ class CodeStream {
 						break;
 				}	
 			}else{ 
-				//Пропуск выполнения кода для циклов и конструкций Если
+				//Пропуск выполнения кода для циклов и конструкций Если Иначе
 				//echo '{'; 
 				$this->GetChar(); 
 				//echo '}';
