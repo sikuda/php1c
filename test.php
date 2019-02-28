@@ -6,7 +6,7 @@
 	//eval('php1C\Message(123);');
 	//eval('$Mass=php1C\Array1C();$Mass->Add("Печкин");$Rezultat=$Mass->GET(0);php1C\Message($Rezultat);');
 
-	$str = 'Результат = Log(180000000);'; 
+	$str = 'Результат = ACos(-0.25); '; 
 	//$result = php1C\makeCode($str, "Результат");
 	$result = php1C\runCode($str, "Результат");
 	echo $result;

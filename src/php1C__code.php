@@ -372,8 +372,6 @@ class CodeStream {
 				//обработка совпадения функций
 				case 'Date(': return 'php1C\Date1C('.$args.')';
 				case 'StrLen(': return 'php1C\StrLength('.$args.')';
-				case 'Round(': return 'php1C\Round1C('.$args.')';
-				case 'Log(': return 'php1C\Log1C('.$args.')';		
 				default:
 					if(isset($context)) return $this->tokenStream->functions1С['php'][$index].$args.")";
 					else return 'php1C\\'.$this->tokenStream->functions1С['php'][$index].$args.")";

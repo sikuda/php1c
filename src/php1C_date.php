@@ -113,6 +113,10 @@ class Date1C {
 	function __toString(){
 		return $this->value->format("d.m.Y H:i:s");
 	}
+
+	function toFormat($str){
+		return $this->value->format($str);	
+	}
     
     /**
     * Добавить к дате количество секунд, возвращает текущий объект.
