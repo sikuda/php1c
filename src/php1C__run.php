@@ -164,6 +164,19 @@ class CodeStream {
 			$this->D0 = $this->Expression7();
 			$this->MatchOper(TokenStream::oper_closebracket, ')');
 		}
+		//Обработка ?(,,) 
+		elseif( $this->Type === TokenStream::type_operator  && $this->Index === TokenStream::oper_question){
+			$this->GetChar();
+			$this->MatchOper(TokenStream::oper_openbracket);
+			$condition = $this->Expression7();
+			$this->MatchOper(TokenStream::oper_comma);
+			$first = $this->Expression7();
+			$this->MatchOper(TokenStream::oper_comma);
+			$second = $this->Expression7();
+			if( $condition ) $this->D0 = $first;
+			else $this->D0 = $second;
+			$this->MatchOper(TokenStream::oper_closebracket, ')');
+		}
 		else{
 			
 			$this->D0 = $this->Look;
@@ -231,6 +244,9 @@ class CodeStream {
 				$this->D0 = - $this->D0;
 			}elseif($index === TokenStream::oper_plus) {
 				$this->Factor();
+			}elseif($index === TokenStream::oper_not) {
+				$this->Factor();
+				$this->D0 = !($this->D0);	
 			}
 			//Оператор Новый и тип
 			elseif($index === TokenStream::oper_new) {
@@ -246,27 +262,32 @@ class CodeStream {
 		elseif($type === TokenStream::type_variable){
 			$key = $look;
 			//Обработка свойств и функций объекта
-		    while( $this->Type === TokenStream::type_operator && $this->Index === TokenStream::oper_point){
-		    	$this->GetChar();
-		    	//функции объекта
-		    	if( $this->Type === TokenStream::type_function ){
-		    		$func = $this->tokenStream->functions1С['php'][$this->Index];
-		    		$this->D0 = $this->callFunction( $key, $func, $this->Index);		    		
-		    	}
-		    	//свойства объекта	
-				elseif($this->Type === TokenStream::type_variable){
-					$this->D0 = $this->callProperty($key);
+		    while( $this->Type === TokenStream::type_operator && ($this->Index === TokenStream::oper_point || $this->Index === TokenStream::oper_opensqbracket) ){
+			
+				//Обработка квадратных скобок
+				if( $this->Type === TokenStream::type_operator && $this->Index === TokenStream::oper_opensqbracket){
 					$this->GetChar();
-				}	
-				else throw new Exception('Предполагается функция или свойство '.$this->Look.' объекта '.$look);
+					$value = $this->Expression7();
+					$this->D0 = $this->variable[$key]->GET($value);
+					$this->MatchOper(TokenStream::oper_closesqbracket, ']');
+				}
+				//Обработка точки
+				else{
+			    	$this->GetChar();
+			    	//функции объекта
+			    	if( $this->Type === TokenStream::type_function ){
+			    		$func = $this->tokenStream->functions1С['php'][$this->Index];
+			    		$this->D0 = $this->callFunction( $key, $func, $this->Index);		    		
+			    	}
+			    	//свойства объекта	
+					elseif($this->Type === TokenStream::type_variable){
+						$this->D0 = $this->callProperty($key);
+						$this->GetChar();
+					}	
+					else throw new Exception('Предполагается функция или свойство '.$this->Look.' объекта '.$look);
+				}
 			}
-			//Обработка квадратных скобок
-			if( $this->Type === TokenStream::type_operator && $this->Index === TokenStream::oper_opensqbracket){
-				$this->GetChar();
-				$value = $this->Expression7();
-				$this->D0 = $this->variable[$key]->GET($value);
-				$this->MatchOper(TokenStream::oper_closesqbracket, ']');
-			}	
+				
 		}	
 	}
 
@@ -762,7 +783,10 @@ class CodeStream {
 						 		if($skip) return;
 						 		else return $this->D0;
 						 		break;
-								 default:
+						 	case TokenStream::keyword_export:
+						 		$this->GetChar();
+					 			break;		
+							default:
 								throw new Exception('Нет соответствия ключевому слову '.TokenStream::keywords['code'][$this->Index]);
 								break;	
 							}

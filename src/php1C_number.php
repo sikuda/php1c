@@ -46,7 +46,7 @@ function callNumberFunction($key, $arguments){
 			case 'Tan(': return Tan($arguments[0]);
 			case 'АSin(': return ASin($arguments[0]);
 			case 'ACos(': return ACos($arguments[0]);
-			case 'АTan(': return ATan($arguments[0]);
+			case 'ATan(': return ATan($arguments[0]);
 			case 'Exp(': return Exp($arguments[0]);
 			case 'Pow(': return Pow($arguments[0],$arguments[1]);
 			case 'Sqrt(': return Sqrt($arguments[0]);

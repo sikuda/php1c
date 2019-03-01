@@ -259,7 +259,7 @@ function BegOfYear( $date ){
 * @return Date1C , начало квартала для даты $date
 */
 function BegOfQuarter( $date ){
-	$month = intdiv(date_format($date->value,"m"),3)+1;
+	$month = intdiv(intval(date_format($date->value,"m"))-1,3)+1;
 	return Date1C(intval(date_format($date->value,"Y")), $month, 1);
 }
 
@@ -332,7 +332,7 @@ function EndOfYear( $date ){
 * @return Date1C , конец квартала для даты $date
 */
 function EndOfQuarter( $date ){
-	$month = intdiv(date_format($date->value,"m"),3)+4;
+	$month = intdiv(intval(date_format($date->value,"m"))-1,3)+4;
 	return new Date1C(date_format($date->value,"Y").str_pad($month, 2, "0", STR_PAD_LEFT)."01", -1);
 }
 
