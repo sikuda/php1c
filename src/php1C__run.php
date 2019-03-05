@@ -313,7 +313,7 @@ class CodeStream {
 		
 		//Построитель типов
 		if($index < $this->tokenStream->indexTypesColl){
-			return callCollectionType($look, $arguments);
+			return callCollectionType($this->tokenStream->identypes['php'][$index], $arguments);
 		}
 		throw new Exception('Пока тип не определен '.$look);
 	}

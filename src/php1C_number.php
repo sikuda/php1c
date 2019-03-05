@@ -50,7 +50,12 @@ function callNumberFunction($key, $arguments){
 			case 'Exp(': return Exp($arguments[0]);
 			case 'Pow(': return Pow($arguments[0],$arguments[1]);
 			case 'Sqrt(': return Sqrt($arguments[0]);
+			case 'NumberInWords(': return NumberInWords($arguments[0],$arguments[1]);
+			case 'NStr(': return NStr($arguments[0]);
 			case 'Format(': return Format($arguments[0], $arguments[1]);
+			case 'PeriodPresentation(': return PeriodPresentation($arguments[0],$arguments[1],$arguments[2]);
+			case 'StrTemplate(': return StrTemplate($arguments[0],$arguments[1],$arguments[2],$arguments[3],$arguments[4],$arguments[5],$arguments[6],$arguments[7],$arguments[8],$arguments[9],$arguments[10]);
+			case 'StringWithNumber(': return StringWithNumber($arguments[0],$arguments[1],$arguments[2],$arguments[3]);
 			throw new Exception("Неизвестная функция работы с числами  форматированием ".$key."");
 			break;
 	}
@@ -237,17 +242,113 @@ function Format($val,$str_format){
 		if($val) return $ar_format['БИ'];
 		else return $ar_format['БЛ'];	
 	}
+	elseif(is_numeric($val)){
+		$pr = $ar_format['ЧДЦ'];
+		if(!isset($pr)){
+			$pr = strpos( strval($val), '.');
+			if($pr === false) $pr = 0;
+			else $pr = strlen(strval($val)) - $pr - 1;
+		} 
+		$dec = $ar_format['ЧРД'];
+		if(!isset($dec)) $dec= '.';
+		$th = $ar_format['ЧРГ'];
+		if(!isset($th)) $th= ' ';
+		return number_format($val, $pr, $dec, $th); 
+	}
 	elseif(is_object($val)){
 		//Это дата
-		if(get_class($val) === 'php1C\Date1C'){
-			$str = $ar_format['ДФ'];
-
-			$str = str_replace(
-				array('\'','\"','гггг','yyyy','гг','yy','дд','dd','ММ','MM','чч','hh','ЧЧ','HH','мм','mm'),
-				array('',  '',  'Y'   ,'Y'   ,'y' ,'y' ,'d' ,'d' ,'m', 'm' ,'h' ,'h' ,'H' ,'H' ,'i' ,'i'), 
-			$str);
-			return $val->toFormat($str);
+		$name = get_class($val);
+		if( $name === 'php1C\Date1C'){
+			$frm = $ar_format['ДФ'];
+			if(isset($frm)){
+				$frm = str_replace(
+					array('\'','\"','гггг','yyyy','гг','yy','дд','dd','ММ','MM','чч','hh','ЧЧ','HH','мм','mm'),
+					array('',  '',  'Y'   ,'Y'   ,'y' ,'y' ,'d' ,'d' ,'m', 'm' ,'h' ,'h' ,'H' ,'H' ,'i' ,'i'), 
+				$frm);
+				return $val->toFormat($frm);
+			}
+			$frm = $ar_format['ДЛФ'];
+			if(isset($frm)){
+				$frm = str_replace(
+					array('\'','\"','ДД',    'DD',   'Д',    'D',    'В',     'T'),
+					array('',  '',  'd.m.Y' ,'d.m.Y','d.m.Y','d.m.Y','h:m:s' ,'h:m:s' ,), 
+				$frm);
+				return $val->toFormat($frm);	
+			} 
 		}
     }
 	return strval($val);
+}
+
+/**
+* Представление числа прописью.
+*
+* @param  float $val чиcло для вывода   
+* @param  float $frm форматная строка   
+* @return string - результат  
+*/
+function NumberInWords($val, $frm){
+	return 'Еще не реализовано';
+}
+
+/**
+* Функция заглушка, возвращает или русскую строку или самому строчку
+*
+* @param  float $str Строки на разных языках, разделенные символом ";" (точка с запятой). Строка на одном языке состоит из кода языка, указанного в метаданных, символа "=" (равно) и собственно строки текста на данном языке в одинарных кавычках, двойных кавычках или без кавычек (когда указывается только один язык).
+* @return string - результат  
+*/
+function NStr($str){
+	$ar_format = array();
+	$arstr = explode( ';', $str_format);
+	foreach ($arstr as $value) {
+		$duo = explode( '=', $value);
+		$ar_format[trim($duo[0])]=$duo[1];
+	}
+	if(isset($ar_format['ru'])) return $ar_format['ru'];
+	return str;
+}
+
+/**
+* Функция заглушка, возвращает строковое представление периода
+*
+* @param  object Date1C date1 первая дата
+* @param  object Date1C date2 вторая дата
+* @param  string frm строка форматирования
+* @return string - результат  
+*/
+function PeriodPresentation($date1,$date2,$frm){
+	return 'Еще не реализовано';
+}
+
+/**
+* Функция заглушка, возвращает или русскую строку или самому строчку
+*
+* @param  string str строка шаблон для вывода
+* @param  float val1 первое число 
+* @param  float val2 первое число 
+* @param  float val3 первое число 
+* @param  float val4 первое число 
+* @param  float val5 первое число 
+* @param  float val6 первое число 
+* @param  float val7 первое число 
+* @param  float val8 первое число 
+* @param  float val9 первое число 
+* @param  float val10 первое число 
+* @return string - результат  
+*/
+function StrTemplate( $str,$val1,$val2,$val3,$val4,$val5,$val6,$val7,$val8,$val9,$val10){
+	return 'Еще не реализовано';	
+}
+
+/**
+* Функция заглушка, Представление строки числа в требуемой форме.
+*
+* @param  string str строка шаблон для вывода
+* @param  float val1 первое число 
+* @param  string frm 
+* @param  string prm параметры
+* @return string - результат  
+*/
+function StringWithNumber($str,$val,$frm,$prm){
+	return 'Еще не реализовано';
 }

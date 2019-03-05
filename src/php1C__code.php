@@ -113,19 +113,6 @@ class CodeStream {
 		
 		//Обработка скобок и унарных операций 
 		if( $this->Type === TokenStream::type_operator && $this->Index === TokenStream::oper_openbracket ){
-			// $index = $this->Index;
-			// $code = $this->code; 
-			// $this->GetChar();
-			// $this->code = $this->Expression7();
-			// switch ($index) {
-			// 	case TokenStream::oper_openbracket:
-			// 		$this->MatchOper(TokenStream::oper_closebracket, ')');
-			// 		break;
-			// 	default:
-			// 		throw new Exception('Неизвестный унарный оператор '.$this->getOperator($code));
-			// 		break;
-			// }
-			//&& $this->Index === TokenStream::oper_openbracket){
 			$this->GetChar();
 			$this->code = $this->Expression7();
 			$this->MatchOper(TokenStream::oper_closebracket, ')');
