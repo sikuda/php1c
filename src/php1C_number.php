@@ -56,7 +56,7 @@ function callNumberFunction($key, $arguments){
 			case 'PeriodPresentation(': return PeriodPresentation($arguments[0],$arguments[1],$arguments[2]);
 			case 'StrTemplate(': return StrTemplate($arguments[0],$arguments[1],$arguments[2],$arguments[3],$arguments[4],$arguments[5],$arguments[6],$arguments[7],$arguments[8],$arguments[9],$arguments[10]);
 			case 'StringWithNumber(': return StringWithNumber($arguments[0],$arguments[1],$arguments[2],$arguments[3]);
-			throw new Exception("Неизвестная функция работы с числами  форматированием ".$key."");
+			throw new Exception("Неизвестная функция работы с числами и форматированием ".$key."");
 			break;
 	}
 }	

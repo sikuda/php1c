@@ -322,7 +322,9 @@ function ValueIsFilled($val){
 	if(is_object($val)){
 		switch (get_class($val)) {
 		 	case 'php1C\Date1C': return $val != "01.01.0001 00:00:00";
-		 	case 'php1C\Array1C': return ($val->Count()>0);	
+		 	case 'php1C\Array1C':
+		 	case 'php1C\ValueTable':
+		 	case 'php1C\ValueTableColumnCollection': return ($val->Count()>0);	
 		 	default:
 		 		break;
 		 } 

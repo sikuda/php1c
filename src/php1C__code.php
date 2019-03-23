@@ -58,6 +58,9 @@ class CodeStream {
 
 	/**
 	* Проверка совпадения оператора
+	*
+	* @param $subtype TokenStream::const индекс операции
+	* @param $look string error::const строковое представление операции
 	*/
 	private function MatchOper($subtype, $look='???'){
 		if( $this->Type === TokenStream::type_operator && $this->Index === $subtype){ 
@@ -68,6 +71,8 @@ class CodeStream {
 
 	/**
 	* Проверка совпадения ключевого слова
+	*
+	* @param $subtype TokenStream::const индекс ключевого слова
 	*/
 	private function MatchKeyword($subtype){
 		if( $this->Type === TokenStream::type_keyword && $this->Index === $subtype){ 
@@ -177,6 +182,10 @@ class CodeStream {
 
 	/**
 	* Выполнение кода для зависящих от дальнейших данных(унарные операции и свойства и функции объекта)
+	*
+	* @param $type TokenStream::const тип предыдущего токена
+	* @param $look string тектовое представление предыдущего токена
+	* @param $index TokenStream::const индекс предыдущего токена
 	*/
 	private function ForwardOperation($type, $look, $index=-1){
 		if($type === TokenStream::type_operator){
@@ -219,19 +228,15 @@ class CodeStream {
 			    	$this->GetChar();
 			    	//функции объекта
 			    	if( $this->Type === TokenStream::type_function ){
-			    		//$this->codePHP .= '+'.$this->Look.$this->Index.'+';
 			    		$this->code = $this->code.'->'.$this->splitFunction( $key, $this->Look, $this->Index);
-			    		return;
 			    	}
 			    	//функции объекта неопределенная
 			    	elseif( $this->Type === TokenStream::type_extfunction ){
-			    		//$this->codePHP .= '+'.$this->Look.$this->Index.'+';
 			    		$this->code = $this->code.'->'.$this->splitFunction( $key, $this->Look, $this->Index);
-			    		return;
 			    	}
 			    	//свойства объекта	
 					elseif($this->Type === TokenStream::type_variable){
-						$this->code = $this->code.'->Get('.$this->Look.')';
+						$this->code = $this->code.'->Get("'.$this->Look.'")';
 						$this->GetChar();
 					}	
 					elseif($this->Type === TokenStream::type_number) throw new Exception('Неправильная константа типа число '.$this->Look);
@@ -280,9 +285,6 @@ class CodeStream {
 	public function Expression7($level=7){
 		if($level > 2) $this->Expression7($level-1);
 		switch ($level) {
-			// case 1: // Базовые операции
-			// 	$this->Factor();
-			// 	break;
 			case 2: // Базовые операции
 				$this->Factor();
 				break;
@@ -375,7 +377,6 @@ class CodeStream {
 	*/
 	public function splitFunction($context=null, $func, $index=-1){
 		$args = ''; 
-		//$args = 'array(';
 		$this->GetChar();
 		//разбор аргументов функции		
 		if($this->Type !== TokenStream::type_operator || $this->Index !== TokenStream::oper_closebracket){
@@ -470,20 +471,8 @@ class CodeStream {
 									$this->codePHP .= $this->code;
 								}
 							}
-							//elseif ($this->Type === TokenStream::type_end_code) {
-							//		$this->variable[$key] = $value;
-							//}
 							else throw new Exception('Ожидается ;');
 						}
-						// elseif ($this->Index === TokenStream::oper_point) {
-						// 	$this->codePHP .= '$'.$key.'->';
-						// 	$this->GetChar();
-						// 	if($this->Type === TokenStream::type_function){
-						// 		$this->codePHP .=$this->splitFunction($key, $this->Look, $this->Index);
-						// 	}
-						// 	else throw new Exception('Ожидается функция поле точки');
-						// }
-						// else throw new Exception('Неизвестный оператор после переменной ');
 						else $this->codePHP .= $context.'->'.$curr;
 					}	
 					else throw new Exception('Неизвестный не оператор после переменной '.$key);

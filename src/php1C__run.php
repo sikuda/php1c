@@ -9,20 +9,9 @@
 * @version 0.1
 */
 
-/**
-* Подключаем пространство имен
-*/
 namespace php1C;
 
-/**
-* Используем стандартные исключения
-*/
 use Exception;
-
-
-/**
-* Подключаем базовый модуль работы с 1С и все остальные модули
-*/
 require_once('php1C__tokens.php');
 require_once('php1C_common.php');
 
@@ -46,12 +35,7 @@ class CodeStream {
     private $beginFunction = array();
     private $argsFunction = array();
     
-    //common 
-	private $str = '';
-	private $start = 0;
-	private $pos = 0;
-
-	//current token
+    //current token
 	private $Type  = 0;
 	private $Look  = '';
 	private $Index = -1;
@@ -82,6 +66,8 @@ class CodeStream {
 
 	/**
 	* Ввернуть управление на позицию $pos
+	*
+	* @param $pos int индекс в массиве токенов
 	*/
 	private function setPosition($pos){
 		$this->itoken = $pos;
@@ -90,6 +76,9 @@ class CodeStream {
 
 	/**
 	* Проверка совпадения оператора
+	*
+	* @param $subtype TokenStream::const индекс операции
+	* @param $look string error::const строковое представление операции
 	*/
 	private function MatchOper($subtype, $look='???'){
 		if( $this->Type === TokenStream::type_operator && $this->Index === $subtype){ 
@@ -100,6 +89,8 @@ class CodeStream {
 
 	/**
 	* Проверка совпадения ключевого слова
+	*
+	* @param $subtype TokenStream::const индекс ключевого слова
 	*/
 	private function MatchKeyword($subtype){
 		if( $this->Type === TokenStream::type_keyword && $this->Index === $subtype){ 
@@ -137,23 +128,6 @@ class CodeStream {
 	}
 
 	/**
-	* Получить значение переменной
-	*/
-	private function getVariable(){
-		$key = $this->Look;
-		//echo 'key='.$key.'f='.$this->inFunction;
-  		if( !array_key_exists($key, $this->variable)){
-  			if(isset($this->inFunction)){
-  				if(!array_key_exists($key, $this->lvariable)) 
-  					throw new Exception('Не определена переменная '.$this->Look.'  в функции '.$this->inFunction);
-				else return $this->lvariable[$key];
-			}
-			else throw new Exception('Не определена переменная '.$this->Look);
-		} 
-    	else return $this->variable[$key];	
-	}
-
-	/**
 	* Первичный выполнятор примитивных выражений 
 	*/
 	private function Factor(){
@@ -181,7 +155,7 @@ class CodeStream {
 			
 			$this->D0 = $this->Look;
 			if($this->Type === TokenStream::type_variable){
-				$this->D0 = $this->getVariable(); 
+				$this->D0 = $this->getContext($this->D0); 
 			}
 			if ($this->Type === TokenStream::type_date) $this->D0 = Date1C($this->D0);
 			if ($this->Type === TokenStream::type_number) $this->D0 = toNumber1C($this->D0);
@@ -235,6 +209,11 @@ class CodeStream {
 
 	/**
 	* Выполнение кода для зависящих от дальнейших данных(унарные операции и свойства и функции объекта)
+	*
+	*
+	* @param $type TokenStream::const тип предыдущего токена
+	* @param $look string тектовое представление предыдущего токена
+	* @param $index TokenStream::const индекс предыдущего токена
 	*/
 	private function ForwardOperation($type, $look, $index=-1){
 		if($type === TokenStream::type_operator){
@@ -260,38 +239,55 @@ class CodeStream {
 			}	
 		}
 		elseif($type === TokenStream::type_variable){
-			$key = $look;
 			//Обработка свойств и функций объекта
-		    while( $this->Type === TokenStream::type_operator && ($this->Index === TokenStream::oper_point || $this->Index === TokenStream::oper_opensqbracket) ){
-			
-				//Обработка квадратных скобок
-				if( $this->Type === TokenStream::type_operator && $this->Index === TokenStream::oper_opensqbracket){
-					$this->GetChar();
-					$value = $this->Expression7();
-					$this->D0 = $this->variable[$key]->GET($value);
-					$this->MatchOper(TokenStream::oper_closesqbracket, ']');
-				}
-				//Обработка точки
-				else{
-			    	$this->GetChar();
-			    	//функции объекта
-			    	if( $this->Type === TokenStream::type_function ){
-			    		$func = $this->tokenStream->functions1С['php'][$this->Index];
-			    		$this->D0 = $this->callFunction( $key, $func, $this->Index);		    		
-			    	}
-			    	//свойства объекта	
-					elseif($this->Type === TokenStream::type_variable){
-						$this->D0 = $this->callProperty($key);
-						$this->GetChar();
-					}	
-					else throw new Exception('Предполагается функция или свойство '.$this->Look.' объекта '.$look);
-				}
-			}
-				
+			$this->D0 = $this->getProperty($look);
 		}	
 	}
 
-	//Выдать идентификатор типа по названию или индексу
+	/**
+	*  Получение свойств или функциий у объекта в цикла [] или .
+	*
+	* @param $look string имя переменной контекта
+	* @param $lastkey string последнее свойство выбираемое в строке 
+	* @param $lastcontext any последний контект выбираемый в строке
+	*/
+	private function getProperty($look, &$lastkey=null, &$lastcontext=null){
+		$context = $this->getContext($look);
+	    while( $this->Type === TokenStream::type_operator && ($this->Index === TokenStream::oper_point || $this->Index === TokenStream::oper_opensqbracket) ){
+		
+	    	$lastcontext = $context;
+
+			//Обработка квадратных скобок
+			if($this->Index === TokenStream::oper_opensqbracket){
+				$this->GetChar();
+				$lastkey = $this->Expression7();
+				$context = $context->GET($lastkey);
+				$this->MatchOper(TokenStream::oper_closesqbracket, ']');
+			}
+			//Обработка точки
+			else{
+		    	$this->GetChar();
+		    	//функции объекта
+		    	if( $this->Type === TokenStream::type_function ){
+		    		$func = $this->tokenStream->functions1С['php'][$this->Index];
+		    		$context = $this->callFunction( $context, $func, $this->Index);		    		
+		    	}
+		    	//свойства объекта	
+				elseif($this->Type === TokenStream::type_variable){
+					$lastkey = $this->Look;
+					$args = array( 0 => $lastkey);
+					$context = callCollectionFunction($context, 'Get(', $args);
+					$this->GetChar();
+				}	
+				else throw new Exception('Предполагается функция или свойство '.$this->Look.' объекта '.$look);
+			}
+		}
+		return $context;
+	} 
+
+	/**
+	* Выдать идентификатор типа по названию или индексу
+	*/
 	private function getNewType(){
 		$index = $this->Index;
 		$look = $this->Look;
@@ -405,6 +401,12 @@ class CodeStream {
 		return $this->D0;
 	}
 
+	/**
+	* Возвращает в параметре $args массив аргументов функций
+	*
+	* @param $args array outout массив переменных функции
+	* @return true
+	*/
 	private function splitArguments(&$args){
 		$this->GetChar();
 		if($this->Type !== TokenStream::type_operator || $this->Index !== TokenStream::oper_closebracket){
@@ -428,7 +430,7 @@ class CodeStream {
 	*/
 	private function getContext($key=''){
 		if(!empty($key)){
-			if($this->variable[$key] === null ){
+			if($this->variable[$key] === null && !empty($this->inFunction)){
 				if($this->lvariable[$key] === null )throw new Exception('Не определена  переменная '.$key);
 				else return $this->lvariable[$key];
 			} 
@@ -438,10 +440,23 @@ class CodeStream {
 	}
 
 	/**
+	* Установка переменных по ключу (глобальной или локальной)
+	*
+	* @param $key string имя переменной контекста
+	* @param $value any значение переменной контекста
+	*/
+	private function setContext($key, $value=null){
+		if( isset($this->inFunction) && array_key_exists($key, $this->variable) === false ){
+			$this->lvariable[$key] = $value;
+		} 
+	    else $this->variable[$key] = $value;
+	}
+
+	/**
 	* Получение свойства объекта через точку 
 	*
-	* @param $context string имя переменной контекста
-	* @param $func string название функции
+	* @param $key string имя переменной контекста
+	* @param $func string имя название функции
 	* @param $index int индекс функции в таблице распознаных функций
 	*/
 	private function callProperty($key){
@@ -449,7 +464,8 @@ class CodeStream {
 		$context = $this->getContext($key);
 		if(isset($context)){
 			$args = array( 0 => $this->Look);
-		   	return callCollectionFunction($context, 'Get(', $args);
+		   	$this->D0 = callCollectionFunction($context, 'Get(', $args);
+		   	return $this->D0;
 	    }
 	    else throw new Exception("Неизвестный контекст вызова свойства ".$this->Look);
 	}
@@ -526,7 +542,7 @@ class CodeStream {
 	}
 
 	/*
-	** Проверка на описание функции или процедуры... 
+	** Проверка на выполнение кода внутри описания функции или процедуры... 
 	**
 	** $handle - token_function(TokenStream) обрабатываемая структура кода 
 	*/
@@ -568,21 +584,9 @@ class CodeStream {
 						$this->GetChar();
 						if( $this->Type === TokenStream::type_operator){
 
-							while($this->Index === TokenStream::oper_point){
-								$context = $this->getContext($key);
-								$this->GetChar();
-								//функция объекта
-								if( $this->Type === TokenStream::type_function ){
-									$func = $this->tokenStream->functions1С['php'][$this->Index];
-									$this->D0 = $this->callFunction( $key, $func, $this->Index);   		
-								}
-		    					//свойства объекта	
-								elseif($this->Type === TokenStream::type_variable){
-									$func = $this->Look;
-									$this->D0 = $this->callProperty($key);
-									$this->GetChar();
-								}
-								$key = ''; //переходи к текущему контексту
+							if($this->Index === TokenStream::oper_point){
+								//echo 'point='.$key;
+								$this->getProperty($key, $func, $context);
 							}
 
 						    if($this->Index === TokenStream::oper_equal){
@@ -590,11 +594,10 @@ class CodeStream {
 						 		$this->GetChar();
 								$value = $this->Expression7();
 								if( $this->Type === TokenStream::type_operator && $this->Index === TokenStream::oper_semicolon){
-									if(isset($context)) $this->D0 = $context->SET($func, $value);
+									if(isset($context))  $context->SET($func, $value);
 									else{
-										if( $this->inFunction && !array_key_exists($key, $this->variable)) $this->lvariable[$key] = $value;
-										else $this->variable[$key] = $value;
-									}
+										$this->setContext($key, $value);	
+									} 
 									$this->MatchOper(TokenStream::oper_semicolon, ';');
 								}
 								else throw new Exception('Ожидается ;');
@@ -605,8 +608,6 @@ class CodeStream {
 					case TokenStream::type_function:
 					case TokenStream::type_extfunction:
 						$this->Expression7();
-						//echo 'type='.$this->Type.';look='.$this->Look;
-						//$this->MatchOper(TokenStream::oper_semicolon, ';');
 						break;
 					case TokenStream::type_comments:
 						$this->GetChar();
