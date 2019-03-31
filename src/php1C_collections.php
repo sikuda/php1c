@@ -161,6 +161,10 @@ class Array1C{
 		return "Массив";
 	}
 
+	function toArray(){
+		return $this->value;
+	}
+
 	function UBound(){
 		$key = count($this->value);
 		if(is_null($key) ) return -1;
@@ -168,12 +172,10 @@ class Array1C{
 	}
 
 	function Insert($index, $val){
-		//if(!isset($val)) $val = null;
 		$this->value[$index] = $val;
 	}
 
 	function Add($val){
-		//tocheck
 		$this->value[] = $val;
 		return $this;
 	}
@@ -183,7 +185,6 @@ class Array1C{
 	}
 
 	function Find($val){
-		//tocheck
 		$key = array_search($val, $this->value);
 		if($key === FALSE) return new undefined1C();
 		else return $key;
@@ -248,6 +249,10 @@ class Structure1C{
 		}
 	}
 
+	function toArray(){
+		return $this->value;
+	}
+
 	function __toString(){
 		return "Структура";
 	}
@@ -260,8 +265,9 @@ class Structure1C{
 		return count($this->value);
 	}
 
-	function Property($key){
+	function Property($key, $value=null){
 		$key = strtoupper($key);
+		$value = $this->value[$key];
 		return array_key_exists($key, $this->value);
 	}
 
@@ -449,18 +455,23 @@ class ValueTable{
 		//throw new Exception("Пока нет реализации Найти");	
 	}
 
+	//Поиск по структуре
 	function FindRows($filter){
-		if(!is_object($arr) || get_class($arr) !== 'php1C\Array1C')
-		$strcols = $this->GetAllColumns();
-		$keys = explode(',',$strcols);
-		for ($i=0; $i < count($keys); $i++){
-			$col = strtoupper(trim($keys[$i]));
-			foreach ($this->rows as $row) {
-				// $val = $row->Get($col);
-				// if( $val === $value ) return $row;
+		if(!is_object($filter) || get_class($filter) !== 'php1C\Structure1C'){
+			throw new Exception("Аргумент функции должен быть структурой ".$filter);
+		} 
+		$array_filter = $filter->toArray();
+		$array = new Array1C();
+		foreach ($this->rows as $key => $row){
+			$found = true;
+			foreach ($array_filter as $key_filter => $value_filter) {
+				if( $row[$key_filter] == $value_filter ){
+					$found = false;
+				}
 			}
-		}	
-		throw new Exception("Аргумент функции должен быть структурой ".$filter);
+			if($found) $array->Add($row); 	
+		}
+		return $array;
 	}
 
 	function Clear(){
@@ -502,8 +513,17 @@ class ValueTable{
 		throw new Exception("Пока нет реализации Свернуть");	
 	}
 
-	function Move($str, $offset){
-		throw new Exception("Пока нет реализации Сдвинуть");	
+	function Move($row, $offset){
+		if(is_object($row) && get_class($row) === 'php1C\ValueTableRow'){
+			$row = $this->IndexOf($row);
+		}
+		if(!is_float($row) && !is_int($row)) throw new Exception("Первый параметр должен быть числом или строкой ТаблицыЗначений");
+		if(!is_float($offset) && !is_int($offset)) throw new Exception("Второй параметр должен быть числом");
+		$row_object = $this->rows[$row];
+		//if($row>$row+$offset) $row += 1;
+		array_splice($this->rows,$row,1);
+		array_splice($this->rows,$row+$offset,0,array($row_object));
+		//var_dump($this->rows);
 	}
 
 	function Copy($rows, $cols){
@@ -523,9 +543,12 @@ class ValueTable{
 			$row = $this->rows[$row];
 		}elseif(!is_object($row) && get_class($row) !== 'php1C\ValueTableRow'){
 			throw new Exception("Параметр может быть либо строкой либо числом");
-		}		
-		$row->setValueTable(null);
-		unset($row);
+		}
+		$key = $this->IndexOf($row);
+		if($key !== -1){
+			$row->setValueTable(null);
+			unset($this->rows[$key]);
+		}	
 	}
 }
 
@@ -610,6 +633,10 @@ class ValueTableRow{
 
 	function __toString(){
 		return "СтрокаТаблицыЗначений";
+	}
+
+	function setValueTable($parent){
+		$this->ValueTable = &$parent;
 	}
 
 	//Для получения данных через точку

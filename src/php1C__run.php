@@ -585,7 +585,6 @@ class CodeStream {
 						if( $this->Type === TokenStream::type_operator){
 
 							if($this->Index === TokenStream::oper_point){
-								//echo 'point='.$key;
 								$this->getProperty($key, $func, $context);
 							}
 
@@ -679,31 +678,60 @@ class CodeStream {
 						 	case TokenStream::keyword_for:
 						 		$this->MatchKeyword(TokenStream::keyword_for);
 						 		if(!$skip){	
-							 		//Пока только шаблона Для перем=
-							 		if($this->Type !== TokenStream::type_variable) 
-							 			throw new Exception('Ожидается имя переменной');
-							 		$iterator = $this->Look;
-									$this->GetChar();
-									if( $this->Type === TokenStream::type_operator && $this->Index === TokenStream::oper_equal ){
+							 		
+							 		//Шаблона Для каждого перем ИЗ Чего-то Цикл ... КонецЦикла;
+							 		if($this->Type !== TokenStream::keyword_foreach){
+							 			$this->GetChar();
+							 			if($this->Type !== TokenStream::type_variable) throw new Exception('Ожидается имя переменной');
+							 			$iterator = $this->Look;
+							 			$this->GetChar();
+							 			$this->MatchKeyword(TokenStream::keyword_from);
+							 			if($this->Type !== TokenStream::type_variable) throw new Exception('Ожидается имя переменной');
+							 			$array = $this->getContext($this->Look);
+							 			if(!method_exists($array, 'toArray'))
+							 				throw new Exception('Нельзя из этого элемента выбрать итерации');
+							 			$array = $array->toArray();
+							 			$this->setContext($iterator, current($array));
+							 			//$this->lvariable[] = ;
+							 			$this->GetChar();	
+							 			$this->MatchKeyword(TokenStream::keyword_circle);
+							 			$startpos = $this->itoken;
+							 			$it = 0;
+							 			while($this->getContext($iterator)!==false){
+							 				if($this->continueCode(TokenStream::keyword_circle, false)){
+								 				$this->setPosition($startpos); //move back to code
+								 				$this->setContext($iterator, next($array));
+								 		    }
+							 				else $this->setContext($iterator, false);
+							 				if(++$it > self::MAX_ITERRATOR_IN_CIRCLE) throw new Exception('Я отработал максимальное значение циклов '.self::MAX_ITERRATOR_IN_CIRCLE);	
+							 			}
+							 		}
+							 		//Шаблона Для перем=Нач По Кон Цикл ... КонецЦикла;
+							 		else{
+								 		if($this->Type !== TokenStream::type_variable) throw new Exception('Ожидается имя переменной');
+								 		$iterator = $this->Look;
 										$this->GetChar();
-										$value = $this->Expression7();
-						 				$this->lvariable[$iterator] = $value;
-									}
-									else throw new Exception('Ожидается символ =');
-									$startpos = $this->itoken;
-									$this->MatchKeyword(TokenStream::keyword_to);
-							 		$key = $this->lvariable[$iterator] <= $this->Expression7();
-							 		$this->MatchKeyword(TokenStream::keyword_circle);
-							 		$it = 0;
-						 			while($key){
-						 				if($this->continueCode(TokenStream::keyword_circle, false)){
-							 				$this->setPosition($startpos); //move back to code
-							 				$this->lvariable[$iterator]++;
-							 				$key = $this->lvariable[$iterator] <= $this->Expression7();	
-							 			    $this->MatchKeyword(TokenStream::keyword_circle);
-						 			    }
-						 				else $key = false;
-						 				if(++$it > self::MAX_ITERRATOR_IN_CIRCLE) throw new Exception('Я отработал максимальное значение циклов '.self::MAX_ITERRATOR_IN_CIRCLE); 
+										if( $this->Type === TokenStream::type_operator && $this->Index === TokenStream::oper_equal ){
+											$this->GetChar();
+											$value = $this->Expression7();
+							 				$this->lvariable[$iterator] = $value;
+										}
+										else throw new Exception('Ожидается символ =');
+										$startpos = $this->itoken;
+										$this->MatchKeyword(TokenStream::keyword_to);
+								 		$key = $this->lvariable[$iterator] <= $this->Expression7();
+								 		$this->MatchKeyword(TokenStream::keyword_circle);
+								 		$it = 0;
+							 			while($key){
+							 				if($this->continueCode(TokenStream::keyword_circle, false)){
+								 				$this->setPosition($startpos); //move back to code
+								 				$this->lvariable[$iterator]++;
+								 				$key = $this->lvariable[$iterator] <= $this->Expression7();	
+								 			    $this->MatchKeyword(TokenStream::keyword_circle);
+							 			    }
+							 				else $key = false;
+							 				if(++$it > self::MAX_ITERRATOR_IN_CIRCLE) throw new Exception('Я отработал максимальное значение циклов '.self::MAX_ITERRATOR_IN_CIRCLE); 
+							 			}
 						 			}
 					 			}
 							 	$this->continueCode(TokenStream::keyword_circle, true);

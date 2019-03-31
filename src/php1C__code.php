@@ -540,24 +540,38 @@ class CodeStream {
 					 		//Для перем=.. по .. цикл КонецЦикла;
 					 	case TokenStream::keyword_for:
 					 		$this->MatchKeyword(TokenStream::keyword_for);
-					 		$this->codePHP .= "for(";
-					 		//Пока только шаблона Для перем=
-					 		if($this->Type !== TokenStream::type_variable) throw new Exception('Ожидается имя переменной');
-					 		$iterator = $this->Look;
-							$this->GetChar();
-							if( $this->Type === TokenStream::type_operator && $this->Index === TokenStream::oper_equal ){
-								$this->codePHP .= '$'.$iterator.'=';
+					 		if($this->Type !== TokenStream::keyword_foreach){
+					 			$this->GetChar();
+					 			//Шаблона Для каждого перем ИЗ Чего-то Цикл ... КонецЦикла;
+					 			if($this->Type !== TokenStream::type_variable) throw new Exception('Ожидается имя переменной');
+					 			$iterator = $this->Look;
+					 			$this->GetChar();
+							 	$this->MatchKeyword(TokenStream::keyword_from);
+							 	if($this->Type !== TokenStream::type_variable) throw new Exception('Ожидается имя переменной');
+							 	$array = $this->Look;
+							 	$this->GetChar();
+							 	$this->MatchKeyword(TokenStream::keyword_circle);
+							 	$this->codePHP .= "foreach( $".$array."->toArray() as $".$iterator." ){";
+							 	$this->continueCode(TokenStream::keyword_circle);
+							}else{
+								//Шаблона Для перем=Нач По Кон Цикл ... КонецЦикла;
+								$this->codePHP .= "for(";
+						 		if($this->Type !== TokenStream::type_variable) throw new Exception('Ожидается имя переменной');
+						 		$iterator = $this->Look;
 								$this->GetChar();
-								$this->code = $this->Expression7();
-				 			}
-							else throw new Exception('Ожидается символ =');
-							$this->codePHP .= $this->code . ';';
-							$this->MatchKeyword(TokenStream::keyword_to);
-					 		$this->code = $this->Expression7();
-					 		$this->codePHP .= '$'.$iterator.'<='.$this->code. ';';
-							$this->MatchKeyword(TokenStream::keyword_circle);
-					 		$this->codePHP .= $this->code . '$'.$iterator.'++){';
-					 		$this->continueCode(TokenStream::keyword_circle);
+								if( $this->Type === TokenStream::type_operator && $this->Index === TokenStream::oper_equal ){
+									$this->codePHP .= '$'.$iterator.'=';
+									$this->GetChar();
+									$this->code = $this->Expression7();
+					 			}
+								else throw new Exception('Ожидается символ =');
+								$this->codePHP .= $this->code . ';';
+								$this->MatchKeyword(TokenStream::keyword_to);
+						 		$this->code = $this->Expression7();
+						 		$this->codePHP .= '$'.$iterator.'<='.$this->code. ';';
+						 		$this->codePHP .= $this->code . '$'.$iterator.'++){';
+						 		$this->continueCode(TokenStream::keyword_circle);
+					 		}
 					 		break;	
 					 	case TokenStream::keyword_endcircle:
 					 		if($handle===TokenStream::keyword_circle){
