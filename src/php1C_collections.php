@@ -43,7 +43,7 @@ function typesPHP_Collection(){
 * @return string[] Массив названий функций работы с датой.
 */
 function functions_Collections(){
-	return  array('ВГраница(', 'Вставить(', 'Добавить(', 'Количество(', 'Найти(', 'Очистить(','Получить(', 'Удалить(','Установить(','Свойство(','ЗагрузитьКолонку(','ВыгрузитьКолонку(', 'ЗаполнитьЗначения(','Индекс(', 'Итог(', 'Найти(','НайтиСтроки(','Очистить(','Свернуть(', 'Сдвинуть(','Копировать(', 'КопироватьКолонки(','Сортировать(','Удалить(');
+	return  array('ВГраница(', 'Вставить(', 'Добавить(', 'Количество(', 'Найти(', 'Очистить(','Получить(', 'Удалить(','Установить(','Свойство(','ЗагрузитьКолонку(','ВыгрузитьКолонку(', 'ЗаполнитьЗначения(','Индекс(', 'Итог(', 'Найти(','НайтиСтроки(','Очистить(','Свернуть(', 'Сдвинуть(','Скопировать(', 'СкопироватьКолонки(','Сортировать(','Удалить(');
 }
 /**
 * Массив названий английских функций для работы с датой. Соответстует элементам русским функций.
@@ -148,7 +148,7 @@ class Array1C{
 			$this->value = array();
 			$cnt = 0;
 			if(is_array($counts) && (count($counts)>0)){
-				//if( count($counts) > 1 ) throw new Exception("Многомерные массивы пока не поддерживаются");
+				if( count($counts) > 1 ) throw new Exception("Многомерные массивы пока не поддерживаются");
 				$cnt = $counts[0];
 				if( is_numeric($cnt) && $cnt > 0 ){
 					for ($i=0; $i < $cnt; $i++) $this->value[i] = null;
@@ -322,7 +322,7 @@ class ValueTable{
 	public $КОЛОНКИ;
 	public $INDEXES; //CollectionIndexes коллекция из CollectionIndex
 	public $ИНДЕКСЫ;
-
+	
 	function __construct($args=null,$copy=null){
 
 		if(is_array($copy)) $this->value = $copy;
@@ -402,7 +402,7 @@ class ValueTable{
 		foreach ($this->COLUMNS->cols as $val) {
 			$strcols .= $val->NAME.',';
 		}	
-		return $strcols;	
+		return substr($strcols,0,-1); //уберем последнюю запятую	
 	}
 
 	//Заполнить значениями таблицу
@@ -452,7 +452,6 @@ class ValueTable{
 			}
 		}
 		return null;
-		//throw new Exception("Пока нет реализации Найти");	
 	}
 
 	//Поиск по структуре
@@ -526,16 +525,71 @@ class ValueTable{
 		//var_dump($this->rows);
 	}
 
-	function Copy($rows, $cols){
-		throw new Exception("Пока нет реализации Скопировать");	
+	/** 
+	* Скопировать таблицуЗначений с фильтрацией по строкам и колонкам
+	*
+	* @param Array1C $rows массив строк для выгрузки
+	* @param string $cols строка перечисления колонок
+	* @return возвращает новый объект ТаблицаЗначений1С
+	*/
+	function Copy($rows=null, $strcols=null){
+		if(isset($row) && (!is_object($rows) || get_class($rows) !== 'php1C\Array1C')) throw new Exception("Первый параметр должен быть массивом строк или пустым"); 
+		$array = $this->CopyColumns($strcols);
+		if(!isset($rows)) $rows = $this->rows;
+		else $rows = $rows->toArray();
+		foreach ($rows as $row){
+			$newrow = $array->Add();
+			foreach ($array->COLUMNS->cols as $col){
+				$newrow->Set($col->NAME, $row->Get($col->NAME));
+			}
+		}	
+		return $array;
 	}
 
-	function CopyColumns($cols){
-		throw new Exception("Пока нет реализации СкопироватьКолонки");	
+	/** 
+	* Скопировать пустые колонки ТаблицуЗначений в новую ТаблицуЗначений
+	*
+	* @param string $strcols строка перечисления колонок
+	* @return возвращает новый объект ТаблицаЗначений1С
+	*/
+	function CopyColumns($strcols){
+		$array = new ValueTable;
+		if(!isset($strcols)) $strcols = $this->GetAllColumns();
+		$keys = explode(',',$strcols);
+		for ($i=0; $i < count($keys); $i++){
+			$col = strtoupper(trim($keys[$i]));
+			$array->COLUMNS->Add($col);
+		}
+		return $array;
 	}
 
-	function Sort($cols, $cmp_object=null){
-		throw new Exception("Пока нет реализации Сортировать");	
+	//TEST
+	//$cmp_object - пока не используется
+	function Sort($strcols, $cmp_object=null){
+		if(!isset($strcols)) $strcols = $this->GetAllColumns();
+		if(!is_string($strcols)) throw new Exception("Первый параметр должен быть обязаельно заполнен наименованиями колонок");
+		$this->sort = array();
+		$this->sortdir = array();
+		$pairs = explode(',',$strcols);
+		foreach ($pairs as $pair) {
+		 	$keys = explode(' ',$pair);
+		  	$col = strtoupper(trim($keys[0]));
+			$coldir = strtoupper(trim($keys[1]));
+			//echo $coldir;
+			if($coldir ==='УБЫВ') $this->sortdir[] =-1;
+			else $this->sortdir[] = 1;
+			$this->sort[] = $col;
+		}
+		usort($this->rows, function($a, $b){
+			for($i=0;i<count($this->sort);$i++){
+				$vala = $a->Get($this->sort[$i]);
+				$valb = $b->Get($this->sort[$i]);
+				if($vala !== $valb) return $this->sortdir[$i] *(($vala < $valb) ? -1 : 1);
+			}
+			return 0;
+		});
+		unset($this->sortdir);
+		unset($this->sort);
 	}
 
 	function Del($row){
