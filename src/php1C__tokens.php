@@ -95,6 +95,7 @@ class TokenStream {
 	const oper_opensqbracket  = 26;
 	const oper_closesqbracket = 27;
 	
+	const fEnglishVariable = true; //true - Использовать только латинские переменные (false - переменные идут по русски)
 
 	const LetterRus = array('А','Б','В','Г','Д','Е','Ё' ,'Ж' ,'З','И','Й' ,'К','Л','М','Н','О','П','Р','С','Т','У','Ф','Х' ,'Ц','Ч' ,'Ш' ,'Щ'  ,'Ъ','Ы','Ь','Э' ,'Ю' ,'Я' ,'а','б','в','г','д','е','ё' ,'ж'  ,'з','и','й', 'к','л','м','н','о','п','р','с','т','у','ф','х' ,'ц','ч','ш' ,'щ'  ,'ъ','ы','ь','э' ,'ю' ,'я');
 	const LetterEng = array('A','B','V','G','D','E','JO','ZH','Z','I','JJ','K','L','M','N','O','P','R','S','T','U','F','KH','C','CH','SH','SHH','' ,'Y','' ,'EH','YU','YA','a','b','v','g','d','e','jo','zh','z','i','jj','k','l','m','n','o','p','r','s','t','u','f','kh','c','ch','sh','shh','' ,'y','' ,'eh','yu','ya');
@@ -403,15 +404,15 @@ class TokenStream {
 				//Индентификатор без аргументов
 				//Ключевое слово
 				$key = array_search($current, self::keywords['code']);
-				if( $key !== false ) return new Token(self::type_keyword, $current,$key);
+				if( $key !== false ) return new Token(self::type_keyword, $current, $key);
 				else{
 					//Идентификатор типа без скобок
 					$key = array_search($current, $this->identypes['rus']);
 					if( $key !== false ) return new Token(self::type_identification, $current, $key);
 					$key = array_search($current, $this->identypes['eng']);
 					if( $key !== false ) return new Token(self::type_identification, $current, $key);
-					//Переменная не переводим на английский
-					return new Token(self::type_variable, $current); 
+					if( self::fEnglishVariable ) return new Token(self::type_variable, str_replace(self::LetterRus, self::LetterEng, $current));
+					else return new Token(self::type_variable, $current); //Переменная не переводим на английский
 				} 
 			}
 		}

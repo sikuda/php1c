@@ -44,7 +44,7 @@ function callNumberFunction($key, $arguments){
 			case 'Sin(': return Sin($arguments[0]);
 			case 'Cos(': return Cos($arguments[0]);
 			case 'Tan(': return Tan($arguments[0]);
-			case 'АSin(': return ASin($arguments[0]);
+			case 'ASin(': return ASin($arguments[0]);
 			case 'ACos(': return ACos($arguments[0]);
 			case 'ATan(': return ATan($arguments[0]);
 			case 'Exp(': return Exp($arguments[0]);
@@ -137,17 +137,18 @@ function Tan($val){
 /**
 * Возращает арксинус числа
 *
-* @param  float $val число для получения синуса   
+* @param  float $val число для получения арксинуса   
 * @return float - результат  
 */
 function ASin($val){
+	//var_dump(\asin($val));
 	return \asin($val);
 }
 
 /**
 * Возращает аркосинус числа
 *
-* @param  float $val число для получения косинуса   
+* @param  float $val число для получения арккосинуса   
 * @return float - результат  
 */
 function ACos($val){
@@ -157,7 +158,7 @@ function ACos($val){
 /**
 * Возращает артангенс числа
 *
-* @param  float $val число для получения тангенса   
+* @param  float $val число для получения арктангенса   
 * @return float - результат  
 */
 function ATan($val){

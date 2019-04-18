@@ -106,23 +106,37 @@ class CodeStream {
 		$this->GetChar();
 		$this->MatchOper(TokenStream::oper_point, '.');
 		if($this->Type === TokenStream::type_variable){
-			switch ($this->Look) {
-				case 'ВК'  : //
-				case 'CR'  : return chr(13);
-				case 'ВТаб': //
-				case 'VTab': return chr(11);
-				case 'НПП' : //
-				case 'NBSP': return chr(160);
-				case 'ПС'  : //''
-				case 'LF'  : return char(10);
-				case 'ПФ'  : //
-				case 'FF'  : return chr(12);
-				case 'Таб'  : //Т
-				case 'TAB'  : return chr(9);
-				default:
-					throw new Exception('Неопределенный символ '.$this->Look);
-					break;
-			}
+			if( TokenStream::fEnglishVariable )
+				switch ($this->Look) {
+					case 'VK'  : //
+					case 'CR'  : return chr(13);
+					case 'VTab': //
+					case 'VTab': return chr(11);
+					case 'NPP' : //
+					case 'NBSP': return chr(160);
+					case 'PS'  : //''
+					case 'LF'  : return chr(10);
+					case 'PF'  : //
+					case 'FF'  : return chr(12);
+					case 'Tab'  : //Т
+					case 'TAB'  : return chr(9);
+				}	
+			else	
+				switch ($this->Look) {
+					case 'ВК'  : //
+					case 'CR'  : return chr(13);
+					case 'ВТаб': //
+					case 'VTab': return chr(11);
+					case 'НПП' : //
+					case 'NBSP': return chr(160);
+					case 'ПС'  : //''
+					case 'LF'  : return chr(10);
+					case 'ПФ'  : //
+					case 'FF'  : return chr(12);
+					case 'Таб'  : //Т
+					case 'TAB'  : return chr(9);
+				}
+			new Exception('Неопределенный символ '.$this->Look);
 		}
 		else throw new Exception('Ожидается перечисление символ, а не '.$this->Look);
 	}
@@ -866,7 +880,8 @@ class CodeStream {
 			$this->GetChar();
 			if($this->Type !== TokenStream::type_end_code) {
 				$this->continueCode();
-				$name = strtoupper($name_var); //str_replace(TokenStream::LetterRus, TokenStream::LetterEng, $name_var));
+				$name = strtoupper($name_var); 
+				if( TokenStream::fEnglishVariable ) $name = str_replace(TokenStream::LetterRus, TokenStream::LetterEng, $name);
 				if(isset($name_var)) return toString1C($this->variable[$name]);
 			}	
 			else return "\n Нет кода для выполнения \n";

@@ -12,6 +12,7 @@
 namespace php1C;
 
 use Exception;
+require_once('php1C__tokens.php');
 require_once('php1C_common.php');
 
 /**
@@ -242,6 +243,7 @@ class Structure1C{
 				$keys = explode(',',$args[0]);
 				for ($i=0; $i < count($keys); $i++) {
 					$k = strtoupper(trim ($keys[$i]));
+					if( TokenStream::fEnglishVariable ) $k = str_replace(TokenStream::LetterRus, TokenStream::LetterEng, $k);
 					if(!isset($args[$i+1])) $this->value[$k] = null;
 					else $this->value[$k] = $args[$i+1];
 				}
@@ -258,6 +260,7 @@ class Structure1C{
 	}
 
 	function Insert($key, $val=null){
+		if( TokenStream::fEnglishVariable ) $key = str_replace(TokenStream::LetterRus, TokenStream::LetterEng, $key);
 		$this->value[strtoupper($key)] = $val;
 	}
 
@@ -266,6 +269,7 @@ class Structure1C{
 	}
 
 	function Property($key, $value=null){
+		if( TokenStream::fEnglishVariable ) $key = str_replace(TokenStream::LetterRus, TokenStream::LetterEng, $key);
 		$key = strtoupper($key);
 		$value = $this->value[$key];
 		return array_key_exists($key, $this->value);
@@ -278,18 +282,21 @@ class Structure1C{
 	}
 
 	function Del($key){
+		if( TokenStream::fEnglishVariable ) $key = str_replace(TokenStream::LetterRus, TokenStream::LetterEng, $key);
 		$key = strtoupper($key);
 		unset($this->value[$key]);
 	}
 
 	//Для получения данных через точку
 	function Get($key){
+		if( TokenStream::fEnglishVariable ) $key = str_replace(TokenStream::LetterRus, TokenStream::LetterEng, $key);
 		$key = strtoupper($key);
 		return $this->value[$key];
 	}
 
 	//Для установки данных через точку
 	function Set($key, $val=null){
+		if( TokenStream::fEnglishVariable ) $key = str_replace(TokenStream::LetterRus, TokenStream::LetterEng, $key);
 		$key = strtoupper($key);
 		if(array_key_exists($key, $this->value)) $this->value[$key] = $val;
 		else throw new Exception("Не найден ключ структуры ".$key);
@@ -320,6 +327,7 @@ class ValueTable{
 	private $rows;   //array of ValueTableRow
 	public $COLUMNS; //ValueTableColumnCollection - collection of ValueTableColumn
 	public $КОЛОНКИ;
+	public $KOLONKI;
 	public $INDEXES; //CollectionIndexes коллекция из CollectionIndex
 	public $ИНДЕКСЫ;
 	
@@ -330,6 +338,7 @@ class ValueTable{
 			$this->rows = array();
 			$this->COLUMNS = new ValueTableColumnCollection($this);
 			$this->КОЛОНКИ = &$this->COLUMNS;
+			$this->KOLONKI = &$this->COLUMNS;
 			$this->INDEXES = new CollectionIndexes($this);
 			$this->ИНДЕКСЫ = &$this->INDEXES;
 		}
@@ -337,6 +346,10 @@ class ValueTable{
 
 	function __toString(){
 		return "ТаблицаЗначений";
+	}
+
+	function toArray(){
+		return $this->rows;
 	}
 
 	function Add(){
@@ -356,23 +369,23 @@ class ValueTable{
 
 	//Выгрузка колонки в Array1C
 	function UnloadColumn($col){
-		if(isset($col)){
-			if(is_int($col)){
-				$col = $this->COLUMNS->cols[$col];
-			}elseif (is_string($col)) {
-				$col = $this->COLUMNS->cols[strtoupper($col)];
-			}
-			if(is_object($col) && get_class($col) === 'php1C\ValueTableColumn'){
-				$array = new Array1C;
-				foreach ($this->rows as $key => $value) {
-					$val = $value->Get($col->NAME);
-					$array->Add($val);
-				}
-				return $array;
-			}
+		if(is_int($col)){
+			$col = $this->COLUMNS->cols[$col];
+		}elseif (is_string($col)) {
+			if( TokenStream::fEnglishVariable ) $col = str_replace(TokenStream::LetterRus, TokenStream::LetterEng, $col);
+			$col = $this->COLUMNS->cols[strtoupper($col)];
 		}
-		throw new Exception("Не найдена колонка для выгрузки ".$col);
+		else throw new Exception("Не задана колонка для выгрузки ".$col);
+		if(is_object($col) && get_class($col) === 'php1C\ValueTableColumn'){
+			$array = new Array1C;
+			foreach ($this->rows as $key => $value) {
+				$val = $value->Get($col->NAME);
+				$array->Add($val);
+			}
+			return $array;
+		}
 	}
+	
 
 	//Загрузка колонки из Array1C
 	function LoadColumn($arr, $col){
@@ -382,6 +395,7 @@ class ValueTable{
 			if(is_int($col)){
 				$col = $this->COLUMNS->cols[$col];
 			}elseif (is_string($col)) {
+
 				$col = $this->COLUMNS->cols[strtoupper($col)];
 			}	
 			if(is_object($col) && get_class($col) === 'php1C\ValueTableColumn'){
@@ -408,6 +422,7 @@ class ValueTable{
 	//Заполнить значениями таблицу
 	function FillValues($value, $strcols=null){
 		if(!isset($strcols)) $strcols = $this->GetAllColumns(); 
+		if( TokenStream::fEnglishVariable ) $strcols = str_replace(TokenStream::LetterRus, TokenStream::LetterEng, $strcols);
 		$keys = explode(',',$strcols);
 		for ($i=0; $i < count($keys); $i++){
 			$col = strtoupper(trim($keys[$i]));
@@ -425,6 +440,7 @@ class ValueTable{
 	}
 
 	function Total($col){
+		if( TokenStream::fEnglishVariable ) $col = str_replace(TokenStream::LetterRus, TokenStream::LetterEng, $col);
 		$col = strtoupper($col);
 		$sum = 0;
 		foreach ($this->rows as $key => $value) {
@@ -482,8 +498,9 @@ class ValueTable{
 	//Для получения данных через точку
 	function Get($key){
 		if(is_string($key)){
+			if( TokenStream::fEnglishVariable ) $key = str_replace(TokenStream::LetterRus, TokenStream::LetterEng, $key);
 			$key = strtoupper($key);
-			if($key === 'КОЛОНКИ' || $key === 'COLUMNS'){
+			if($key === 'КОЛОНКИ' || $key === 'COLUMNS' || $key === 'KOLONKI'){
 				return $this->COLUMNS;
 			}	
 		}
@@ -496,6 +513,7 @@ class ValueTable{
 	//Для установки данных через точку
 	function Set($key, $val=null){
 		if(is_string($key)){
+			if( TokenStream::fEnglishVariable ) $key = str_replace(TokenStream::LetterRus, TokenStream::LetterEng, $key);
 			$key = strtoupper($key);
 			if(($key === 'КОЛОНКИ' || $key === 'COLUMNS') && (is_object($val) && get_class($val) === 'ValueTableColumnCollection')){
 				$this->COLUMNS = $val;
@@ -508,7 +526,10 @@ class ValueTable{
 		throw new Exception("Не найден имя столба ТаблицыЗначений ".$key);
 	}
 
+	//TODO
 	function GroupBy($colgr, $colsum){
+		if( TokenStream::fEnglishVariable ) $colgr = str_replace(TokenStream::LetterRus, TokenStream::LetterEng, $colgr);
+		if( TokenStream::fEnglishVariable ) $colsum = str_replace(TokenStream::LetterRus, TokenStream::LetterEng, $colsum);
 		throw new Exception("Пока нет реализации Свернуть");	
 	}
 
@@ -519,10 +540,8 @@ class ValueTable{
 		if(!is_float($row) && !is_int($row)) throw new Exception("Первый параметр должен быть числом или строкой ТаблицыЗначений");
 		if(!is_float($offset) && !is_int($offset)) throw new Exception("Второй параметр должен быть числом");
 		$row_object = $this->rows[$row];
-		//if($row>$row+$offset) $row += 1;
 		array_splice($this->rows,$row,1);
 		array_splice($this->rows,$row+$offset,0,array($row_object));
-		//var_dump($this->rows);
 	}
 
 	/** 
@@ -533,13 +552,15 @@ class ValueTable{
 	* @return возвращает новый объект ТаблицаЗначений1С
 	*/
 	function Copy($rows=null, $strcols=null){
-		if(isset($row) && (!is_object($rows) || get_class($rows) !== 'php1C\Array1C')) throw new Exception("Первый параметр должен быть массивом строк или пустым"); 
+		if(isset($row) && (!is_object($rows) || get_class($rows) !== 'php1C\Array1C')) throw new Exception("Первый параметр должен быть массивом строк или пустым");
+		if( TokenStream::fEnglishVariable ) $strcols = str_replace(TokenStream::LetterRus, TokenStream::LetterEng, $strcols);
 		$array = $this->CopyColumns($strcols);
 		if(!isset($rows)) $rows = $this->rows;
 		else $rows = $rows->toArray();
 		foreach ($rows as $row){
 			$newrow = $array->Add();
 			foreach ($array->COLUMNS->cols as $col){
+				//var_dump($col);
 				$newrow->Set($col->NAME, $row->Get($col->NAME));
 			}
 		}	
@@ -553,8 +574,9 @@ class ValueTable{
 	* @return возвращает новый объект ТаблицаЗначений1С
 	*/
 	function CopyColumns($strcols){
-		$array = new ValueTable;
 		if(!isset($strcols)) $strcols = $this->GetAllColumns();
+		if( TokenStream::fEnglishVariable ) $strcols = str_replace(TokenStream::LetterRus, TokenStream::LetterEng, $strcols);
+		$array = new ValueTable;
 		$keys = explode(',',$strcols);
 		for ($i=0; $i < count($keys); $i++){
 			$col = strtoupper(trim($keys[$i]));
@@ -563,10 +585,15 @@ class ValueTable{
 		return $array;
 	}
 
-	//TEST
-	//$cmp_object - пока не используется
+	/**
+	* Отсортировать таблицу значений по стоке с колонками
+	* 
+	* @param strcols string строка перечислений колонов и порядка сортировки ("Товар, Цена Убыв")
+	* @param cmp_object объект сортировки //TODO
+	*/
 	function Sort($strcols, $cmp_object=null){
 		if(!isset($strcols)) $strcols = $this->GetAllColumns();
+		if( TokenStream::fEnglishVariable ) $strcols = str_replace(TokenStream::LetterRus, TokenStream::LetterEng, $strcols);
 		if(!is_string($strcols)) throw new Exception("Первый параметр должен быть обязаельно заполнен наименованиями колонок");
 		$this->sort = array();
 		$this->sortdir = array();
@@ -576,7 +603,7 @@ class ValueTable{
 		  	$col = strtoupper(trim($keys[0]));
 			$coldir = strtoupper(trim($keys[1]));
 			//echo $coldir;
-			if($coldir ==='УБЫВ') $this->sortdir[] =-1;
+			if($coldir==='УБЫВ' || $coldir==="DESC") $this->sortdir[] =-1;
 			else $this->sortdir[] = 1;
 			$this->sort[] = $col;
 		}
@@ -623,6 +650,10 @@ class ValueTableColumnCollection{
 		$this->cols = array();
 	}
 
+	function toArray(){
+		return $this->cols;
+	}
+
 	function setValueTable($parent){
 		$this->ValueTable = &$parent;
 	}
@@ -634,6 +665,7 @@ class ValueTableColumnCollection{
 	function Add($key=null){
 		if(!isset($key)) $key = ''; //пустые имена колонок в 1С допустимы.
 		if(is_string($key)){
+			if( TokenStream::fEnglishVariable ) $key = str_replace(TokenStream::LetterRus, TokenStream::LetterEng, $key);		
 			$key = strtoupper($key);
 			$this->cols[$key] = new ValueTableColumn($key);
 		}
@@ -695,7 +727,10 @@ class ValueTableRow{
 
 	//Для получения данных через точку
 	function Get($key){
+		//echo 'key='.$key;
 		if(is_string($key)){
+			if( TokenStream::fEnglishVariable ) $key = str_replace(TokenStream::LetterRus, TokenStream::LetterEng, $key);
+			$key = strtoupper($key);
 			$array = $this->ValueTable->COLUMNS->cols;
 			if(array_key_exists($key, $array)){
 				$key = strtoupper($key);
@@ -708,14 +743,17 @@ class ValueTableRow{
 	//Для установки данных через точку
 	function Set($key, $value=null){
 		if(is_string($key)){
+			if( TokenStream::fEnglishVariable ) $key = str_replace(TokenStream::LetterRus, TokenStream::LetterEng, $key);
 			$key = strtoupper($key);
 			$this->row[$key] = $value;	
 		}
 		else throw new Exception("Нет такой колонки в таблице");
 	}
-
 }
 
+/**
+* Коллекция индексов(пока пустая реальзация для ТаблицыЗначений)
+*/
 class CollectionIndexes{
 	/**
 	* @var array коллекция значений в строке
@@ -732,9 +770,13 @@ class CollectionIndexes{
 	 	return "ИндексыКоллекции";
 	}
 
+	function toArray(){
+		return $this->indexs;
+	}
+
 	function Add($name){
-		//if(!isset($key)) $key = ''; //пустые имена колонок в 1С допустимы.
 		if(is_string($key)){
+			if( TokenStream::fEnglishVariable ) $keyl = str_replace(TokenStream::LetterRus, TokenStream::LetterEng, $key);
 			$key = strtoupper($key);
 			$this->cols[$key] = new CollectionIndex($name);
 		}
@@ -752,6 +794,7 @@ class CollectionIndexes{
 	}
 
 	function Del($key){
+		if( TokenStream::fEnglishVariable ) $key = str_replace(TokenStream::LetterRus, TokenStream::LetterEng, $key);
 		$key = strtoupper($key);
 		unset($this->indexs[$key]);
 	}
@@ -763,7 +806,6 @@ class CollectionIndex{
 	*/
 	private $name;
 	function __construct($col){
-	// 	if(isset($args)) $this->ValueTable = &$args;
 	 	$this->name = $col;
 	}
 
