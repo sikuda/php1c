@@ -212,7 +212,8 @@ class CodeStream {
 				$func = str_replace(TokenStream::LetterRus, TokenStream::LetterEng, $this->Look);
 				$this->D0 = $this->callFunction( null, $func);
 				return;
-			}	
+			}
+
 			$type = $this->Type;
 			$look = $this->Look;
 			$index = $this->Index;

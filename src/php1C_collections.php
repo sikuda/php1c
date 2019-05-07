@@ -321,19 +321,18 @@ function ValueTable($args=null){
 *
 */
 class ValueTable{
-	/**
-	* @var array внутренее хранение таблицы значений в виде массива колонок (каждая колонка это массив)
-	*/
+	
 	private $rows;   //array of ValueTableRow
 	public $COLUMNS; //ValueTableColumnCollection - collection of ValueTableColumn
 	public $КОЛОНКИ;
 	public $KOLONKI;
 	public $INDEXES; //CollectionIndexes коллекция из CollectionIndex
 	public $ИНДЕКСЫ;
+	public $INDEKSYY;
 	
 	function __construct($args=null,$copy=null){
 
-		if(is_array($copy)) $this->value = $copy;
+		if(is_array($copy)) $this->rows = $copy;
 		else{	
 			$this->rows = array();
 			$this->COLUMNS = new ValueTableColumnCollection($this);
@@ -341,23 +340,27 @@ class ValueTable{
 			$this->KOLONKI = &$this->COLUMNS;
 			$this->INDEXES = new CollectionIndexes($this);
 			$this->ИНДЕКСЫ = &$this->INDEXES;
+			$this->$INDEKSYY = &$this->INDEXES;
 		}
 	}
 
 	function __toString(){
-		return "ТаблицаЗначений";
+		if (TokenStream::fEnglishTypes) return "ValueTable";
+		else return "ТаблицаЗначений";
 	}
 
 	function toArray(){
 		return $this->rows;
 	}
 
+	//Добавить новую строку в таблицу
 	function Add(){
 		$row = new ValueTableRow($this);
 		$this->rows[] = $row;
 		return $row;
 	}
 
+	//Вставить новую строку в таблицу
 	function Insert($index){
 		if(is_int($index)){
 			$row = new ValueTableRow($this);
@@ -385,7 +388,6 @@ class ValueTable{
 			return $array;
 		}
 	}
-	
 
 	//Загрузка колонки из Array1C
 	function LoadColumn($arr, $col){
@@ -432,13 +434,14 @@ class ValueTable{
 		}
 	}
 
+	//Возвратить индекс строки в таблице
 	function IndexOf($row){
 		$key = array_search( $row, $this->rows);
 		if( $key === FALSE ) $key = -1;
 		return $key;
-		//throw new Exception("Пока нет реализации Индекс ");	
 	}
 
+	//Возвратить итог по колонке
 	function Total($col){
 		if( TokenStream::fEnglishVariable ) $col = str_replace(TokenStream::LetterRus, TokenStream::LetterEng, $col);
 		$col = strtoupper($col);
@@ -457,6 +460,7 @@ class ValueTable{
 		return count($this->rows);
 	}
 
+	//Найти значение в талцице и возврать строку или Неопределено(null)
 	function Find($value, $strcols=null){
 		if(!isset($strcols)) $strcols = $this->GetAllColumns();
 		$keys = explode(',',$strcols);
@@ -470,7 +474,7 @@ class ValueTable{
 		return null;
 	}
 
-	//Поиск по структуре
+	//Поиск по структуре возврат Array1C
 	function FindRows($filter){
 		if(!is_object($filter) || get_class($filter) !== 'php1C\Structure1C'){
 			throw new Exception("Аргумент функции должен быть структурой ".$filter);
@@ -489,6 +493,7 @@ class ValueTable{
 		return $array;
 	}
 
+	//Очистить значения таблицы
 	function Clear(){
 		$this->rows->setValueTable(null);
 		unset($this->rows);
@@ -526,13 +531,57 @@ class ValueTable{
 		throw new Exception("Не найден имя столба ТаблицыЗначений ".$key);
 	}
 
-	//TODO
+	//Группируем данные таблицы значений 
 	function GroupBy($colgr, $colsum){
 		if( TokenStream::fEnglishVariable ) $colgr = str_replace(TokenStream::LetterRus, TokenStream::LetterEng, $colgr);
 		if( TokenStream::fEnglishVariable ) $colsum = str_replace(TokenStream::LetterRus, TokenStream::LetterEng, $colsum);
-		throw new Exception("Пока нет реализации Свернуть");	
+		$grkeys = explode(',',$colgr);
+		$sumkeys = explode(',',$colsum);
+		$table = $this->CopyColumns($colgr.','.$colsum);
+		$this->COLUMNS = $table->COLUMNS;
+		$this->COLUMNS->setValueTable($this);
+		foreach ($this->rows as $row) {
+
+			//Поиск совпадений по группировке
+			$fnew = true;
+			foreach ($table->rows as $newrow){
+				$found = true;
+				foreach ($grkeys as $grkey){
+					if($newrow->Get($grkey) != $row->Get($grkey)){
+						$found = false;
+						break;
+					}
+				}
+				if($found){
+					$fnew = false;
+					break;
+				} 
+			}
+			
+			if($fnew){
+				//новая строка
+				$newrow = $table->Add($this);
+				$newrow->setValueTable($this);
+				foreach ($grkeys as $grkey){
+					$newrow->Set($grkey, $row->Get($grkey));	
+				}
+				foreach ($sumkeys as $sumkey){
+					$newrow->Set($sumkey, $row->Get($sumkey));	
+				}
+			}else{
+				//суммируем данные в строку
+				foreach ($sumkeys as $sumkey){
+					$curr = $newrow->Get($sumkey);
+					$newrow->Set($sumkey, $curr + $row->Get($sumkey));
+				}
+			}
+		}
+		unset($this->rows);
+		$this->rows = $table->rows;
+		unset($table);
 	}
 
+	//Сдвинуть строку $row на $offset
 	function Move($row, $offset){
 		if(is_object($row) && get_class($row) === 'php1C\ValueTableRow'){
 			$row = $this->IndexOf($row);
@@ -553,6 +602,7 @@ class ValueTable{
 	*/
 	function Copy($rows=null, $strcols=null){
 		if(isset($row) && (!is_object($rows) || get_class($rows) !== 'php1C\Array1C')) throw new Exception("Первый параметр должен быть массивом строк или пустым");
+		if(!isset($strcols)) $strcols = $this->GetAllColumns();
 		if( TokenStream::fEnglishVariable ) $strcols = str_replace(TokenStream::LetterRus, TokenStream::LetterEng, $strcols);
 		$array = $this->CopyColumns($strcols);
 		if(!isset($rows)) $rows = $this->rows;
@@ -592,6 +642,9 @@ class ValueTable{
 	* @param cmp_object объект сортировки //TODO
 	*/
 	function Sort($strcols, $cmp_object=null){
+
+		if (isset($cmp_object)) throw new Exception("Пока нет реализации по объекту сравнения");
+
 		if(!isset($strcols)) $strcols = $this->GetAllColumns();
 		if( TokenStream::fEnglishVariable ) $strcols = str_replace(TokenStream::LetterRus, TokenStream::LetterEng, $strcols);
 		if(!is_string($strcols)) throw new Exception("Первый параметр должен быть обязаельно заполнен наименованиями колонок");
@@ -608,7 +661,7 @@ class ValueTable{
 			$this->sort[] = $col;
 		}
 		usort($this->rows, function($a, $b){
-			for($i=0;i<count($this->sort);$i++){
+			for($i=0;$i<count($this->sort);$i++){
 				$vala = $a->Get($this->sort[$i]);
 				$valb = $b->Get($this->sort[$i]);
 				if($vala !== $valb) return $this->sortdir[$i] *(($vala < $valb) ? -1 : 1);
@@ -619,6 +672,7 @@ class ValueTable{
 		unset($this->sort);
 	}
 
+	//Удалить строку из таблицы
 	function Del($row){
 		if(is_int($row)){
 			$row = $this->rows[$row];
@@ -709,8 +763,8 @@ class ValueTableRow{
 	/**
 	* @var array коллекция значений в строке
 	*/
-	private $ValueTable;
-	private $row; 
+	private $ValueTable; //parent  
+	private $row;        //array of fields
 
 	function __construct($args=null){
 		if(isset($args)) $this->ValueTable = &$args;
@@ -727,7 +781,6 @@ class ValueTableRow{
 
 	//Для получения данных через точку
 	function Get($key){
-		//echo 'key='.$key;
 		if(is_string($key)){
 			if( TokenStream::fEnglishVariable ) $key = str_replace(TokenStream::LetterRus, TokenStream::LetterEng, $key);
 			$key = strtoupper($key);
@@ -800,6 +853,9 @@ class CollectionIndexes{
 	}
 }
 
+/**
+* Индекс коллекции(пока пустая реальзация для ТаблицыЗначений)
+*/
 class CollectionIndex{
 	/**
 	* @var array коллекция значений в строке
