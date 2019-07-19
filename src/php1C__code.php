@@ -161,6 +161,9 @@ class CodeStream {
 						
 			if($this->Type === TokenStream::type_keyword){
 				switch ($this->Index) {
+					case TokenStream::keyword_val:
+						$this->code = '';
+						return;
 				 	case TokenStream::keyword_undefined:
 				 		$this->code = 'null';
 				 		break;
@@ -395,6 +398,10 @@ class CodeStream {
 		//разбор аргументов функции		
 		if($this->Type !== TokenStream::type_operator || $this->Index !== TokenStream::oper_closebracket){
 			$this->code = $this->Expression7();
+			if($this->Type === TokenStream::type_keyword && $this->Index === TokenStream::keyword_val){
+				$this->GetChar();
+				$this->code = $this->Expression7();
+			} 
 			$args .= $this->code;
 			$this->code = '';
 				
@@ -402,6 +409,10 @@ class CodeStream {
 				if($this->Type !== TokenStream::type_operator || $this->Index !== TokenStream::oper_comma) throw new Exception('Ожидается запятая , ');
 				$this->GetChar();
 				$this->code = $this->Expression7();
+				if($this->Type === TokenStream::type_keyword && $this->Index === TokenStream::keyword_val){
+					$this->GetChar();
+					$this->code = $this->Expression7();
+				} 
 				$args .= ','.$this->code;
 				$this->code = '';	
 			}

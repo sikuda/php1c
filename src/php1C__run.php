@@ -176,6 +176,9 @@ class CodeStream {
 			
 			if($this->Type === TokenStream::type_keyword){
 				switch ($this->Index) {
+					case TokenStream::keyword_val:
+						$this->D0 = null;
+						return;
 				 	case TokenStream::keyword_undefined:
 				 		$this->D0 = null;
 				 		break;
@@ -430,7 +433,7 @@ class CodeStream {
 			while( $this->Type !== TokenStream::type_operator || $this->Index !== TokenStream::oper_closebracket ){
 				if($this->Type !== TokenStream::type_operator || $this->Index !== TokenStream::oper_comma) throw new Exception('Ожидается запятая , ');
 				$this->GetChar();
-				$args[] = $this->Expression7();	
+				$args[] = $this->Expression7();
 			}
 		}
 		$this->MatchOper(TokenStream::oper_closebracket, ')');
@@ -796,14 +799,17 @@ class CodeStream {
 						 			$this->GetChar();
 						 			if($this->Type !== TokenStream::type_operator || $this->Index !== TokenStream::oper_closebracket){
 										
-										//разбор переменных
-										if($this->Type !== TokenStream::type_variable) throw new Exception('Ожидается переменная функции или процедуры'.$this->Look);
+										//разбор первой переменной
+						 				if($this->Type === TokenStream::type_keyword && $this->Index === TokenStream::keyword_val) $this->GetChar(); //ЗНАЧ
+										if($this->Type !== TokenStream::type_variable) throw new Exception('Ожидается переменная функции или процедуры '.$this->Look);
 										$this->argsFunction[$func][] = $this->Look;
 										$this->GetChar();
 										while( $this->Type !== TokenStream::type_operator || $this->Index !== TokenStream::oper_closebracket ){
 											if($this->Type !== TokenStream::type_operator || $this->Index !== TokenStream::oper_comma) throw new Exception('Ожидается запятая , ');
 											$this->GetChar();
-											if($this->Type !== TokenStream::type_variable) throw new Exception('Ожидается переменная функции или процедуры'.$this->Look);
+											//разбор остальных переменных
+											if($this->Type === TokenStream::type_keyword && $this->Index === TokenStream::keyword_val) $this->GetChar(); //ЗНАЧ
+											if($this->Type !== TokenStream::type_variable) throw new Exception('Ожидается переменная функции или процедуры '.$this->Look);
 											$this->argsFunction[$func][] = $this->Look;
 											$this->GetChar();
 										}
