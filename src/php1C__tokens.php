@@ -12,7 +12,7 @@ use Exception;
 /*
 *  Для подключение всех списков функций подключаем 
 */
-require_once( 'php1C_common.php');
+require_once('php1C_common.php');
 
 
 /**
@@ -53,7 +53,7 @@ class TokenStream {
 	public $row = 1;
     public $col = 1;
 
-    //types
+    //Типы(types)
     const type_end_code  = -1; 	
     const type_undefined = 0;
     const type_newline   = 1;
@@ -69,7 +69,7 @@ class TokenStream {
     const type_extfunction    = 19;
     const type_variable       = 50;
     
-    //opers
+    //Операции(operations)
 	const oper_undefined    = 0;
 	const oper_openbracket  = 1;
 	const oper_closebracket = 2; 
@@ -95,32 +95,44 @@ class TokenStream {
 	const oper_opensqbracket  = 26;
 	const oper_closesqbracket = 27;
 	
-	const fEnglishVariable = true;  //true - Использовать только латинские переменные (false - переменные идут по русски)
-	const fEnglishTypes    = false; //true - Использовать только английские названия типов, Использовать только русские названия типов)
-
-	const LetterRus = array('А','Б','В','Г','Д','Е','Ё' ,'Ж' ,'З','И','Й' ,'К','Л','М','Н','О','П','Р','С','Т','У','Ф','Х' ,'Ц','Ч' ,'Ш' ,'Щ'  ,'Ъ','Ы','Ь','Э' ,'Ю' ,'Я' ,'а','б','в','г','д','е','ё' ,'ж'  ,'з','и','й', 'к','л','м','н','о','п','р','с','т','у','ф','х' ,'ц','ч','ш' ,'щ'  ,'ъ','ы','ь','э' ,'ю' ,'я');
-	const LetterEng = array('A','B','V','G','D','E','JO','ZH','Z','I','JJ','K','L','M','N','O','P','R','S','T','U','F','KH','C','CH','SH','SHH','' ,'Y','' ,'EH','YU','YA','a','b','v','g','d','e','jo','zh','z','i','jj','k','l','m','n','o','p','r','s','t','u','f','kh','c','ch','sh','shh','' ,'y','' ,'eh','yu','ya');
-	const str_Identifiers = '/^[_A-Za-zА-Яа-яЁё][_0-9A-Za-zА-Яа-яЁё]*/u';
-
-	//Ключевые слова - type_keyword
-	const keywords = array( 
-		"code"    => array('НЕОПРЕДЕЛЕНО', 'ИСТИНА','ЛОЖЬ', 'ЕСЛИ', 'ТОГДА', 'ИНАЧЕЕСЛИ', 'ИНАЧЕ',   'КОНЕЦЕСЛИ','ПОКА',  'ДЛЯ', 'КАЖДОГО', 'ПО','В', 'ИЗ', 'ЦИКЛ','КОНЕЦЦИКЛА', 'ПРЕРВАТЬ','ПРОДОЛЖИТЬ', 'ФУНКЦИЯ', 'ПРОЦЕДУРА', 'КОНЕЦФУНКЦИИ', 'КОНЕЦПРОЦЕДУРЫ', 'ВОЗВРАТ', 'ПЕРЕМ', 'СИМВОЛЫ', 'ЭКСПОРТ', 'ЗНАЧ'),
-		"codePHP" => array('Undefined',    'true',  'false','if(',  '){',    '} elseif {','} else {','}',        'while(','for(','foreach(','to', 'in','in','){',            '}',         'break',   'continue',   'function', 'function', '}',            '}',   'return',  'var'  , 'chars',   'export',  'VAL'),
-		//"codePHP" => array('Undefined',    'true',  'false','if(',  '){',    '} elseif {','} else {','}',        'while(','for(','foreach(','to', 'in','in','){',            '}',         'break',   'continue',   'function', 'function', '}',            '}',   'return',  'var'  , 'chars',   'export',  'val'),
-	);
-	const keyword_undefined = 0; const keyword_true = 1; const keyword_false = 2; const keyword_if = 3; const keyword_then = 4; const keyword_elseif = 5; const keyword_else = 6; const keyword_endif = 7; const keyword_while = 8; const keyword_for = 9; const keyword_foreach = 10; const keyword_to = 11; const keyword_in = 12; const keyword_from = 13;const keyword_circle = 14; const keyword_endcircle = 15; const keyword_break = 16;  const keyword_continue = 17; const keyword_function = 18; const keyword_procedure = 19; const  keyword_endfunction = 20; const keyword_endprocedure = 21; const keyword_return=22; const keyword_var=23; const keyword_chars=24; const keyword_export=25; const keyword_val=26;
+	//Ключевые слова(keywords)
+	const keyword_undefined = 0; 
+	const keyword_true   = 1; 
+	const keyword_false  = 2; 
+	const keyword_if     = 3; 
+	const keyword_then   = 4; 
+	const keyword_elseif = 5; 
+	const keyword_else   = 6; 
+	const keyword_endif  = 7; 
+	const keyword_while  = 8; 
+	const keyword_for    = 9; 
+	const keyword_foreach = 10; 
+	const keyword_to     = 11; 
+	const keyword_in     = 12; 
+	const keyword_from   = 13;
+	const keyword_circle = 14; 
+	const keyword_endcircle = 15; 
+	const keyword_break  = 16;  
+	const keyword_continue = 17; 
+	const keyword_function = 18; 
+	const keyword_procedure = 19; 
+	const keyword_endfunction = 20; 
+	const keyword_endprocedure = 21; 
+	const keyword_return  = 22; 
+	const keyword_var     = 23; 
+	const keyword_chars   = 24; 
+	const keyword_export  = 25; 
+	const keyword_val     =26;
 
 	//Индентификаторы типов - type_identification
 	public $identypes = array(
-		"rus" => array(), // типы по русски в верхнем регистре для поиска	
-        "eng" => array(), // типы по английски в вернем регистре для поиска
+		"lng" => array(), // типы на языке в верхнем регистре для поиска	
         "php" => array()  // типы по английски как будет в коде			
 	);
 	public $indexTypesColl = -1; 
 	
 	public $functions1С = array(
-		"rus" => array(),  // функции по русски в верхнем регистре для поиска
-		"eng" => array(),  // функции по английски в вернем регистре для поиска
+		"lng" => array(),  // функции на языке в верхнем регистре для поиска
 		"php" => array()   // функции по английски как будет в коде 
 	);
 	//Индексы функций модулей
@@ -139,7 +151,7 @@ class TokenStream {
 		$this->str = $str;
 
 		//Добавление в таблицы общих типов
-		$this->indexTypesColl  = $this->AddTypes( typesRUS_Collection(),  typesENG_Collection(), typesPHP_Collection());
+		$this->indexTypesColl  = $this->AddTypes( types_Collection(),  typesPHP_Collection());
 
 		//Добавление в таблицы общих функций 
 		$this->indexFuncCom  = $this->AddModule( functions_Com(),  functionsPHP_Com());
@@ -157,13 +169,10 @@ class TokenStream {
     * @param $typesPHP array массив английских названий типов в PHP
     * @return int возвращаем верхнюю границу модуля в общем списке 
 	*/
-	private function AddTypes( $typesRus, $typesEng, $typesPHP ){
-		if(is_array($typesRus) && is_array($typesEng) && is_array($typesPHP) ){
-			foreach ($typesRus as $value) {
-				array_push($this->identypes['rus'], strtoupper($value));
-			}
-			foreach ($typesEng as $value) {
-				array_push($this->identypes['eng'], strtoupper($value));
+	private function AddTypes( $types, $typesPHP ){
+		if(is_array($types) && is_array($typesPHP) ){
+			foreach ($types as $value) {
+				array_push($this->identypes['lng'], strtoupper($value));
 			}
 			foreach ($typesPHP as $value) {
 				array_push($this->identypes['php'], $value);
@@ -179,13 +188,12 @@ class TokenStream {
     * @param $funcEng array массив английских названий функций
     * @return int возвращаем верхнюю границу модуля в общем списке 
 	*/
-	private function AddModule( $funcRus, $funcEng ){
-		if(is_array($funcRus) && is_array($funcEng) ){
-			foreach ($funcRus as $value) {
-				array_push($this->functions1С['rus'], strtoupper($value));
+	private function AddModule( $func, $funcPHP ){
+		if(is_array($func) && is_array($funcPHP) ){
+			foreach ($func as $value) {
+				array_push($this->functions1С['lng'], strtoupper($value));
 			}
-			foreach ($funcEng as $value) {
-				array_push($this->functions1С['eng'], strtoupper($value));
+			foreach ($funcPHP as $value) {
 				array_push($this->functions1С['php'], $value);
 			}
 		}
@@ -378,7 +386,7 @@ class TokenStream {
 		}
 	    
 		//Обработка переменных, ключевых слов или функций
-		if( $this->matchMove(self::str_Identifiers)){
+		if( $this->matchMove(php1C_Identifiers)){
 			$current = strtoupper($this->current());
 			if($current == 'НОВЫЙ' ) return new Token(self::type_operator, 'НОВЫЙ', self::oper_new);
 			elseif($current == 'ИЛИ' ) return new Token(self::type_operator, 'ИЛИ', self::oper_or);
@@ -386,36 +394,30 @@ class TokenStream {
 			elseif($current == 'НЕ' ) return new Token(self::type_operator, 'НЕ', self::oper_not);	
 			elseif($this->curr() == '('){
 				//Идентификатор типа  с аргументами
-				$key = array_search($current, $this->identypes['rus']);
+				$key = array_search($current, $this->identypes['lng']);
 				if( $key !== false ) return new Token(self::type_identification, $this->identypes['php'][$key], $key);
-				$key = array_search($current, $this->identypes['eng']);
-				if( $key !== false ) return new Token(self::type_identification,  $this->identypes['php'][$key], $key);
+				// $key = array_search($current, $this->identypes['eng']);
+				// if( $key !== false ) return new Token(self::type_identification,  $this->identypes['php'][$key], $key);
 				$this->move();
-				//Общая функция на русском
-				$key = array_search($current.'(', $this->functions1С['rus']);
+				//Общая функция на языке
+				$key = array_search($current.'(', $this->functions1С['lng']);
 				if( $key !== false ) return new Token(self::type_function, $current, $key); 
 				else{
-					//Общая функция на английском
-					$key = array_search($current.'(', $this->functions1С['eng']);
-					if( $key !== false ) return new Token(self::type_function, $current, $key); 
-					else return new Token(self::type_extfunction, str_replace(self::LetterRus, self::LetterEng, $current));	
+					//нераспознаные функции переводим на английский
+					return new Token(self::type_extfunction, str_replace(php1C_LetterLng, php1C_LetterEng, $current));	
 				}
 				throw new Exception('Непонятная функция ('.$current.')'); 
 		    } 
 			else{
 				//Индентификатор без аргументов
-				//Ключевое слово rus - eng
-				$key = array_search($current, self::keywords['code']);
-				if( $key !== false ) return new Token(self::type_keyword, $current, $key);
-				$key = array_search($current, self::keywords['codePHP']);
+				$key = array_search($current, php1C_Keywords);
 				if( $key !== false ) return new Token(self::type_keyword, $current, $key);
 				else{
 					//Идентификатор типа без скобок
-					$key = array_search($current, $this->identypes['rus']);
+					$key = array_search($current, $this->identypes['lng']);
 					if( $key !== false ) return new Token(self::type_identification, $current, $key);
-					$key = array_search($current, $this->identypes['eng']);
-					if( $key !== false ) return new Token(self::type_identification, $current, $key);
-					if( self::fEnglishVariable ) return new Token(self::type_variable, str_replace(self::LetterRus, self::LetterEng, $current));
+					//Нераспознанные переменные
+					if( fEnglishVariable ) return new Token(self::type_variable, str_replace(php1C_LetterLng, php1C_LetterEng, $current));
 					else return new Token(self::type_variable, $current); //Переменная не переводим на английский
 				} 
 			}

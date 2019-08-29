@@ -106,7 +106,7 @@ class CodeStream {
 		$this->GetChar();
 		$this->MatchOper(TokenStream::oper_point, '.');
 		if($this->Type === TokenStream::type_variable){
-			if( TokenStream::fEnglishVariable )
+			if( fEnglishVariable )
 				switch ($this->Look) {
 					case 'VK'  : //
 					case 'CR'  : return chr(13);
@@ -212,7 +212,7 @@ class CodeStream {
 			 	return;
 			}
 			if( $this->Type === TokenStream::type_extfunction){
-				$func = str_replace(TokenStream::LetterRus, TokenStream::LetterEng, $this->Look);
+				$func = str_replace(php1C_LetterLng, php1C_LetterEng, $this->Look);
 				$this->D0 = $this->callFunction( null, $func);
 				return;
 			}
@@ -792,7 +792,7 @@ class CodeStream {
 						 	case TokenStream::keyword_procedure:
 						 		$this->GetChar();
 						 		if($this->Type === TokenStream::type_extfunction){
-						 			$func = str_replace(TokenStream::LetterRus, TokenStream::LetterEng, $this->Look);
+						 			$func = str_replace(php1C_LetterLng, php1C_LetterEng, $this->Look);
 						 			if($skip) throw new Exception('Вложенных функций не допускается');
 						 			//инициализация переменных функции в массив $this->argsFunction[$func]
 						 			$this->argsFunction[$func] = array();
@@ -888,7 +888,7 @@ class CodeStream {
 			if($this->Type !== TokenStream::type_end_code) {
 				$this->continueCode();
 				$name = strtoupper($name_var); 
-				if( TokenStream::fEnglishVariable ) $name = str_replace(TokenStream::LetterRus, TokenStream::LetterEng, $name);
+				if( fEnglishVariable ) $name = str_replace(php1C_LetterLng, php1C_LetterEng, $name);
 				if(isset($name_var)) return toString1C($this->variable[$name]);
 			}	
 			else return "\n Нет кода для выполнения \n";

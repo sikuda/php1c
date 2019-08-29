@@ -11,11 +11,17 @@
 * Подключаем пространство имен
 */
 namespace php1C;
-
-/**
-* Используем стандартные исключения
-*/
 use Exception;
+
+//Подключаем язык
+require_once('php1C_settings.php');
+if (LANGUAGE == 'en') {
+	require_once('lang/en.php');   
+}
+else{
+	require_once('lang/ru.php');
+}
+
 
 /*
 *  Подключаем все модули для 1С
@@ -27,16 +33,8 @@ require_once('php1C_collections.php');
 require_once('php1C_file.php');
 
 /**
-* Массив названий русских функций для общей работы с 1С
-* @return string[] Массив названий функций общей работы с 1С.
-*/
-function functions_Com(){
-	return  array('Сообщить(', 'Найти(', 'ЗначениеЗаполнено(', 'Тип(', 'ТипЗнч(' );
-}
-
-/**
-* Массив названий английских функций для общей работы с 1С. Соответстует элементам русским функций.
-* @return string[] Массив названий функций работы с датой.
+* Массив функций PHP для общей работы с 1С. Соответстует элементам в язоковых файлах.
+* @return string[] Массив названий общих функций.
 */   
 function functionsPHP_Com(){
 	return  array('Message(',  'Find(',  'ValueIsFilled(',    'Type(','TypeOf(');
@@ -91,10 +89,10 @@ function callCommonFunction($context=null, $key, $arguments){
 * @return string Возвращем значение как в 1С ('Да', 'Нет', Дату в формате 1С dd.mm.yyyy, 'Неопределено' и другое
 */  
 function toString1C($arg){
-	if(!isset($arg)) return "Неопределено";
+	if(!isset($arg)) return php1C_Undefined; //"Неопределено";
 	if(is_bool($arg)){
-		if($arg === true ) return "Да";
-		else return "Нет";
+		if($arg === true ) return php1C_Bool[0]; //"Да";
+		else return php1C_Bool[1]; //"Нет";
 	}
 	return strval($arg); 
 }

@@ -12,6 +12,7 @@
 namespace php1C;
 use Exception;
 
+
 /**
 * Подключаем разбора и базовый модуль работы с 1С
 */
@@ -90,7 +91,7 @@ class CodeStream {
 		$this->GetChar();
 		$this->MatchOper(TokenStream::oper_point, '.');
 		if($this->Type === TokenStream::type_variable){
-			if( TokenStream::fEnglishVariable )
+			if( fEnglishVariable )
 				switch ($this->Look) {
 					case 'VK'  : //
 					case 'CR'  : return 'chr(13)';
@@ -185,7 +186,8 @@ class CodeStream {
 			 	return;
 			}
 			if( $this->Type === TokenStream::type_extfunction){
-				$func = str_replace(TokenStream::LetterRus, TokenStream::LetterEng, $this->Look);
+				//$func = str_replace(php1C_LetterLng, php1C_LetterEng, $this->Look);
+				$func = $this->Look;
 				$this->code = $this->splitFunction( null, $func);
 				return;
 			}	
@@ -633,7 +635,7 @@ class CodeStream {
 					 	case TokenStream::keyword_procedure:
 					 		$this->GetChar();
 					 		if($this->Type === TokenStream::type_extfunction){
-					 			$key = str_replace(TokenStream::LetterRus, TokenStream::LetterEng, $this->Look);
+					 			$key = str_replace(php1C_LetterLng, php1C_LetterEng, $this->Look);
 								//$this->GetChar();
 								$this->codePHP .= 'function '.$this->splitFunction(null, $key, -1).'{';
 							}
@@ -696,7 +698,7 @@ class CodeStream {
 
 				$this->continueCode();
 
-				$name = strtoupper(str_replace(TokenStream::LetterRus, TokenStream::LetterEng, $name_var));
+				$name = strtoupper(str_replace(php1C_LetterLng, php1C_LetterEng, $name_var));
 				if(isset($name_var)){
 					eval($this->codePHP);
 				 	return '';
