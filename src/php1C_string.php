@@ -7,21 +7,14 @@
 * @author  sikuda admin@sikuda.ru
 * @version 0.1
 */
-
-
 namespace php1C;
 use Exception;
-
 require_once('php1C_collections.php'); //для функций СтрРазделить, СтрСоединить
-
 
 /**
 * Массив названий английских функций для работы со строками. Соответстует элементам русским функций.
-* @return string[] Массив названий функций работы со строками.
 */   
-function functionsPHP_String(){
-	return array('StrLen(',  'TrimL(','TrimR(','TrimLR(','Left(','Right(','Mid(','StrFind(','Lower(','Upper(','Title(','Char(','CharCode(',   'IsBlankString(','StrReplace(', 'StrLineCount(', 'StrGetLine(',      'StrOccurrenceCount(','StrCompare(', 'StrStartsWith(', 'StrEndsWith(',                     'StrSplit(', 'StrConcat(');
-}	
+const php1C_functionsPHP_String = array('StrLen(',  'TrimL(','TrimR(','TrimLR(','Left(','Right(','Mid(','StrFind(','Lower(','Upper(','Title(','Char(','CharCode(',   'IsBlankString(','StrReplace(', 'StrLineCount(', 'StrGetLine(',      'StrOccurrenceCount(','StrCompare(', 'StrStartsWith(', 'StrEndsWith(',                     'StrSplit(', 'StrConcat(');
 
 /**
 * Вызывает функцию работы с датой

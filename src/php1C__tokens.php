@@ -151,14 +151,14 @@ class TokenStream {
 		$this->str = $str;
 
 		//Добавление в таблицы общих типов
-		$this->indexTypesColl  = $this->AddTypes( types_Collection(),  typesPHP_Collection());
+		$this->indexTypesColl  = $this->AddTypes( php1C_types_Collection,  php1C_typesPHP_Collection);
 
 		//Добавление в таблицы общих функций 
-		$this->indexFuncCom  = $this->AddModule( functions_Com(),  functionsPHP_Com());
-		$this->indexFuncStr  = $this->AddModule( functions_String(),  functionsPHP_String());
-		$this->indexFuncNum  = $this->AddModule( functions_Number(),  functionsPHP_Number());
-		$this->indexFuncDate = $this->AddModule( functions_Date(), functionsPHP_Date());
-		$this->indexFuncColl = $this->AddModule( functions_Collections(), functionsPHP_Collections());
+		$this->indexFuncCom  = $this->AddModule( php1C_functions_Com,  php1C_functionsPHP_Com);
+		$this->indexFuncStr  = $this->AddModule( php1C_functions_String,  php1C_functionsPHP_String);
+		$this->indexFuncNum  = $this->AddModule( php1C_functions_Number,  php1C_functionsPHP_Number);
+		$this->indexFuncDate = $this->AddModule( php1C_functions_Date, php1C_functionsPHP_Date);
+		$this->indexFuncColl = $this->AddModule( php1C_functions_Collections, php1C_functionsPHP_Collections);
 	}
 
 	/**
@@ -179,6 +179,7 @@ class TokenStream {
 			}
 		}
 		return count($this->identypes['php']);
+
 	}
 
 	/**
@@ -396,8 +397,6 @@ class TokenStream {
 				//Идентификатор типа  с аргументами
 				$key = array_search($current, $this->identypes['lng']);
 				if( $key !== false ) return new Token(self::type_identification, $this->identypes['php'][$key], $key);
-				// $key = array_search($current, $this->identypes['eng']);
-				// if( $key !== false ) return new Token(self::type_identification,  $this->identypes['php'][$key], $key);
 				$this->move();
 				//Общая функция на языке
 				$key = array_search($current.'(', $this->functions1С['lng']);

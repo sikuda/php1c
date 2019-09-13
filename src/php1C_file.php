@@ -9,13 +9,9 @@
 * @author  sikuda admin@sikuda.ru
 * @version 0.1
 */
-//require_once( '.\php1C_date.php'); //todo
 namespace php1C;
-
-/**
-* Используем стандартные исключения
-*/
 use Exception;
+//require_once( 'php1C_date.php'); //todo
 
 
 class File1C {

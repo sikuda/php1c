@@ -8,27 +8,20 @@
 * @author  sikuda admin@sikuda.ru
 * @version 0.1
 */
-
 namespace php1C;
 use Exception;
 require_once('php1C__tokens.php');
 
-
 /**
 * Массив названий типов для работы с коллекциями переименовании
-* @return array of string - Массив названий функций работы с коллекциями или пустые.
 */
-function typesPHP_Collection(){
-	return array('Array1C','Structure1C','ValueTable');
-}
+const php1C_typesPHP_Collection = array('Array1C','Structure1C','ValueTable');
 
 /**
 * Массив названий английских функций для работы с датой. Соответстует элементам русским функций.
 * @return string[] Массив названий функций работы с датой.
 */   
-function functionsPHP_Collections(){
-	return  array('UBound(',   'Insert(',   'Add(',      'Count(',      'Find(',  'Clear('  , 'Get(',      'Del(',    'Set(',       'Property(','LoadColumn(',     'UnloadColumn(',      'FillValues(',      'IndexOf(','Total(','Find(','FindRows(',    'Clear(',   'GroupBy(',  'Move(',    'Copy(',       'CopyColumns(',          'Sort(',       'Del(');
-}
+const php1C_functionsPHP_Collections = array('UBound(',   'Insert(',   'Add(',      'Count(',      'Find(',  'Clear('  , 'Get(',      'Del(',    'Set(',       'Property(','LoadColumn(',     'UnloadColumn(',      'FillValues(',      'IndexOf(','Total(','Find(','FindRows(',    'Clear(',   'GroupBy(',  'Move(',    'Copy(',       'CopyColumns(',          'Sort(',       'Del(');
 
 /**
 * Вызывает функции и функции объектов 1С работы с коллекциями

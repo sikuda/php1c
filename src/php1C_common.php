@@ -22,7 +22,6 @@ else{
 	require_once('lang/ru.php');
 }
 
-
 /*
 *  Подключаем все модули для 1С
 */
@@ -33,12 +32,9 @@ require_once('php1C_collections.php');
 require_once('php1C_file.php');
 
 /**
-* Массив функций PHP для общей работы с 1С. Соответстует элементам в язоковых файлах.
-* @return string[] Массив названий общих функций.
+* Массив функций PHP для общей работы с 1С. Соответстует элементам в языковых файлах.
 */   
-function functionsPHP_Com(){
-	return  array('Message(',  'Find(',  'ValueIsFilled(',    'Type(','TypeOf(');
-}
+const php1C_functionsPHP_Com = array('Message(','Find(','ValueIsFilled(','Type(','TypeOf(');
 
 /**
 * Вызывает общие функции и функции объектов 1С 
@@ -103,7 +99,8 @@ function toString1C($arg){
 * @return (string or float) Возвращем значение числа как в 1С (string - для чисел повышенной точности, float - если повышенная точность не важна
 */  
 function toNumber1C($arg){
-	return floatval($arg);
+	if(fPrecision1C) return strval($arg);
+	else return floatval($arg);
 }
 
 /**
@@ -116,7 +113,9 @@ function add1C($arg1, $arg2){
 
 	if (is_string($arg1)) return $arg1 . (string)$arg2;
 	elseif(is_bool($arg1) || is_numeric($arg1)){
-		if(is_bool($arg2) || is_numeric($arg2)) return $arg1+$arg2;
+		if(is_bool($arg2) || is_numeric($arg2)) 
+			if(fPrecision1C) return bcadd($arg1,$arg2,Scale1C);
+			else return $arg1+$arg2;
 	}
 	elseif(is_object($arg1)){
 		if( (get_class($arg1) === 'php1C\Date1C') && is_numeric($arg2) && !is_string($arg2) ) return $arg1->add($arg2);
@@ -133,7 +132,9 @@ function add1C($arg1, $arg2){
 function sub1C($arg1, $arg2){
 
 	if(is_bool($arg1) || is_numeric($arg1)){
-		if(is_bool($arg2) || is_numeric($arg2)) return $arg1-$arg2;
+		if(is_bool($arg2) || is_numeric($arg2)) 
+			if(fPrecision1C) return bcsub($arg1,$arg2,Scale1C);
+			else return $arg1-$arg2;
 	}
 	elseif(is_object($arg1)){
 		if( (get_class($arg1) === 'php1C\Date1C') && is_numeric($arg2) && !is_string($arg2) ) return $arg1->sub($arg2);
@@ -149,7 +150,9 @@ function sub1C($arg1, $arg2){
 */
 function mul1C($arg1, $arg2){
 
-	if((is_bool($arg1) || is_numeric($arg1)) && !is_string($arg1) && (is_bool($arg2) || is_numeric($arg2)) && !is_string($arg2) ) return $arg1*$arg2;
+	if((is_bool($arg1) || is_numeric($arg1)) && !is_string($arg1) && (is_bool($arg2) || is_numeric($arg2)) && !is_string($arg2) ) 
+		if(fPrecision1C) return bcmul($arg1,$arg2,Scale1C);
+			else return $arg1*$arg2;
 	throw new Exception("Преобразование значения к типу Число не может быть выполнено");
 }
 
@@ -161,9 +164,16 @@ function mul1C($arg1, $arg2){
 */
 function div1C($arg1, $arg2){
 
-	if((is_bool($arg1) || is_numeric($arg1)) && !is_string($arg1) && (is_bool($arg2) || is_numeric($arg2)) && !is_string($arg2) ){
-		if( $arg2 == 0) throw new Exception("Деление на 0");
-		else return $arg1/$arg2;	
+	if((is_bool($arg1) || is_numeric($arg1)) && (is_bool($arg2) || is_numeric($arg2)) ){
+		if(fPrecision1C){ 
+			if( bccomp($arg2, "0", Scale1C) === 0) throw new Exception("Деление на 0");
+			else return strval(bcdiv($arg1,$arg2,Scale1C)); 
+		}
+		else{
+			if(is_string($arg1) || is_string($arg2)) throw new Exception("Преобразование значения к типу Число не может быть выполнено");
+			if(floatval($arg2) == 0) throw new Exception("Деление на 0");
+			else return $arg1/$arg2;	
+		}
 	} 
 	throw new Exception("Преобразование значения к типу Число не может быть выполнено");
 }

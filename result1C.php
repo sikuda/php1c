@@ -16,4 +16,6 @@ require_once('src/php1C__run.php');
     	$str = php1C\runCode($code, "Результат"); 
 	}	
 	echo $str;
+
+	//echo strval(bcdiv(1,3,27));
 ?>

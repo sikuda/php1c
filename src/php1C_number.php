@@ -9,14 +9,13 @@
 namespace php1C;
 use Exception;
 
+
 /**
 * Массив названий английских функций для работы с числами. Соответстует элементам русским функций.
-* @return string[] Массив названий функций работы с числами.
 */   
-function functionsPHP_Number(){
-	return array('Int(','Round(','Log(','Log10(','Sin(','Cos(','Tan(','ASin(','ACos(','ATan(','Exp(','Pow(','Sqrt(','Format(', 'NumberInWords(', 'NStr(', 'PeriodPresentation(', 'StrTemplate(', 'StringWithNumber(');
-}
-//Формат, ЧислоПрописью, НСтр, ПредставлениеПериода, СтрШаблон, СтрокаСЧислом	
+const php1C_functionsPHP_Number = array('Int(','Round(','Log(','Log10(','Sin(','Cos(','Tan(','ASin(','ACos(','ATan(','Exp(','Pow(','Sqrt(','Format(', 'NumberInWords(', 'NStr('
+	, 'PeriodPresentation(', 'StrTemplate(', 'StringWithNumber(');
+
 
 /**
 * Вызывает функцию работы с числами

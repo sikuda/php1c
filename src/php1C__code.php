@@ -80,7 +80,7 @@ class CodeStream {
 			$this->GetChar();
 		}
 		else{
-			throw new Exception('Ожидается -'.TokenStream::keywords['code'][$subtype]);
+			throw new Exception('Ожидается -'.php1C_Keywords[$subtype]);
 		}	
 	}
 
@@ -658,7 +658,7 @@ class CodeStream {
 					 		$this->GetChar();
 					 		break;		
 					 	default:
-					 		throw new Exception('Нет соответствия ключевому слову '.TokenStream::keywords['code'][$this->Index]);
+					 		throw new Exception('Нет соответствия ключевому слову '.php1C_Keywords[$this->Index]);
 							break;	
 					}
 					break;
