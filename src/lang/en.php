@@ -15,32 +15,32 @@ const php1C_LetterEng = array('A','B','C','D','E','F','G','H','I','J','K','L','M
 	                          'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q', 'r','s','t','u','v','w','x','y','z');
 
 const php1C_Keywords = array(
-	'Undefined',		//keyword_undefined = 0;
-	'true',				//keyword_true   = 1;
-	'false',			//keyword_false  = 2;
-	'if(',				//keyword_if     = 3;
-	'){',               //keyword_then   = 4; 
-	'} elseif {',		//keyword_elseif = 5;
-	'} else {',         //keyword_else   = 6;
-	'}',                //keyword_endif  = 7; 
-	'while(',           //keyword_while  = 8;
-	'for(',             //keyword_for    = 9;
-	'foreach(',         //keyword_foreach = 10;
-	'to',               //keyword_to     = 11;
-	'in',               //keyword_in     = 12; 
-	'in',               //keyword_from   = 13;
-	'){',               //keyword_circle = 14;
-	'}',                //keyword_endcircle = 15;
-	'break',            //keyword_break  = 16;
-	'continue',         //keyword_continue = 17;
-	'function',         //keyword_function = 18
-	'function',         //keyword_procedure = 19;  
-	'}',                //keyword_endfunction = 20; 
-	'}',                //keyword_endprocedure = 21;
-	'return',           //keyword_return  = 22;
-	'var',              //keyword_var     = 23;
-	'chars',            //keyword_chars   = 24;
-	'export',           //keyword_export  = 25; 
+	'UNDEFINED',		//keyword_undefined = 0;
+	'TRUE',				//keyword_true   = 1;
+	'FALSE',			//keyword_false  = 2;
+	'IF',				//keyword_if     = 3;
+	'THEN',               //keyword_then   = 4; 
+	'ELSIF',		//keyword_elseif = 5;
+	'ELSE',         //keyword_else   = 6;
+	'ENDIF',                //keyword_endif  = 7; 
+	'WHILE',           //keyword_while  = 8;
+	'FOR',             //keyword_for    = 9;
+	'EACH',         //keyword_foreach = 10;
+	'TO',               //keyword_to     = 11;
+	'IN',               //keyword_in     = 12; 
+	'FROM',             //keyword_from   = 13;
+	'DO',               //keyword_circle = 14;
+	'ENDDO',                //keyword_endcircle = 15;
+	'BREAK',            //keyword_break  = 16;
+	'CONTINUE',         //keyword_continue = 17;
+	'FUNCTION',         //keyword_function = 18
+	'PROCEDURE',         //keyword_procedure = 19;  
+	'ENDFUNCTION',                //keyword_endfunction = 20; 
+	'ENDPROCEDURE',                //keyword_endprocedure = 21;
+	'RETURN',           //keyword_return  = 22;
+	'VAR',              //keyword_var     = 23;
+	'CHARS',            //keyword_chars   = 24;
+	'EXPORT',           //keyword_export  = 25; 
 	'VAL');             //keyword_val     =26;
 
 /**
@@ -56,7 +56,9 @@ const php1C_functions_Com = array(
 	'Find(',
 	'ValueIsFilled(',
 	'Type(',
-	'TypeOf('
+	'TypeOf(',
+	'String(',
+	'Number('
 );
 
 

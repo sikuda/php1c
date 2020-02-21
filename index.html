@@ -4,13 +4,18 @@
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
 <link rel="stylesheet" href="../lib/codemirror.css">
 <script src="../lib/codemirror.js"></script>
-<script src="../mode/javascript/javascript.js"></script>
+<!-- <script src="../mode/javascript/javascript.js"></script> -->
 <script src="../mode/1c/1c.js"></script>
-<script src="../mode/css/css.js"></script>
+<!-- <script src="../mode/css/css.js"></script>
 <script src="../mode/clike/clike.js"></script>
-<script src="../mode/php/php.js"></script>
+<script src="../mode/php/php.js"></script> -->
 <link rel="stylesheet" href="../theme/1c.css">
 <body onload="loadDocument()">
+  <h4>Выбор языка для 1С</h4>
+  <input type="radio" name="lang" value="ru" checked> Русский<br>
+  <input type="radio" name="lang" value="en"> Английский<br>
+  <!-- <input type="radio" name="lang" value="ua"> Украинский<br><br> -->
+    
   <h4>Открытый проект выполнения кода 1С на PHP. <br><a href='https://github.com/sikuda/php1c.ru'>https://github.com/sikuda/php1c.ru</a></h4>
   <p>Хотите попробовать выполнить или преобразовать Ваш кусочек кода 1С? Вставьте его в первое поле и нажмите кнопку Выполнить или Преобразовать в PHP для преобразования этого кода.</p>
   <div width="100%">
@@ -83,7 +88,9 @@
         }
       }        
       var params = context;
-      xhttp.open("POST", 'result1C.php', true)
+      var lang = "ru"
+      if( document.getElementsByName("lang")[1].checked) lang = "en";
+      xhttp.open("POST", 'result1C.php?lang='+lang, true)
       xhttp.setRequestHeader('Content-Type', 'text-plain');
       xhttp.send(params);
     }

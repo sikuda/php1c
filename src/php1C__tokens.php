@@ -41,7 +41,7 @@ class Token {
 class TokenStream {
 
 	//array of token
-    public $tokens = array();
+    public $tokens  = undefined;
     private $itoken = 0;
 
     //common 
@@ -388,7 +388,7 @@ class TokenStream {
 	    
 		//Обработка переменных, ключевых слов или функций
 		if( $this->matchMove(php1C_Identifiers)){
-			$current = strtoupper($this->current());
+			$current = mb_strtoupper($this->current());
 			if($current == 'НОВЫЙ' ) return new Token(self::type_operator, 'НОВЫЙ', self::oper_new);
 			elseif($current == 'ИЛИ' ) return new Token(self::type_operator, 'ИЛИ', self::oper_or);
 			elseif($current == 'И' ) return new Token(self::type_operator, 'И', self::oper_and);
@@ -434,7 +434,8 @@ class TokenStream {
 		$this->tokens = array();
 		$this->start = 0;
 		$this->pos = 0;
-		$token = $this->readToken(); 
+		$token = $this->readToken();
+
 		$key = 0;
 		while( $token->type !== self::type_end_code ){
 			$token->col = $this->col;
@@ -445,7 +446,7 @@ class TokenStream {
 			$token = $this->readToken(); 
 			$key++;
 		}
-		$this->tokens[$key] = new Token(self::type_end_code);//,'',-1,$this->col,$this->row);
+		$this->tokens[$key] = new Token(self::type_end_code);
 		$this->tokens[$key]->col = $this->col;
 		$this->tokens[$key]->row = $this->row;
 		$this->start = 0;

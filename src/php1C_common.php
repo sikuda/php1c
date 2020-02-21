@@ -15,7 +15,7 @@ use Exception;
 
 //Подключаем язык
 require_once('php1C_settings.php');
-if (LANGUAGE == 'en') {
+if (LANGUAGE === 'en') {
 	require_once('lang/en.php');   
 }
 else{
@@ -34,7 +34,7 @@ require_once('php1C_file.php');
 /**
 * Массив функций PHP для общей работы с 1С. Соответстует элементам в языковых файлах.
 */   
-const php1C_functionsPHP_Com = array('Message(','Find(','ValueIsFilled(','Type(','TypeOf(');
+const php1C_functionsPHP_Com = array('Message(','Find(','ValueIsFilled(','Type(','TypeOf(','toString1C(','toNumber1C(');
 
 /**
 * Вызывает общие функции и функции объектов 1С 
@@ -62,6 +62,12 @@ function callCommonFunction($context=null, $key, $arguments){
 		case 'TypeOf(':
 			if(isset($arguments[1])) throw new Exception("Ожидается ) ");
 			return TypeOf($arguments[0]);
+		case 'toString1C(':
+			if(isset($arguments[1])) throw new Exception("Ожидается ) ");
+			return toString1C($arguments[0]);
+		case 'toNumber1C(':
+			if(isset($arguments[1])) throw new Exception("Ожидается ) ");
+			return toNumber1C($arguments[0]);		
 		default:
 			throw new Exception("Неизвестная общая функция ".$key."");
 		}	
@@ -80,7 +86,7 @@ function callCommonFunction($context=null, $key, $arguments){
 }
 
 /**
-* Выводит данные в представлении 1С (на русском)
+* Выводит данные в представлении 1С (на установленном языке)
 * @param any $arg
 * @return string Возвращем значение как в 1С ('Да', 'Нет', Дату в формате 1С dd.mm.yyyy, 'Неопределено' и другое
 */  
@@ -90,7 +96,17 @@ function toString1C($arg){
 		if($arg === true ) return php1C_Bool[0]; //"Да";
 		else return php1C_Bool[1]; //"Нет";
 	}
-	return strval($arg); 
+	$val = strval($arg);
+	//делаем пробелы между тысячными, миллионам и тд.
+	if(Regionalset_grouping && is_numeric($arg)){
+		$res = strpos($val, '.');
+		if($res === false) $res = strlen($val)-1;
+		while($res>3){
+			$val = substr($val, 0, $res-2)+' '+substr(string, $res-2, 3);
+			$res-=3;
+		}
+	} 
+    return $val;
 }
 
 /**

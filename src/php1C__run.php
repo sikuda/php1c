@@ -8,7 +8,6 @@
 * @author  sikuda admin@sikuda.ru
 * @version 0.1
 */
-
 namespace php1C;
 
 use Exception;
@@ -44,7 +43,7 @@ class CodeStream {
 	private $varstack = array();
 	private $D0 = '';
 	
-	const MAX_ITERRATOR_IN_CIRCLE = 100500; //Держите себы в руках - надо же ограничивать бесконечные циклы
+	const MAX_ITERRATOR_IN_CIRCLE = 100500; //Держите себя в руках - надо же ограничивать бесконечные циклы
 		
 	/**
 	* Обработать один токен
@@ -448,8 +447,8 @@ class CodeStream {
 	*/
 	private function getContext($key=''){
 		if(!empty($key)){
-			if($this->variable[$key] === null && !empty($this->inFunction)){
-				if($this->lvariable[$key] === null )throw new Exception('Не определена  переменная '.$key);
+			if(!isset($this->variable[$key]) && !empty($this->inFunction)){
+				if(!isset($this->lvariable[$key])) throw new Exception('Не определена  переменная '.$key);
 				else return $this->lvariable[$key];
 			} 
 		    else return $this->variable[$key];
@@ -887,7 +886,7 @@ class CodeStream {
 			$this->GetChar();
 			if($this->Type !== TokenStream::type_end_code) {
 				$this->continueCode();
-				$name = strtoupper($name_var); 
+				$name = mb_strtoupper($name_var); 
 				if( fEnglishVariable ) $name = str_replace(php1C_LetterLng, php1C_LetterEng, $name);
 				if(isset($name_var)) return toString1C($this->variable[$name]);
 			}	

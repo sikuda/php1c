@@ -1,8 +1,8 @@
 <?php
 // Установка языка програмирования 
-//- ru
+//- ru - default setting
 //- en
-define('LANGUAGE', 'ru');
+//define('LANGUAGE', 'ru');
 
 //true - Использовать только латинские переменные в PHP (false - переменные не переводятся)
 define('fEnglishVariable', true);
@@ -13,5 +13,8 @@ define('fEnglishTypes', false);
 //true - Использовать повышенную точность вычислений как в 1С, false - стандартные вычисления php
 define('fPrecision1C', false);
 define('Scale1C', 27);
+
+// Группировка 12 345.66 или 12345.66 
+define('Regionalset_grouping', false);
 
 ?>

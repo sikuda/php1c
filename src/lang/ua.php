@@ -16,49 +16,51 @@ const php1C_LetterEng = array('A','B','V','G','G','D','E','EH','ZH','Z','I','I',
 							  'a','b','v','g','g','d','e','eh','zh','z','i','i','ji','jj','k','l','m','n','o','p','r','s','t','u','f','kh','c','ch','sh','shh','','yu','ya');
 
 const php1C_Keywords = array(
-	'НЕВИЗНАЧЕНО',     //keyword_undefined = 0
-	'ЩОПРАВДА',        //keyword_true   = 1;
-	'БРЕХНЯ',          //keyword_false  = 2;
-	'ЕСЛИ',            //keyword_if     = 3;
-	'ТОГДА',           //keyword_then   = 4; 
-	'ИНАЧЕЕСЛИ',       //keyword_elseif = 5;
-	'ИНАЧЕ',           //keyword_else   = 6;
-	'КОНЕЦЕСЛИ',       //keyword_endif  = 7; 
-	'ПОКА',            //keyword_while  = 8;
-	'ДЛЯ',             //keyword_for    = 9;
-	'КАЖДОГО',         //keyword_foreach = 10;
-	'ПО',              //keyword_to     = 11;
-	'В',               //keyword_in     = 12; 
-	'ИЗ',              //keyword_from   = 13;
-	'ЦИКЛ',            //keyword_circle = 14;
-	'КОНЕЦЦИКЛА',      //keyword_endcircle = 1
-	'ПРЕРВАТЬ',        //keyword_break  = 16;
-	'ПРОДОЛЖИТЬ',      //keyword_continue = 17
-	'ФУНКЦИЯ',         //keyword_function = 18
-	'ПРОЦЕДУРА',       //keyword_procedure = 1
-	'КОНЕЦФУНКЦИИ',    //keyword_endfunction =
-	'КОНЕЦПРОЦЕДУРЫ',  //keyword_endprocedure 
-	'ВОЗВРАТ',         //keyword_return  = 22;
-	'ПЕРЕМ',           //keyword_var     = 23;
-	'СИМВОЛЫ',         //keyword_chars   = 24;
-	'ЭКСПОРТ',         //keyword_export  = 25;
-	'ЗНАЧ');           //keyword_val     =26;
+	'НЕВИЗНАЧЕНО',  //keyword_undefined = 0
+	'ЩОПРАВДА',     //keyword_true   = 1;
+	'БРЕХНЯ',       //keyword_false  = 2;
+	'ЯКЩО',         //keyword_if     = 3;
+	'ТОДІ',         //keyword_then = 4; 
+	'ІНАКШЕЯКЩО',   //keyword_elseif = 5;
+	'ІНАКШЕ',       //keyword_else = 6;
+	'КIНЕЦЬЯКЩО',   //keyword_endif = 7; 
+	'ПОКИ',         //keyword_while = 8;
+	'ДЛЯ',          //keyword_for = 9;
+	'КОЖНОГО',      // keyword_foreach = 10;
+	'ПО',           // keyword_to = 11;
+	'В',            //keyword_in = 12; 
+	'З',            //keyword_from = 13;
+	'ЦИКЛ',         //keyword_circle = 14;
+	'КIНЕЦЬЦИКЛУ',  //keyword_endcircle = 1
+	'ПЕРЕРВАТИ',    // keyword_break = 16;
+	'ПРОДОВЖИТИ',   // keyword_continue = 17
+	'ФУНКЦIЯ',      // keyword_function = 18
+	'ПРОЦЕДУРА',    //keyword_procedure = 1
+	'КIНЕЦЬФУНКЦIЇ',   //keyword_endfunction =
+	'КIНЕЦЬПРОЦЕДУРИ', //keyword_endprocedure 
+	'ПОВЕРНЕННЯ',     // keyword_return = 22;
+	'ПЕРЕМ',          //keyword_var = 23;
+	'СИМВОЛИ',        // keyword_chars = 24;
+	'ЕКСПОРТ',        //keyword_export  = 25;
+	'ЗНАЧ');          //keyword_val     =26;
 
 /**
 * Массив названий русских типов для работы с коллекциями
 * @return array of string - Массив названий функций работы с коллекциями.
 */
-const php1C_types_Collection = array('Массив','Структура','ТаблицаЗначений');
+const php1C_types_Collection = array('Масив','Структура','ТаблицяЗначень');
 
 /**
 * Массив общих русских функций для общей работы с 1С
 */
 const php1C_functions_Com = array(
-	'Сообщить(', 
-	'Найти(', 
-	'ЗначениеЗаполнено(', 
+	'Передавати(', 
+	'Шукати(', 
+	'ЗначенняЗаповнене(', 
 	'Тип(', 
-	'ТипЗнч('
+	'ТипЗнч(',
+	'Стрічка('),
+	'Число('
 );
 
 /**
@@ -86,8 +88,12 @@ const php1C_Undefined = "Невизначано";
 const php1C_Bool = array("Да","Ні");
 
 
-//Устаревшее - Буквы для жесткого перобразования к верхнему регистру 
-//const LetterRusLower = array('а','б','в','г','д','е','ё' ,'ж' ,'з','и','й', 'к','л','м','н','о','п','р','с','т','у','ф','х','ц','ч','ш','щ','ъ','ы','ь','э','ю','я');
-//const LetterRusUpper = array('А','Б','В','Г','Д','Е','Ё' ,'Ж' ,'З','И','Й' ,'К','Л','М','Н','О','П','Р','С','Т','У','Ф','Х','Ц','Ч','Ш','Щ','Ъ','Ы','Ь','Э','Ю','Я'); 
-//strtoupper($value) = str_replace(self::LetterRusLower, self::LetterRusUpper, $value);
+// ЯКЩО ЩОПРАВДА <> БРЕХНЯ ТОДІ
+// 	Передавати("ЦЕ НЕ БРЕХНЯ");
+// ІНАКШЕ
+// 	Передавати("ЦЕ БРЕХНЯ");
+// КIНЕЦЬЯКЩО
+
+
+
 ?>
