@@ -88,8 +88,10 @@ const php1C_functions_Date = array('DATE(','CURRENTDATE(', 'YEAR(', 'MONTH(','DA
 */   
 const php1C_functions_Collections = array('UBOUND(', 'INSERT(', 'ADD(', 'COUNT(', 'FIND(', 'CLEAR(' , 'GET(', 'DEL(', 'SET(', 'PROPERTY(','LOADCOLUMN(', 'UNLOADCOLUMN(', 'FILLVALUES(', 'INDEXOF(','TOTAL(','FIND(','FINDROWS(', 'CLEAR(', 'GROUPBY(', 'MOVE(','COPY(','COPYCOLUMNS(','SORT(','DEL(');
 
-//Строковые представления некоторых типов
-const php1C_Undefined = 'UNDEFINED';
-const php1C_Bool = array('YES','NO');
+/*
+*   для Вывода как в 1С
+*/
+const php1C_Undefined = 'Undefined';
+const php1C_Bool = array('Yes','No');
 
 ?>

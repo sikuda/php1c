@@ -42,7 +42,7 @@ class CodeStream {
 	private $codestack = array();
 
 	/**
-	* Обработать один токен
+	* Обработать один токен, пока из массива
 	*/
 	private function GetChar(){
 
@@ -50,8 +50,14 @@ class CodeStream {
 		//if($this->itoken >= count($this->tokens)) throw new Exception('Выход за пределы массива токенов, индекс='.$this->itoken);
 
 		$token = $this->tokens[$this->itoken];
-		$this->Type = $token->type; 
+		while($token->type === TokenStream::type_newline) {
+			$token = $this->tokens[++$this->itoken];
+		}
+		$this->Type = $token->type;
 		$this->Look = $token->context; 
+
+		//echo '|'.$token->type.'v'.$token->context.'|';
+
 		$this->Index = $token->index;
 		$this->itoken++;
 
