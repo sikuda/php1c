@@ -1,11 +1,11 @@
 <?php
 /**
-* Дополнительный модуль для получения кода PHP из 1С
+* Модуль для получения кода PHP из 1С
 * 
 * Модуль для работы с 1С 
 * Преобразование кода в код php
 * 
-* @author  sikuda admin@sikuda.ru
+* @author  sikuda@yandex.ru
 * @version 0.1
 */
 
@@ -16,7 +16,7 @@ use Exception;
 /**
 * Подключаем разбора и базовый модуль работы с 1С
 */
-require_once( 'php1C__tokens.php');
+//require_once( 'php1C__tokens.php');
 require_once( 'php1C_common.php');
 
 /**
@@ -678,9 +678,9 @@ class CodeStream {
 
 		//Блок разбора по токеном
 		try{
-			//php1C'.'\\'.'
-			if(isset($name_var)) $buffer .= chr(10).'Сообщить('.$name_var.');';
-
+			//добавляем вывод результата
+			if(isset($name_var)) $buffer .= ';'.chr(10).php1C_functions_Com[0].$name_var.');';
+			
 			$this->tokenStream = new TokenStream($buffer);
 			$this->tokenStream->CodeToTokens();
 			$this->tokens = &$this->tokenStream->tokens;
@@ -698,7 +698,7 @@ class CodeStream {
 
 				$this->continueCode();
 
-				$name = strtoupper(str_replace(php1C_LetterLng, php1C_LetterEng, $name_var));
+				//$name = strtoupper(str_replace(php1C_LetterLng, php1C_LetterEng, $name_var));
 				if(isset($name_var)){
 					eval($this->codePHP);
 				 	return '';

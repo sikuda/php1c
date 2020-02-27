@@ -164,15 +164,14 @@ class TokenStream {
 	/**
 	* Добавление типов в общую таблицу типов
 	*
-    * @param $typesRus array массив русских названий типов
-    * @param $typesEng array массив английских названий типов
+    * @param $types array массив названий типов на выбранном языке
     * @param $typesPHP array массив английских названий типов в PHP
     * @return int возвращаем верхнюю границу модуля в общем списке 
 	*/
 	private function AddTypes( $types, $typesPHP ){
 		if(is_array($types) && is_array($typesPHP) ){
 			foreach ($types as $value) {
-				array_push($this->identypes['lng'], strtoupper($value));
+				array_push($this->identypes['lng'], mb_strtoupper($value));
 			}
 			foreach ($typesPHP as $value) {
 				array_push($this->identypes['php'], $value);
@@ -192,7 +191,7 @@ class TokenStream {
 	private function AddModule( $func, $funcPHP ){
 		if(is_array($func) && is_array($funcPHP) ){
 			foreach ($func as $value) {
-				array_push($this->functions1С['lng'], strtoupper($value));
+				array_push($this->functions1С['lng'], mb_strtoupper($value));
 			}
 			foreach ($funcPHP as $value) {
 				array_push($this->functions1С['php'], $value);
@@ -389,7 +388,7 @@ class TokenStream {
 		//Обработка переменных, ключевых слов или функций
 		if( $this->matchMove(php1C_Identifiers)){
 			$current = mb_strtoupper($this->current());
-			if($current == 'НОВЫЙ' ) return new Token(self::type_operator, 'НОВЫЙ', self::oper_new);
+			if($current == php1C_type_New ) return new Token(self::type_operator, php1C_type_New, self::oper_new);
 			elseif($current == 'ИЛИ' ) return new Token(self::type_operator, 'ИЛИ', self::oper_or);
 			elseif($current == 'И' ) return new Token(self::type_operator, 'И', self::oper_and);
 			elseif($current == 'НЕ' ) return new Token(self::type_operator, 'НЕ', self::oper_not);	

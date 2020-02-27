@@ -16,7 +16,7 @@ use Exception;
 //Подключаем язык
 require_once('php1C_settings.php');
 if (LANGUAGE === 'en') {
-	require_once('lang/en.php');   
+ 	require_once('lang/en.php');   
 }
 else{
 	require_once('lang/ru.php');
@@ -330,7 +330,7 @@ function Message($mess='', $status=0){
 * @return возвращает позицию найденной строки начиная с 1. Если ничего не нашло возвратит 0
 */
 function Find($str='', $substr=''){
-	$res = strpos($str, $substr);
+	$res = mb_strpos($str, $substr);
 	if($res === false) return 0;
 	else return $res+1;
 }
