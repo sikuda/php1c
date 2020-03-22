@@ -2,7 +2,7 @@
 /**
 * Модуль Английского языка для получения кода PHP из 1С
 * 
-* @author  sikuda admin@sikuda.ru
+* @author  sikuda@yandex.ru
 * @version 0.1
 */
 namespace php1C;
@@ -52,7 +52,7 @@ const php1C_type_New = 'NEW';
 /**
 * Массив названий английских типов для работы с коллекциями
 */
-const php1C_types_Collection = array('ARRAY','STRUCTURE','VALUETABLE');
+const php1C_types_Collection = array('ARRAY','STRUCTURE','MAP','VALUETABLE');
 
 /**
 * Массив названий английских функций для общей работы с 1С. Соответстует элементам русским функций.
@@ -64,7 +64,8 @@ const php1C_functions_Com = array(
 	'TYPE(',
 	'TYPEOF(',
 	'STRING(',
-	'NUNBER('
+	'NUNBER(',
+	'NEW('
 );
 
 

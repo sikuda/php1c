@@ -5,7 +5,7 @@
 * Модуль для работы с массивами, структурами  в 1С и функциями для работы с ними
 * для будущего (соответствиями, списком значений, таблица значений)
 * 
-* @author  sikuda admin@sikuda.ru
+* @author  sikuda@yandex.ru
 * @version 0.1
 */
 namespace php1C;
@@ -15,7 +15,7 @@ require_once('php1C__tokens.php');
 /**
 * Массив названий типов для работы с коллекциями переименовании
 */
-const php1C_typesPHP_Collection = array('Array1C','Structure1C','ValueTable');
+const php1C_typesPHP_Collection = array('Array1C','Structure1C','Map1C','ValueTable');
 
 /**
 * Массив названий английских функций для работы с датой. Соответстует элементам русским функций.
@@ -34,6 +34,7 @@ function callCollectionType($key, $arguments){
 	switch ($key) {
 		case 'Array1C': return Array1C($arguments);
 		case 'Structure1C': return Structure1C($arguments);
+		case 'Map1C': return Map1C($arguments);
 		case 'ValueTable': return ValueTable($arguments);
 		default:
 			throw new Exception('Пока тип в коллекциях не определен '.$key);
@@ -211,7 +212,7 @@ class Structure1C{
 			if( (count($args) > 0) && is_string($args[0])){
 				$keys = explode(',',$args[0]);
 				for ($i=0; $i < count($keys); $i++) {
-					$k = strtoupper(trim ($keys[$i]));
+					$k = mb_strtoupper(trim ($keys[$i]));
 					if( fEnglishVariable ) $k = str_replace(php1C_LetterLng, php1C_LetterEng, $k);
 					if(!isset($args[$i+1])) $this->value[$k] = null;
 					else $this->value[$k] = $args[$i+1];
@@ -226,6 +227,98 @@ class Structure1C{
 
 	function __toString(){
 		return "Структура";
+	}
+
+	function Insert($key, $val=null){
+		if( fEnglishVariable ) $key = str_replace(php1C_LetterLng, php1C_LetterEng, $key);
+		$this->value[mb_strtoupper($key)] = $val;
+	}
+
+	function Count(){
+		return count($this->value);
+	}
+
+	function Property($key, $value=null){
+		if( fEnglishVariable ) $key = str_replace(php1C_LetterLng, php1C_LetterEng, $key);
+		$key = mb_strtoupper($key);
+		$value = $this->value[$key];
+		return array_key_exists($key, $this->value);
+	}
+
+	function Clear(){
+		//tocheck
+		unset($this->value);
+		$this->value = array();
+	}
+
+	function Del($key){
+		if( fEnglishVariable ) $key = str_replace(php1C_LetterLng, php1C_LetterEng, $key);
+		$key = mb_strtoupper($key);
+		unset($this->value[$key]);
+	}
+
+	//Для получения данных через точку
+	function Get($key){
+		if( fEnglishVariable ) $key = str_replace(php1C_LetterLng, php1C_LetterEng, $key);
+		$key = mb_strtoupper($key);
+		return $this->value[$key];
+	}
+
+	//Для установки данных через точку
+	function Set($key, $val=null){
+		if( fEnglishVariable ) $key = str_replace(php1C_LetterLng, php1C_LetterEng, $key);
+		$key = mb_strtoupper($key);
+		if(array_key_exists($key, $this->value)) $this->value[$key] = $val;
+		else throw new Exception("Не найден ключ структуры ".$key);
+	}	
+}
+
+
+//------------------------------------------------------------------------------------------
+
+/**
+* Получение соответствия 1С 
+*
+* @param array $cnt аргументы функции в массиве
+* @return возвращает новый объект массива 1С
+*
+*/
+function Map1C($args=null){
+	return new Map1C($args);
+}
+
+/**
+* Класс для работы со структурой 1С
+*/
+class Map1C{
+	/**
+	* @var array внутренее хранение массива
+	*/
+	private $value; //array of PHP 
+
+	function __construct($args=null,$copy=null){
+
+		if(is_array($copy)) $this->value = $copy;
+		else{	
+			$this->value = array();
+			if( (count($args) > 0) && is_string($args[0])){
+				$keys = explode(',',$args[0]);
+				for ($i=0; $i < count($keys); $i++) {
+					$k = strtoupper(trim ($keys[$i]));
+					if( fEnglishVariable ) $k = str_replace(php1C_LetterLng, php1C_LetterEng, $k);
+					if(!isset($args[$i+1])) $this->value[$k] = null;
+					else $this->value[$k] = $args[$i+1];
+				}
+			}
+		}
+	}
+
+	function toArray(){
+		return $this->value;
+	}
+
+	function __toString(){
+		return "Соответствие";
 	}
 
 	function Insert($key, $val=null){
