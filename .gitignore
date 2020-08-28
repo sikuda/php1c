@@ -1,5 +1,12 @@
+test*
+test.php
 *.sublime*
 *.settings
 old/*
 modalshow/*
 js/*
+question/*
+test.php
+output.php
+php1C-UnitTests.epf
+
