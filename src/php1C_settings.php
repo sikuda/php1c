@@ -2,7 +2,7 @@
 // Установка языка програмирования 
 //- ru - default setting
 //- en
-if (!defined('LANGUAGE')) define('LANGUAGE', 'ru');
+if (!defined('Language1C')) define('Language1C', 'ru');
 
 //true - Использовать только латинские переменные в PHP (false - переменные не переводятся)
 define('fEnglishVariable', true);

@@ -2,8 +2,8 @@
 /**
 * Модуль Английского языка для получения кода PHP из 1С
 * 
-* @author  sikuda admin@sikuda.ru
-* @version 0.1
+* @author  sikuda@yandex.ru
+* @version 0.2
 */
 namespace php1C;
 
@@ -52,7 +52,7 @@ const php1C_type_New = 'NEW';
 /**
 * Массив названий английских типов для работы с коллекциями
 */
-const php1C_types_Collection = array('ARRAY','STRUCTURE','VALUETABLE');
+const php1C_types_Collection = array('ARRAY','STRUCTURE','MAP','VALUETABLE');
 
 /**
 * Массив названий английских функций для общей работы с 1С. Соответстует элементам русским функций.
@@ -64,7 +64,8 @@ const php1C_functions_Com = array(
 	'TYPE(',
 	'TYPEOF(',
 	'STRING(',
-	'NUNBER('
+	'NUNBER(',
+	'NEW('
 );
 
 
@@ -93,5 +94,23 @@ const php1C_functions_Collections = array('UBOUND(', 'INSERT(', 'ADD(', 'COUNT('
 */
 const php1C_Undefined = 'Undefined';
 const php1C_Bool = array('Yes','No');
+const php1C_double_quotes  = "\" (double quote)";
+const php1C_single_quotes  = '\' (single quote)';
+
+/*
+* Логические операции 
+*/
+const php1C_OR = 'OR';
+const php1C_AND = 'AND';
+const php1C_NOT = 'NOT';
+
+/*
+*  Представление ошибок на языке 
+*/
+const php1C_error_UndefineOperator = 'Undefined operator';
+const php1C_error_UndefineSymbol   = 'Undefined operator';
+const php1C_error_UndefineFunction = 'Undefined function';
+const php1C_error_BadDateType      = 'Bad const type date';
+
 
 ?>

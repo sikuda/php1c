@@ -15,7 +15,7 @@ use Exception;
 
 //Подключаем язык
 require_once('php1C_settings.php');
-if (LANGUAGE === 'en') {
+if (Language1C === 'en') {
  	require_once('lang/en.php');   
 }
 else{
@@ -183,10 +183,9 @@ function div1C($arg1, $arg2){
 	if((is_bool($arg1) || is_numeric($arg1)) && (is_bool($arg2) || is_numeric($arg2)) ){
 		if(fPrecision1C){ 
 			if( bccomp($arg2, "0", Scale1C) === 0) throw new Exception("Деление на 0");
-			else return strval(bcdiv($arg1,$arg2,Scale1C)); 
+			else return bcdiv($arg1,$arg2,Scale1C); 
 		}
 		else{
-			if(is_string($arg1) || is_string($arg2)) throw new Exception("Преобразование значения к типу Число не может быть выполнено");
 			if(floatval($arg2) == 0) throw new Exception("Деление на 0");
 			else return $arg1/$arg2;	
 		}

@@ -1,11 +1,11 @@
 <?php 
-require_once( 'php1C_common.php');
 
-$REZULTAT = null;
-function SLOZHENIE($D,$YA){
-$REZULTAT=php1C\add1C(php1C\add1C("4",$D),$YA);
-}
-SLOZHENIE(1,22);
+require_once( 'src\php1C_common.php');
+
+$STR=php1C\Structure1C(array("Дата, Клиент"));$STR->Insert("Поставщик","ООО");$REZULTAT=$STR->
+Get("POSTAVSHHIK");
+
+echo $REZULTAT;
 
 
  ?>
