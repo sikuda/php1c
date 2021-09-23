@@ -1,37 +1,17 @@
-## Welcome to GitHub Pages
+## php1c
 
-You can use the [editor on GitHub](https://github.com/sikuda/php1c/edit/gh-pages/index.md) to maintain and preview the content for your website in Markdown files.
+Если 1С можно запускать на .NET(http://oscript.io), то почему же не пойди далее и попробовать запустить на интернет технологиях например на самом популярном PHP.
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+На данном этапе это просто выполнение строки кода на 1С(по русски или английски) без дополнительных модулей... 
+Перенаправление для прямого тестирования: [https://php1c.ru](https://php1c.ru)
 
-### Markdown
+Включаем обработку 1С для тестирования - php1C-UnitTests.epf Те функции которые тестируем:
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+- Работа с датой (Есть. Файл теста- unit-tests/Dates.txt)
+- Работа со строками(Есть. Файл теста - unit-tests/Strings.txt)
+- Работа с массивом(Есть. Файл теста - unit-tests/Arrays.txt)
+- Работа с структурой(Естью Файл теста - unit-tests/Structure.txt)
+- Работа с числами и форматированием (делаем - unit-tests/Number.txt)
+- Работа функций и процедур в коде(тестируем)
+- Работа с файлами (делаем)
 
-```markdown
-Syntax highlighted code block
-
-# Header 1
-## Header 2
-### Header 3
-
-- Bulleted
-- List
-
-1. Numbered
-2. List
-
-**Bold** and _Italic_ and `Code` text
-
-[Link](url) and ![Image](src)
-```
-
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
-
-### Jekyll Themes
-
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/sikuda/php1c/settings/pages). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
-
-### Support or Contact
-
-Having trouble with Pages? Check out our [documentation](https://docs.github.com/categories/github-pages-basics/) or [contact support](https://support.github.com/contact) and we’ll help you sort it out.
