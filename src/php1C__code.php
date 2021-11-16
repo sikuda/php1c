@@ -610,7 +610,7 @@ class CodeStream {
 					 		//Для перем=.. по .. цикл КонецЦикла;
 					 	case TokenStream::keyword_for:
 					 		$this->MatchKeyword(TokenStream::keyword_for);
-					 		if($this->Type !== TokenStream::keyword_foreach){
+					 		if($this->Type == TokenStream::keyword_foreach){
 					 			$this->GetChar();
 					 			//Шаблона Для каждого перем ИЗ Чего-то Цикл ... КонецЦикла;
 					 			if($this->Type !== TokenStream::type_variable) throw new Exception('Ожидается имя переменной');
@@ -640,6 +640,7 @@ class CodeStream {
 						 		$this->code = $this->Expression7();
 						 		$this->pushCode('$'.$iterator.'<='.$this->code. ';');
 						 		$this->pushCode($this->code . '$'.$iterator.'++){');
+						 		$this->GetChar();
 						 		$this->continueCode(TokenStream::keyword_circle);
 					 		}
 					 		break;	
