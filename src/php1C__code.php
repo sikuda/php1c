@@ -639,7 +639,7 @@ class CodeStream {
 								$this->MatchKeyword(TokenStream::keyword_to);
 						 		$this->code = $this->Expression7();
 						 		$this->pushCode('$'.$iterator.'<='.$this->code. ';');
-						 		$this->pushCode($this->code . '$'.$iterator.'++){');
+						 		$this->pushCode('$'.$iterator.'++){');
 						 		$this->GetChar();
 						 		$this->continueCode(TokenStream::keyword_circle);
 					 		}
