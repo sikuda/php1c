@@ -1,6 +1,6 @@
 <?php
 /**
-* Модуль Английского языка для получения кода PHP из 1С
+* Module English lang for get code PHP from 1С
 * 
 * @author  sikuda@yandex.ru
 * @version 0.2
@@ -55,7 +55,7 @@ const php1C_type_New = 'NEW';
 const php1C_types_Collection = array('ARRAY','STRUCTURE','MAP','VALUETABLE');
 
 /**
-* Массив названий английских функций для общей работы с 1С. Соответстует элементам русским функций.
+* Массив названий английских функций для общей работы с 1С. Соответствует элементам русским функций.
 */   
 const php1C_functions_Com = array(
 	'MESSAGE(',
@@ -80,19 +80,22 @@ const php1C_functions_String = array('STRLEN(', 'TRIML(','TRIMR(','TRIMLR(','LEF
 const php1C_functions_Number = array('INT(','ROUND(','LOG(','LOG10(','SIN(','COS(','TAN(','ASIN(','ACOS(','ATAN(','EXP(','POW(','SQRT(','FORMAT(', 'NUMBERINWORDS(', 'NSTR(', 'PERIODPRESENTATION(', 'STRTEMPLATE(', 'STRINGWITHNUMBER(');
 
 /**
-* Массив названий английских функций для работы с датой. Соответстует элементам русским функций.
+* Массив названий английских функций для работы с датой. Соответствует элементам русским функций.
 */   
 const php1C_functions_Date = array('DATE(','CURRENTDATE(', 'YEAR(', 'MONTH(','DAY(', 'HOUR(', 'MINUTE(', 'SECOND(', 'BEGOFYEAR(', 'BEGOFQUARTER(', 'BEGOFMONTH(', 'BEGOFWEEK(' ,'BEGOFDAY(' ,'BEGOFHOUR(' ,'BEGOFMINUTE(', 'ENDOFYEAR(','ENDOFQUARTER(', 'ENDOFMONTH(', 'ENDOFWEEK(', 'ENDOFDAY(','ENDOFHOUR(','ENDOFMINUTE(','WEEKOFYEAR(', 'DAYOFYEAR(', 'WEEKDAY(', 'ADDMONTH(');
 
 /**
-* Массив названий английских функций для работы с датой. Соответстует элементам русским функций.
+* Массив названий английских функций для работы с датой. Соответствует элементам русским функций.
 */   
 const php1C_functions_Collections = array('UBOUND(', 'INSERT(', 'ADD(', 'COUNT(', 'FIND(', 'CLEAR(' , 'GET(', 'DEL(', 'SET(', 'PROPERTY(','LOADCOLUMN(', 'UNLOADCOLUMN(', 'FILLVALUES(', 'INDEXOF(','TOTAL(','FIND(','FINDROWS(', 'CLEAR(', 'GROUPBY(', 'MOVE(','COPY(','COPYCOLUMNS(','SORT(','DEL(');
 
 /*
-*   для Вывода как в 1С
+* Константы для Вывода как в 1С
 */
 const php1C_Undefined = 'Undefined';
+const php1C_strBool = "Boolean";
+const php1C_Number =  "Number";
+const php1C_String  = "String";
 const php1C_Bool = array('Yes','No');
 const php1C_double_quotes  = "\" (double quote)";
 const php1C_single_quotes  = '\' (single quote)';
@@ -105,12 +108,9 @@ const php1C_AND = 'AND';
 const php1C_NOT = 'NOT';
 
 /*
-*  Представление ошибок на языке 
+* Представление ошибок на языке
 */
 const php1C_error_UndefineOperator = 'Undefined operator';
-const php1C_error_UndefineSymbol   = 'Undefined operator';
+const php1C_error_UndefineSymbol   = 'Undefined symbol';
 const php1C_error_UndefineFunction = 'Undefined function';
 const php1C_error_BadDateType      = 'Bad const type date';
-
-
-?>

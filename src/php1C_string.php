@@ -69,7 +69,7 @@ function StrLength( $arg ){
 /**
 * Возращает строку без левых пробелов
 *
-* @param  string cтрока 
+* @param  string $arg cтрока
 * @return string строка 
 */
 function TrimL( $arg ){
@@ -79,7 +79,7 @@ function TrimL( $arg ){
 /**
 * Возращает строку без правых пробелов(и др спец. символов пробелов)
 *
-* @param  string cтрока 
+* @param  string $arg cтрока
 * @return string строка  
 */
 function TrimR( $arg ){
@@ -89,10 +89,11 @@ function TrimR( $arg ){
 /**
 * Возращает строку без левых и правых пробелов
 *
-* @param  string cтрока 
+* @param string $arg cтрока
 * @return string строка  
 */
-function TrimLR( $arg ){
+function TrimLR(string $arg ): string
+{
 	return trim($arg);
 }
 
@@ -136,7 +137,7 @@ function Mid( $arg1, $arg2, $arg3 ){
 * Возращает строку начиная с $arg2(счет с 1) в количестве $arg3 элементов строки $arg1
 * 
 * @param  $arg1 string cтрока 
-* @param  $arg2 strung подстрока поиска 
+* @param  $arg2 string подстрока поиска
 * @param  $arg3 <> направление поиска 
 * @param  $arg4 int начальная позиция поиска (если слева то с 1) 
 * @param  $arg5 int количество вхождений в поиск 
@@ -282,18 +283,19 @@ function StrLineCount($str){
 /**
 * Возращает num(начиная с 1) строку из общей строки
 *
-* @param  string str входящая строка
-* @param  int num номер строки в общей строке
+* @param string $str str входящая строка
+* @param int $num num номер строки в общей строке
 * @return string получившая строка 
 */
-function StrGetLine($str, $num){
+function StrGetLine(string $str, int $num): string
+{
 	while($num>1){
 		$pos = strpos($str, chr(10));
 		$str = substr($str, $pos+1);
 		$num--;
 	}
 	$pos = strpos($str,chr(10));
-	if($роs !== false){
+    if($pos !== false){
 		$str = substr($str, 0, $pos);	
 	} 
 	return $str;
@@ -302,22 +304,24 @@ function StrGetLine($str, $num){
 /**
 * Возращает число вхождений подстроки в строку
 *
-* @param  string str входящая строка
-* @param  string substr подстрока поиска
+* @param string $str str входящая строка
+* @param string $substr substr подстрока поиска
 * @return int число вхождений подстроки в строку 
 */
-function StrOccurrenceCount($str, $substr){
+function StrOccurrenceCount(string $str, string $substr): int
+{
 	return substr_count($str, $substr);
 }
 
 /**
 * Возращает число вхождений подстроки в строку
 *
-* @param  string str1 первая строка
-* @param  string str2 вторая строка
+* @param string $str1 str1 первая строка
+* @param string $str2 str2 вторая строка
 * @return int число результат сравнения строк 
 */
-function StrCompare($str1, $str2){
+function StrCompare(string $str1, string $str2): int
+{
 	$res = strcmp($str1,$str2);
 	if($res > 0) $res = 1;
 	if($res < 0) $res = -1;
@@ -327,11 +331,12 @@ function StrCompare($str1, $str2){
 /**
 * Возращает число вхождений подстроки в строку
 *
-* @param  string str первая строка
-* @param  string substr вторая строка
-* @return int число результат сравнения строк 
+* @param  string $str str первая строка
+* @param  string $substr substr вторая строка
+* @return bool число результат сравнения строк
 */
-function StrStartsWith($str, $substr){
+function StrStartsWith($str, $substr): bool
+{
 	$res = strpos($str, $substr);
 	if($res===0) return true;
 	else return false;
@@ -340,11 +345,12 @@ function StrStartsWith($str, $substr){
 /**
 * Возращает число вхождений подстроки в строку
 *
-* @param  string str первая строка
-* @param  string substr вторая строка
-* @return int число результат сравнения строк 
+* @param string $str str первая строка
+* @param string $substr substr вторая строка
+* @return bool число результат сравнения строк
 */
-function StrEndsWith($str, $substr){
+function StrEndsWith(string $str, string $substr): bool
+{
 	$res = strrpos($str, $substr);
 	//return $res;
 	if($res == (strlen($str)-strlen($substr))) return true;
@@ -352,15 +358,17 @@ function StrEndsWith($str, $substr){
 }
 
 /**
-* Возращает массив из подстрок общей строки
-*
-* @param  string str общая строка
-* @param  string spliter строка разделитель
-* @return bool andempty включать в результат пустые строки 
-*/
-function StrSplit($str, $spliter, $andempty){
-	$array = explode($spliter, $str);
-	if(!$andempty){
+ * Возращает массив из подстрок общей строки
+ *
+ * @param string $str str общая строка
+ * @param string $split spliter строка разделитель
+ * @return Array1C and empty включать в результат пустые строки
+ * @throws Exception
+ */
+function StrSplit(string $str, string $split, $and_empty): Array1C
+{
+	$array = explode($split, $str);
+	if(!$and_empty){
 		$array = array_filter($array, function($var){ return (!isset($var) || (strlen($var)==0));} );
 	}
 	return new Array1C(null, $array);
@@ -370,10 +378,11 @@ function StrSplit($str, $spliter, $andempty){
 /**
 * Возращает массив из подстрок общей строки
 *
-* @param  Аrray1C array1C массив строк для объединения
-* @param  string spliter строка разделитель
+* @param  Array1C $array1C массив строк для объединения
+* @param string $split spliter строка разделитель
 * @return string объединенная получаемая строка   
 */
-function StrConcat($array1C, $spliter){
-	return implode($array1C->getArray(), $spliter);
+function StrConcat(Array1C $array1C, string $split): string
+{
+	return implode($array1C->getArray(), $split);
 }

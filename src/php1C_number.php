@@ -190,7 +190,7 @@ function Sqrt($val){
 /**
 * Возращает отформатированное значение величины по строке форматирования
 *
-* @param  number, date, bool $val для форматирования   
+* @param  number $val , date, bool $val для форматирования
 * @param  string $str_format строка форматирования   
 * @return string результат форматирования
 *
@@ -290,13 +290,13 @@ function NumberInWords($val, $frm){
 */
 function NStr($str){
 	$ar_format = array();
-	$arstr = explode( ';', $str_format);
+	$arstr = explode( ';', $str);
 	foreach ($arstr as $value) {
 		$duo = explode( '=', $value);
 		$ar_format[trim($duo[0])]=$duo[1];
 	}
 	if(isset($ar_format['ru'])) return $ar_format['ru'];
-	return str;
+	return $str;
 }
 
 /**
@@ -334,10 +334,10 @@ function StrTemplate( $str,$val1,$val2,$val3,$val4,$val5,$val6,$val7,$val8,$val9
 /**
 * Функция заглушка, Представление строки числа в требуемой форме.
 *
-* @param  string str строка шаблон для вывода
-* @param  float val1 первое число 
-* @param  string frm 
-* @param  string prm параметры
+* @param  string $str str строка шаблон для вывода
+* @param  float $val1 первое число
+* @param  string $frm
+* @param  string $prm параметры
 * @return string - результат  
 */
 function StringWithNumber($str,$val,$frm,$prm){

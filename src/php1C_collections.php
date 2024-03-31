@@ -24,40 +24,36 @@ const php1C_typesPHP_Collection = array('Array1C','Structure1C','Map1C','ValueTa
 const php1C_functionsPHP_Collections = array('UBound(',   'Insert(',   'Add(',      'Count(',      'Find(',  'Clear('  , 'Get(',      'Del(',    'Set(',       'Property(','LoadColumn(',     'UnloadColumn(',      'FillValues(',      'IndexOf(','Total(','Find(','FindRows(',    'Clear(',   'GroupBy(',  'Move(',    'Copy(',       'CopyColumns(',          'Sort(',       'Del(');
 
 /**
-* Вызывает функции и функции объектов 1С работы с коллекциями
-*
-* @param string $key строка названии функции со скобкой
-* @param array $arguments аргументы функции в массиве
-* @return возвращает результат функции или выбрасывает исключение
-*/
-function callCollectionType($key, $arguments){
-	switch ($key) {
-		case 'Array1C': return Array1C($arguments);
-		case 'Structure1C': return Structure1C($arguments);
-		case 'Map1C': return Map1C($arguments);
-		case 'ValueTable': return ValueTable($arguments);
-		default:
-			throw new Exception('Пока тип в коллекциях не определен '.$key);
-			break;
-	}
-}	
+ * Вызывает функции и функции объектов 1С работы с коллекциями
+ *
+ * @param string $key строка в названии функции со скобкой
+ * @param array $arguments аргументы функции в массиве
+ * @return Structure1C|Map1C|Array1C|ValueTable результат функции или выбрасывает исключение
+ * @throws Exception
+ */
+function callCollectionType(string $key, array $arguments)
+{
+    switch($key) {
+        case 'Array1C': return Array1C($arguments);
+        case 'Structure1C': return Structure1C($arguments);
+        case 'Map1C': return Map1C($arguments);
+        case 'ValueTable': return ValueTable($arguments);
+        default: throw new Exception('Пока тип в коллекциях не определен ' . $key);
+    }
+}
 
 /**
-* Вызывает функции и функции объектов 1С работы с коллекциями
-*
-* @param object $context объект для вызова функции или null
-* @param string $key строка названии функции со скобкой
-* @param array $arguments аргументы функции в массиве
-* @return возвращает результат функции или выбрасывает исключение
-*/
-function callCollectionFunction($context=null, $key, $arguments){
+ * Вызывает функции и функции объектов 1С работы с коллекциями
+ *
+ * @param $context - объект для вызова функции или null
+ * @param string $key строка в названии функции со скобкой
+ * @param array $arguments аргументы функции в массиве
+ * @throws Exception
+ */
+function callCollectionFunction($context=null, $key, $arguments)
+{
 	if($context === null){
-		switch($key){
-		//case 'func(':
-		//	break;
-		default:
-			throw new Exception("Неизвестная функция работы с коллекциями ".$key."");
-		}	
+	    throw new Exception("Неизвестная функция работы с коллекциями ".$key);
 	}
 	else{
 		if( method_exists($context, substr($key, 0, -1) )){ 
@@ -98,7 +94,11 @@ function callCollectionFunction($context=null, $key, $arguments){
 
 
 //---------------------------------------------------------------------------------------------------------
-function Array1C($args=null){
+/**
+ * @throws Exception
+ */
+function Array1C($args): Array1C
+{
 	return new Array1C($args);
 }
 
@@ -108,9 +108,9 @@ function Array1C($args=null){
 */
 class Array1C{
 	/**
-	* @var array внутренее хранение массива
+	* @var array внутреннее хранение массива
 	*/
-	private $value; //array of PHP 
+	private array $value; //array of PHP
 
 	function __construct($counts=null, $copy=null){
 
@@ -122,7 +122,7 @@ class Array1C{
 				if( count($counts) > 1 ) throw new Exception("Многомерные массивы пока не поддерживаются");
 				$cnt = $counts[0];
 				if( is_numeric($cnt) && $cnt > 0 ){
-					for ($i=0; $i < $cnt; $i++) $this->value[i] = null;
+					for ($i=0; $i < $cnt; $i++) $this->value[$i] = null;
 				}
 			} 
 		}
@@ -402,7 +402,7 @@ class ValueTable{
 			$this->KOLONKI = &$this->COLUMNS;
 			$this->INDEXES = new CollectionIndexes($this);
 			$this->ИНДЕКСЫ = &$this->INDEXES;
-			$this->$INDEKSYY = &$this->INDEXES;
+			$this->INDEKSYY = &$this->INDEXES;
 		}
 	}
 
@@ -867,7 +867,7 @@ class ValueTableRow{
 }
 
 /**
-* Коллекция индексов(пока пустая реальзация для ТаблицыЗначений)
+* Коллекция индексов(пока пустая реализация для ТаблицыЗначений)
 */
 class CollectionIndexes{
 	/**
@@ -885,30 +885,39 @@ class CollectionIndexes{
 	 	return "ИндексыКоллекции";
 	}
 
-	function toArray(){
+	function toArray(): array
+    {
 		return $this->indexs;
 	}
 
-	function Add($name){
+    /**
+     *  Добавляем колонку в коллекцию индексов
+     *
+     * @throws Exception
+     */
+    function Add($key): void
+    {
 		if(is_string($key)){
-			if( fEnglishVariable ) $keyl = str_replace(php1C_LetterLng, php1C_LetterEng, $key);
+			if( fEnglishVariable ) $key = str_replace(php1C_LetterLng, php1C_LetterEng, $key);
 			$key = strtoupper($key);
-			$this->cols[$key] = new CollectionIndex($name);
+			$this->cols[$key] = new CollectionIndex($key);
 		}
-		else  new Exception("Имя колонки должно быть строкой");	
+		else  throw new Exception("Имя колонки должно быть строкой");
 	}
 
-	function Count(){
+	function Count(): int
+    {
 		return count($this->indexs);
 	}
 
-	function Clear(){
-		//tocheck
+	function Clear(): void
+    {
 		unset($this->indexs);
 		$this->indexs = array();
 	}
 
-	function Del($key){
+	function Del($key): void
+    {
 		if( fEnglishVariable ) $key = str_replace(php1C_LetterLng, php1C_LetterEng, $key);
 		$key = strtoupper($key);
 		unset($this->indexs[$key]);

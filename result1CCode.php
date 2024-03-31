@@ -33,4 +33,3 @@ require_once('src/php1C__code.php');
 	    }
 	}	
 	echo $str;
-?>
