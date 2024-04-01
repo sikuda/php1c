@@ -50,7 +50,7 @@ function callCollectionType(string $key, array $arguments)
  * @param array $arguments аргументы функции в массиве
  * @throws Exception
  */
-function callCollectionFunction($context=null, $key, $arguments)
+function callCollectionFunction($context, $key, $arguments)
 {
 	if($context === null){
 	    throw new Exception("Неизвестная функция работы с коллекциями ".$key);
@@ -63,10 +63,10 @@ function callCollectionFunction($context=null, $key, $arguments)
 			case 'Add(':    if(isset($arguments[0])) return $context->Add($arguments[0]);
 							else return $context->Add();
 			case 'Count(':  return $context->Count();
-			case 'Find(':   return $context->Find($arguments[0]);
-			case 'Clear(':  return $context->Clear();
+			//case 'Find(':   return $context->Find($arguments[0]);
+			//case 'Clear(':  return $context->Clear();
 			case 'Get(':    return $context->Get($arguments[0]);	
-			case 'Del(':    return $context->Del($arguments[0]);
+			//case 'Del(':    return $context->Del($arguments[0]);
 			case 'Set(':    return $context->Set($arguments[0], $arguments[1]);
 			case 'Property(': return $context->Property($arguments[0], $arguments[1]);
 			case 'LoadColumn(': return $context->LoadColumn($arguments[0], $arguments[1]);

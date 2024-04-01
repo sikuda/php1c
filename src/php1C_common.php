@@ -117,12 +117,12 @@ function toNumber1C(string $arg){
 
 /**
  * Сложение двух переменных в 1С
- * @param object $arg1
- * @param object $arg2
+ * @param $arg1
+ * @param $arg2
  * @return string Результат сложение в зависемости от типа переменных (string, bool, Date1C)
  * @throws Exception
  */
-function add1C(object $arg1, object $arg2){
+function add1C($arg1, $arg2){
 
 	if (is_string($arg1)) return $arg1 . (string)$arg2;
 	elseif(is_bool($arg1) || is_numeric($arg1)){
@@ -138,12 +138,12 @@ function add1C(object $arg1, object $arg2){
 
 /**
  * Вычитание двух переменных в 1С
- * @param object $arg1
- * @param object $arg2
+ * @param $arg1
+ * @param $arg2
  * @return float, Date1C Результат вычитания в зависимости от типа переменных (float, Date1C, исключение)
  * @throws Exception
  */
-function sub1C(object $arg1, object $arg2){
+function sub1C($arg1, $arg2){
 
 	if(is_bool($arg1) || is_numeric($arg1)){
 		if(is_bool($arg2) || is_numeric($arg2)) 
@@ -159,8 +159,8 @@ function sub1C(object $arg1, object $arg2){
 
 /**
  * Умножение двух переменных в 1С
- * @param object $arg1
- * @param object $arg2
+ * @param $arg1
+ * @param $arg2
  * @return float Результат сложение в зависемости от типа переменных (float или исключение)
  * @throws Exception
  */
@@ -174,12 +174,12 @@ function mul1C($arg1, $arg2){
 
 /**
  * Деление двух переменных в 1С
- * @param object $arg1
- * @param object $arg2
+ * @param $arg1
+ * @param $arg2
  * @return float Результат сложение в зависимости от типа переменных (float или исключение)
  * @throws Exception
  */
-function div1C(object $arg1, object $arg2){
+function div1C($arg1, $arg2){
 
 	if((is_bool($arg1) || is_numeric($arg1)) && (is_bool($arg2) || is_numeric($arg2)) ){
 		if(fPrecision1C){ 

@@ -39,17 +39,6 @@ class CodeStream {
 	//Идентификаторы функций - function identification
 	private $functions1С;
 
-
-	// /**
-	// * Конструктор класса
-	// * Заполняет массив функций для распознания.
-	// */
-	// function __construct( $tokenStream ){
-	// 	$this->functions1С = $tokenStream->functions1С;
-	// 	$this->identypes = $tokenStream->identypes;
-	// 	$this->tokens = $tokenStream->tokens;
-	// }
-
 	/*
 	** Вставляем текущий кусочек в результат 
 	*/
@@ -743,8 +732,12 @@ class CodeStream {
 				if(isset($name_var)){
 					if(fEnglishVariable) $name_var = str_replace(php1C_LetterLng, php1C_LetterEng, $name_var);
 					$name_var = mb_strtoupper($name_var);
-					eval($this->codePHP.' php1C\\Message($'.$name_var.');');
-				 	return '';
+                    $REZULTAT = "";
+					//eval($this->codePHP.' php1C\\Message($'.$name_var.');');
+				 	//return '';
+                    //eval("\$name_var = \"$str\";");
+                    eval($this->codePHP);
+                    return $REZULTAT;
 				}
 				else return $this->codePHP;
 			}  
