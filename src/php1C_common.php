@@ -1,4 +1,5 @@
-<?php
+<?php /** @_noinspection ALL */
+
 /**
 * Общий модуль работы с 1С
 * 
@@ -37,46 +38,48 @@ const php1C_functionsPHP_Com = array('Message(','Find(','ValueIsFilled(','Type('
  *
  * @throws Exception
  */
-function callCommonFunction($context, string $key, array $arguments){
-	if($context === null){
-		switch($key){
-		case 'Message(':
-			if(isset($arguments[2])) throw new Exception("Ожидается ) ");
-			Message($arguments[0], $arguments[1]);
-		case 'Find(':
-			if(isset($arguments[2])) throw new Exception("Ожидается ) ");
-			return Find($arguments[0], $arguments[1]);
-		case 'ValueIsFilled(':
-			if(isset($arguments[1])) throw new Exception("Ожидается ) ");
-			return ValueIsFilled($arguments[0]);
-		case 'Type(':
-			if(isset($arguments[1])) throw new Exception("Ожидается ) ");
-			return Type($arguments[0]);
-		case 'TypeOf(':
-			if(isset($arguments[1])) throw new Exception("Ожидается ) ");
-			return TypeOf($arguments[0]);
-		case 'toString1C(':
-			if(isset($arguments[1])) throw new Exception("Ожидается ) ");
-			return toString1C($arguments[0]);
-		case 'toNumber1C(':
-			if(isset($arguments[1])) throw new Exception("Ожидается ) ");
-			return toNumber1C($arguments[0]);		
-		default:
-			throw new Exception("Неизвестная общая функция ".$key."");
-		}	
-	}
-	else{
-		if( method_exists($context, substr($key, 0, -1) )){ 
-			switch($key){
-			case 'Find(':   return $context->Find($arguments[0]);
-			default:
-				throw new Exception("Нет обработки общей функции для объекта  ".$key."");
-			}
-		}else{
-			throw new Exception("Не найдена общая функция у объекта  ".$key."");
-		}
-	}
-}
+//function callCommonFunction($context, string $key, array $arguments){
+//	if($context === null){
+//		switch($key){
+//		case 'Message(':
+//			if(isset($arguments[2])) throw new Exception("Ожидается ) ");
+//			Message($arguments[0]);
+//            break;
+//		case 'Find(':
+//			if(isset($arguments[2])) throw new Exception("Ожидается ) ");
+//			return Find($arguments[0], $arguments[1]);
+//		case 'ValueIsFilled(':
+//			if(isset($arguments[1])) throw new Exception("Ожидается ) ");
+//			return ValueIsFilled($arguments[0]);
+//		case 'Type(':
+//			if(isset($arguments[1])) throw new Exception("Ожидается ) ");
+//			return Type($arguments[0]);
+//		case 'TypeOf(':
+//			if(isset($arguments[1])) throw new Exception("Ожидается ) ");
+//			return TypeOf($arguments[0]);
+//		case 'toString1C(':
+//			if(isset($arguments[1])) throw new Exception("Ожидается ) ");
+//			return toString1C($arguments[0]);
+//		case 'toNumber1C(':
+//			if(isset($arguments[1])) throw new Exception("Ожидается ) ");
+//			return toNumber1C($arguments[0]);
+//		default:
+//			throw new Exception("Неизвестная общая функция ".$key);
+//		}
+//	}
+//	else{
+//		if( method_exists($context, substr($key, 0, -1) )){
+//			switch($key){
+//			case 'Find(':   return $context->Find($arguments[0]);
+//			default:
+//				throw new Exception("Нет обработки общей функции для объекта  ".$key);
+//			}
+//		}else{
+//			throw new Exception("Не найдена общая функция у объекта  ".$key);
+//		}
+//	}
+//    return false;
+//}
 
 /**
 * Выводит данные в представлении 1С (на установленном языке)
@@ -119,12 +122,14 @@ function toNumber1C(string $arg){
  * Сложение двух переменных в 1С
  * @param $arg1
  * @param $arg2
- * @return string Результат сложение в зависемости от типа переменных (string, bool, Date1C)
+ * @return string Результат сложение в зависимости от типа переменных (string, bool, Date1C)
  * @throws Exception
  */
 function add1C($arg1, $arg2){
 
-	if (is_string($arg1)) return $arg1 . (string)$arg2;
+	if (is_string($arg1)) {
+        return $arg1 . $arg2;
+    }
 	elseif(is_bool($arg1) || is_numeric($arg1)){
 		if(is_bool($arg2) || is_numeric($arg2)) 
 			if(fPrecision1C) return bcadd($arg1,$arg2,Scale1C);
@@ -161,7 +166,7 @@ function sub1C($arg1, $arg2){
  * Умножение двух переменных в 1С
  * @param $arg1
  * @param $arg2
- * @return float Результат сложение в зависемости от типа переменных (float или исключение)
+ * @return float Результат сложение в зависимости от типа переменных (float или исключение)
  * @throws Exception
  */
 function mul1C($arg1, $arg2){
@@ -247,22 +252,7 @@ function less1C($arg1, $arg2): bool
 	if(is_bool($arg1)) $arg1 = tran_bool($arg1);
 	if(is_bool($arg2)) $arg2 = tran_bool($arg2);
 	if(is_numeric($arg1) || is_string($arg1) || (is_object($arg1) && get_class($arg1) === 'php1C\Date1C')) return $arg1 < $arg2;
-	throw new Exception("Операции сравнения на больше-меньше допустимы только для значений совпадающих примитивных типов (Булево, Число, Строка, Дата)");
-}
-
-/**
- * Операция Меньше или равно в 1С
- * @param $arg1
- * @param $arg2
- * @return bool Результат операции Меньше или равно
- * @throws Exception
- */
-function lessequal1C($arg1, $arg2): bool
-{
-	if(is_bool($arg1)) $arg1 = tran_bool($arg1);
-	if(is_bool($arg2)) $arg2 = tran_bool($arg2);
-	if(is_numeric($arg1) || is_string($arg1) || (is_object($arg1) && get_class($arg1) === 'php1C\Date1C')) return $arg1 <= $arg2;
-	throw new Exception("Операции сравнения на меньше или равно допустима только для значений совпадающих примитивных типов (Булево-Число, Строка, Дата)");
+	throw new Exception(php1C_error_BadOperTypeEqual);
 }
 
 /**
@@ -277,36 +267,22 @@ function more1C($arg1, $arg2): bool
 	if(is_bool($arg1)) $arg1 = tran_bool($arg1);
 	if(is_bool($arg2)) $arg2 = tran_bool($arg2);
 	if(is_numeric($arg1) || is_string($arg1) || (is_object($arg1) && get_class($arg1) === 'Date1C')) return $arg1 > $arg2;
-	throw new Exception("Операции сравнения на больше допустима только для значений совпадающих примитивных типов (Булево-Число, Строка, Дата)");
+	throw new Exception(php1C_error_BadOperTypeEqual);
 }
 
 /**
- * Операция Больше или равно в 1С
+ * Операция Равно в 1С
  * @param $arg1
  * @param $arg2
- * @return bool Результат операции Больше или равно
+ * @return bool Результат операции Равно
  * @throws Exception
  */
-function morequal1C($arg1, $arg2): bool
-{
-	if(is_bool($arg1)) $arg1 = tran_bool($arg1);
-	if(is_bool($arg2)) $arg2 = tran_bool($arg2);
-	if(is_numeric($arg1) || is_string($arg1) || (is_object($arg1) && get_class($arg1) === 'php1C\Date1C')) return $arg1 >= $arg2;
-	throw new Exception("Операции сравнения на больше или равно допустима только для значений совпадающих примитивных типов (Булево-Число, Строка, Дата)");
-}
-
-/**
-* Операция Равно в 1С
-* @param $arg1
-* @param $arg2
-* @return bool Результат операции Равно 
-*/
 function equal1C($arg1, $arg2): bool
 {
 	if(is_bool($arg1)) $arg1 = tran_bool($arg1);
 	if(is_bool($arg2)) $arg2 = tran_bool($arg2);
 	if(is_numeric($arg1) || is_string($arg1) || (is_object($arg1) && get_class($arg1) === 'php1C\Date1C')) return $arg1 === $arg2;
-	throw new Exception("Операции сравнения равно допустима только для значений совпадающих примитивных типов (Булево-Число, Строка, Дата)");
+	throw new Exception(php1C_error_BadOperTypeEqual);
 }
 
 /**
@@ -321,18 +297,17 @@ function notequal1C($arg1, $arg2): bool
 	if(is_bool($arg1)) $arg1 = tran_bool($arg1);
 	if(is_bool($arg2)) $arg2 = tran_bool($arg2);
 	if(is_numeric($arg1) || is_string($arg1) || (is_object($arg1) && get_class($arg1) === 'php1C\Date1C')) return $arg1 !== $arg2;
-	throw new Exception("Операции сравнения равно допустима только для значений совпадающих примитивных типов (Булево-Число, Строка, Дата)");
+	throw new Exception(php1C_error_BadOperTypeEqual);
 }
 
 // ---------------------- Общие функции -----------------------------
 
 /**
-* Выводит сообщение через echo
-*
-* @param string $mess
-* @param integer $status (пока не используется)
-*/
-function Message($mess='', $status=0){
+ * Выводит сообщение через echo
+ *
+ * @param string $mess
+ */
+function Message(string $mess=''){
 	echo toString1C($mess);
 }
 
@@ -342,7 +317,7 @@ function Message($mess='', $status=0){
 *
 * @param string $str строка в которой ищут
 * @param string $substr строка поиска(которую ищут)
-* @return int позицию найденной строки начиная с 1. Если ничего не нашло возвратит 0
+* @return int позицию найденной строки начиная с 1. Если ничего не найдено возвратит 0
 */
 function Find(string $str='', string $substr=''): int
 {
@@ -410,7 +385,8 @@ function TypeOf($val): Type1C
 * @param string $str строка описание типа
 * @return Type1C
 */
-function Type(string $str){
+function Type(string $str): Type1C
+{
 	return new Type1C($str);
 }	
 

@@ -10,7 +10,6 @@
 * @version 0.1
 */
 namespace php1C;
-use Exception;
 //require_once( 'php1C_date.php'); //todo
 
 
@@ -69,7 +68,7 @@ class File1C {
 	*/
 	public function Extension(): string
     {
-		return ltrim(strstr($this->fileName,'.'), '.');	;		
+		return ltrim(strstr($this->fileName,'.'), '.');
 	}
 
 	/**

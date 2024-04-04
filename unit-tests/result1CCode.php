@@ -18,9 +18,6 @@ require_once('src/php1C__code.php');
     	//echo $str;
     	//die();
 
-
-    	//echo $code;
-    	//$str .= '2'.isset($iscode);
     	if(isset($_GET["code"])) $str = php1C\makeCode($code);
     	else{	
 	    	if (Language1C === 'en') {

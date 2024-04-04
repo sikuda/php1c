@@ -114,3 +114,5 @@ const php1C_error_UndefineOperator = 'Undefined operator';
 const php1C_error_UndefineSymbol   = 'Undefined symbol';
 const php1C_error_UndefineFunction = 'Undefined function';
 const php1C_error_BadDateType      = 'Bad const type date';
+
+const php1C_error_BadOperTypeEqual  = "Comparison operations are equivalent only for results of matching primitive types (Boolean, Number, String, Date)";

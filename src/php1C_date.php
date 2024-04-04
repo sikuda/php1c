@@ -1,21 +1,22 @@
-<?php
+<?php /** @noinspection PhpUnused */
+
 /**
 * Модуль работы датой 1С
 * 
 * Модуль для работы самой датой 1С и функциями для работы с датой
 * 
-* @author  sikuda admin@sikuda.ru
-* @version 0.2
+* @author  sikuda@yandex.ru
+* @version 0.3
 */
 namespace php1C;
 use Exception;
-use \Datetime;
-use \DateInterval;
+use Datetime;
+use DateInterval;
 
 /**
-* Массив названий английских функций для работы с датой. Соответстует элементам русским функций.
+* Массив названий английских функций для работы с датой - соответствует элементам русским функций.
 * @return string[] Массив названий функций работы с датой.
-*/   
+*/
 const php1C_functionsPHP_Date = array('Date(','CurrentDate(', 'Year(', 'Month(','Day(', 'Hour(', 'Minute(', 'Second(', 'BegOfYear(', 'BegOfQuarter(',  'BegOfMonth(', 'BegOfWeek('   ,'BegOfDay(' ,'BegOfHour(' ,'BegOfMinute(', 'EndOfYear(','EndOfQuarter(', 'EndOfMonth(', 'EndOfWeek(',  'EndOfDay(','EndOfHour(','EndOfMinute(','WeekOfYear(', 'DayOfYear(', 'WeekDay(',   'AddMonth(');
 
 /**
@@ -25,68 +26,68 @@ const php1C_functionsPHP_Date = array('Date(','CurrentDate(', 'Year(', 'Month(',
  * @param array $arguments аргументы функции в массиве
  * @throws Exception
  */
-function callDateFunction(string $key, array $arguments){
-	switch($key){
-		case 'Date(': return Date1C($arguments[0], $arguments[1], $arguments[2], $arguments[3], $arguments[4], $arguments[5], $arguments[6]);
-		case 'CurrentDate(': 
-			if(isset($arguments[0])) throw new Exception("Ожидается символ ')'");
-			else return CurrentDate();
-			break;
-		case 'Year(': return Year($arguments[0]);
-		case 'Month(': return Month($arguments[0]);
-		case 'Day(': return Day($arguments[0]);
-		case 'Hour(': return Hour($arguments[0]);
-		case 'Minute(': return Minute($arguments[0]);
-		case 'Second(': return Second($arguments[0]);
-		case 'BegOfYear(': return BegOfYear($arguments[0]);
-		case 'BegOfQuarter(': return BegOfQuarter($arguments[0]);
-		case 'BegOfMonth(': return BegOfMonth($arguments[0]);
-		case 'BegOfWeek(': return BegOfWeek($arguments[0]);
-		case 'BegOfDay(': return BegOfDay($arguments[0]);
-		case 'BegOfHour(': return BegOfHour($arguments[0]);
-		case 'BegOfMinute(': return BegOfMinute($arguments[0]);
-		case 'EndOfYear(': return EndOfYear($arguments[0]);
-		case 'EndOfQuarter(': return EndOfQuarter($arguments[0]);
-		case 'EndOfMonth(': return EndOfMonth($arguments[0]);
-		case 'EndOfWeek(': return  EndOfWeek($arguments[0]);
-		case 'EndOfDay(': return EndOfDay($arguments[0]);
-		case 'EndOfHour(': return EndOfHour($arguments[0]);
-		case 'EndOfMinute(': return EndOfMinute($arguments[0]);
-		case 'WeekOfYear(': return WeekOfYear($arguments[0]);
-		case 'DayOfYear(': return DayOfYear($arguments[0]);
-		case 'WeekDay(': return WeekDay($arguments[0]);
-		case 'AddMonth(': return AddMonth($arguments[0], $arguments[1]);
-		default:
-			throw new Exception("Неизвестная функция работы с датой ".$key."");
-			break;
-	}
-}	
+//function callDateFunction(string $key, array $arguments){
+//	switch($key){
+//		case 'Date(': return Date1C($arguments[0], $arguments[1], $arguments[2], $arguments[3], $arguments[4], $arguments[5]);
+//		case 'CurrentDate(':
+//			if(isset($arguments[0])) throw new Exception("Ожидается символ ')'");
+//			else return CurrentDate();
+//		case 'Year(': return Year($arguments[0]);
+//		case 'Month(': return Month($arguments[0]);
+//		case 'Day(': return Day($arguments[0]);
+//		case 'Hour(': return Hour($arguments[0]);
+//		case 'Minute(': return Minute($arguments[0]);
+//		case 'Second(': return Second($arguments[0]);
+//		case 'BegOfYear(': return BegOfYear($arguments[0]);
+//		case 'BegOfQuarter(': return BegOfQuarter($arguments[0]);
+//		case 'BegOfMonth(': return BegOfMonth($arguments[0]);
+//		case 'BegOfWeek(': return BegOfWeek($arguments[0]);
+//		case 'BegOfDay(': return BegOfDay($arguments[0]);
+//		case 'BegOfHour(': return BegOfHour($arguments[0]);
+//		case 'BegOfMinute(': return BegOfMinute($arguments[0]);
+//		case 'EndOfYear(': return EndOfYear($arguments[0]);
+//		case 'EndOfQuarter(': return EndOfQuarter($arguments[0]);
+//		case 'EndOfMonth(': return EndOfMonth($arguments[0]);
+//		case 'EndOfWeek(': return  EndOfWeek($arguments[0]);
+//		case 'EndOfDay(': return EndOfDay($arguments[0]);
+//		case 'EndOfHour(': return EndOfHour($arguments[0]);
+//		case 'EndOfMinute(': return EndOfMinute($arguments[0]);
+//		case 'WeekOfYear(': return WeekOfYear($arguments[0]);
+//		case 'DayOfYear(': return DayOfYear($arguments[0]);
+//		case 'WeekDay(': return WeekDay($arguments[0]);
+//		case 'AddMonth(': return AddMonth($arguments[0], $arguments[1]);
+//		default:
+//			throw new Exception("Неизвестная функция работы с датой ".$key);
+//	}
+//}
+
 
 // ----------------------------------------------------------------------------------------------------------------------
 
 /**
 * Класс для работы с датой 1С
 *
-* Основной класс для работы с датой 1С. Капсулирует работу с операторами для даты и хранит внутреннее представление даты.
+* Основной класс для работы с датой 1С.
 */
 class Date1C {
 	/**
 	* @var DateTime внутреннее хранение даты-времени
 	*/
-	public $value;
+	public DateTime  $value;
 
     /**
      * Конструктор объекта Date1C
-     * @param string $str Получение даты из строки YYYYmmdd (19171107) или YYYYmmddHHiiss (19700101000000)
+     * @param string|DateTime $str_val Получение даты из строки типа (19171107) или (19700101000000)
      * @param int $seconds
      * @throws Exception
      */
-	function __construct(string $str = '', int $seconds=0) {
-		if(is_string($str)){
-			if(strlen($str)==8) $this->value = DateTime::createFromFormat("YmdHis", $str . "000000");
-			elseif(strlen($str)==12) $this->value = DateTime::createFromFormat("YmdHis", $str . "00");
-	        else $this->value = DateTime::createFromFormat("YmdHis", $str);	//strlen($str)==14
+	function __construct($str_val, int $seconds=0) {
+		if(is_string($str_val)){
+			if(strlen($str_val)==8) $this->value = DateTime::createFromFormat("YmdHis", $str_val . "000000");
+			elseif(strlen($str_val)==12) $this->value = DateTime::createFromFormat("YmdHis", $str_val . "00");
+	        else $this->value = DateTime::createFromFormat("YmdHis", $str_val);	//strlen($str)==14
 		}
+        else  $this->value = $str_val;
 		if($seconds!==0) $this->add($seconds);
 	}	
 
@@ -98,20 +99,22 @@ class Date1C {
 		return $this->value->format("d.m.Y H:i:s");
 	}
 
+    /**
+     * Преобразовать дату по формату
+    */
 	function toFormat($str): string
     {
-		return $this->value->format($str);	
+		return $this->value->format($str);
 	}
 
     /**
      * Добавить к дате количество секунд, возвращает текущий объект.
-     * @param int $seconds Секунды, котрые надо добавить к дате.
+     * @param int $seconds Секунды, которые надо добавить к дате.
      * @return Date1C текущий объект
      * @throws Exception
      */
 	public function add(int $seconds): Date1C
     {
-		$seconds = intval($seconds);
 		if($seconds>0) $this->value = $this->value->add( new DateInterval('PT'.$seconds.'S'));
 		else $this->value = $this->value->sub( new DateInterval('PT'.-$seconds.'S'));
 		return $this;
@@ -119,13 +122,12 @@ class Date1C {
 
     /**
      * Отнимает от даты количество секунд, возвращает текущий объект.
-     * @param int $seconds Секунды, котрые надо отнять от даты.
+     * @param int $seconds Секунды, которые надо отнять от даты.
      * @return Date1C текущий объект
      * @throws Exception
      */
 	public function sub(int $seconds): Date1C
     {
-		$seconds = intval($seconds);
 		if($seconds>0) $this->value = $this->value->sub( new DateInterval('PT'.$seconds.'S'));
 		else $this->value = $this->value->add( new DateInterval('PT'.-$seconds.'S'));
 		return $this;
@@ -170,7 +172,8 @@ function Date1C($str, int $month=1, int $day=1, int $hour=0, int $minute=0, int 
  */
 function CurrentDate(): Date1C
 {
-	return new Date1C(date("YmdHis"));
+    //return new Date1C(date("YmdHis"));
+    return new Date1C(new DateTime("now"));
 }
 
 /**
@@ -196,7 +199,7 @@ function Month(Date1C $date ): int
 }
 
 /**
-* Возращает месяц от даты
+* Возвращает месяц от даты
 *
 * @param Date1C $date
 * @return int, День месяца без ведущего нуля (от 1 до 31)
@@ -218,7 +221,7 @@ function Hour(Date1C $date ): int
 }
 
 /**
-* Возращает минуты от даты
+* Возвращает минуты от даты
 *
 * @param Date1C $date
 * @return int, Минуты без ведущего нуля типа 01 (от 0 до 59)
@@ -229,7 +232,7 @@ function Minute(Date1C $date ): int
 }
 
 /**
-* Возращает секунды от даты
+* Возвращает секунды от даты
 *
 * @param Date1C $date
 * @return int, секунды без ведущего нуля типа 01 (от 0 до 59)
@@ -240,11 +243,12 @@ function Second(Date1C $date ): int
 }
 
 /**
-* Возвращает начало года для даты
-*
-* @param Date1C $date
-* @return Date1C , начало года для даты $date
-*/
+ * Возвращает начало года для даты
+ *
+ * @param Date1C $date
+ * @return Date1C , начало года для даты $date
+ * @throws Exception
+ */
 function BegOfYear(Date1C $date ): Date1C
 {
 	return new Date1C(date_format($date->value,"Y").'0101000000');
@@ -257,29 +261,32 @@ function BegOfYear(Date1C $date ): Date1C
  * @return Date1C , начало квартала для даты $date
  * @throws Exception
  */
-function BegOfQuarter( $date ): Date1C
+function BegOfQuarter(Date1C $date ): Date1C
 {
 	$month = 3*intdiv(intval(date_format($date->value,"m"))-1,3)+1;
-	return Date1C(intval(date_format($date->value,"Y")), $month, 1);
+    /** @var int $month */
+    return Date1C(intval(date_format($date->value,"Y")), $month);
 }
 
 /**
-* Возвращает начало месяца для даты
-*
-* @param Date1C $date
-* @return Date1C , начало квартала для даты $date
-*/
+ * Возвращает начало месяца для даты
+ *
+ * @param Date1C $date
+ * @return Date1C , начало квартала для даты $date
+ * @throws Exception
+ */
 function BegOfMonth(Date1C $date ): Date1C
 {
 	return new Date1C(date_format($date->value,"Y").date_format($date->value,"m").'01000000');
 }
 
 /**
-* Возвращает начало недели (с понедельника)
-*
-* @param Date1C $date
-* @return Date1C , начало недели с понедельника для даты $date
-*/
+ * Возвращает начало недели (с понедельника)
+ *
+ * @param Date1C $date
+ * @return Date1C , начало недели с понедельника для даты $date
+ * @throws Exception
+ */
 function BegOfWeek(Date1C $date ): Date1C
 {
 	$ts = strtotime(date_format($date->value,"Y").'-'.date_format($date->value,"m").'-'.date_format($date->value,"d"));
@@ -288,55 +295,60 @@ function BegOfWeek(Date1C $date ): Date1C
 }
 
 /**
-* Возвращает начало дня для даты
-*
-* @param Date1C $date
-* @return Date1C , начало дня с полночи для даты $date
-*/
+ * Возвращает начало дня для даты
+ *
+ * @param Date1C $date
+ * @return Date1C , начало дня с полночи для даты $date
+ * @throws Exception
+ */
 function BegOfDay(Date1C $date ): Date1C
 {
 	return new Date1C(date_format($date->value,"Y").date_format($date->value,"m").date_format($date->value,"d").'000000');
 }
 
 /**
-* Возвращает начало часа для даты
-*
-* @param Date1C $date
-* @return Date1C , начало часа для даты $date
-*/
+ * Возвращает начало часа для даты
+ *
+ * @param Date1C $date
+ * @return Date1C , начало часа для даты $date
+ * @throws Exception
+ */
 function BegOfHour(Date1C $date ): Date1C
 {
 	return new Date1C(date_format($date->value,"Y").date_format($date->value,"m").date_format($date->value,"d").date_format($date->value,"H").'0000');
-}  
+}
 
 /**
-* Возвращает начало минуты для даты
-*
-* @param Date1C $date
-* @return Date1C , начало минуты для даты $date
-*/
+ * Возвращает начало минуты для даты
+ *
+ * @param Date1C $date
+ * @return Date1C , начало минуты для даты $date
+ * @throws Exception
+ */
 function BegOfMinute(Date1C $date ): Date1C
 {
 	return new Date1C(date_format($date->value,"Y").date_format($date->value,"m").date_format($date->value,"d").date_format($date->value,"H").date_format($date->value,"i").'00');
-} 
+}
 
 /**
-* Возвращает конец года для даты
-*
-* @param Date1C $date
-* @return Date1C , конец года для даты $date
-*/
+ * Возвращает конец года для даты
+ *
+ * @param Date1C $date
+ * @return Date1C , конец года для даты $date
+ * @throws Exception
+ */
 function EndOfYear(Date1C $date ): Date1C
 {
 	return new Date1C(date_format($date->value,"Y").'1231235959');
 }
 
 /**
-* Возращает конец квартала для даты
-*
-* @param Date1C $date
-* @return Date1C , конец квартала для даты $date
-*/
+ * Возвращает конец квартала для даты
+ *
+ * @param Date1C $date
+ * @return Date1C , конец квартала для даты $date
+ * @throws Exception
+ */
 function EndOfQuarter(Date1C $date ): Date1C
 {
 	$month = 3*intdiv(intval(date_format($date->value,"m"))-1,3)+4;
@@ -344,11 +356,12 @@ function EndOfQuarter(Date1C $date ): Date1C
 }
 
 /**
-* Возвращает конец месяца для даты
-*
-* @param Date1C $date
-* @return Date1C , конец месяца для даты $date
-*/
+ * Возвращает конец месяца для даты
+ *
+ * @param Date1C $date
+ * @return Date1C , конец месяца для даты $date
+ * @throws Exception
+ */
 function EndOfMonth(Date1C $date ): Date1C
 {
 	$month = intval(date_format($date->value,"m"))+1;
@@ -356,11 +369,12 @@ function EndOfMonth(Date1C $date ): Date1C
 }
 
 /**
-* Возращает конец недели для даты
-*
-* @param Date1C $date
-* @return Date1C , конец недели для даты $date
-*/
+ * Возвращает конец недели для даты
+ *
+ * @param Date1C $date
+ * @return Date1C , конец недели для даты $date
+ * @throws Exception
+ */
 function EndOfWeek(Date1C $date ): Date1C
 {
 	$ts = strtotime(date_format($date->value,"Y").'-'.date_format($date->value,"m").'-'.date_format($date->value,"d"));
@@ -370,44 +384,48 @@ function EndOfWeek(Date1C $date ): Date1C
  }
 
 /**
-* Возращает конец дня для даты
-*
-* @param Date1C $date
-* @return Date1C , конец дня для даты $date
-*/ 
+ * Возвращает конец дня для даты
+ *
+ * @param Date1C $date
+ * @return Date1C , конец дня для даты $date
+ * @throws Exception
+ */
 function EndOfDay(Date1C $date ): Date1C
 {
 	return new Date1C(date_format($date->value,"Y").date_format($date->value,"m").date_format($date->value,"d").'235959');
 }
 
 /**
-* Возращает конец часа для даты
-*
-* @param Date1C $date
-* @return Date1C , конец дня для даты $date
-*/
+ * Возвращает конец часа для даты
+ *
+ * @param Date1C $date
+ * @return Date1C , конец дня для даты $date
+ * @throws Exception
+ */
 function EndOfHour(Date1C $date ): Date1C
 {
 	return new Date1C(date_format($date->value,"Y").date_format($date->value,"m").date_format($date->value,"d").date_format($date->value,"H").'5959');
 }
 
 /**
-* Возращает конец минуты для даты
-*
-* @param Date1C $date
-* @return Date1C , конец дня для даты $date
-*/
+ * Возвращает конец минуты для даты
+ *
+ * @param Date1C $date
+ * @return Date1C , конец дня для даты $date
+ * @throws Exception
+ */
 function EndOfMinute(Date1C $date ): Date1C
 {
 	return new Date1C(date_format($date->value,"Y").date_format($date->value,"m").date_format($date->value,"d").date_format($date->value,"H").date_format($date->value,"i").'59');
-} 
+}
 
 /**
-* Возвращает порядковый номер недели года в соответствии со стандартом ISO-8601 (недели начинаются с понедельника)
-*
-* @param Date1C $date
-* @return int Порядковый номер недели года по 1C(1 или 2 января суббота или воскресенье это первая неделя)
-*/
+ * Возвращает порядковый номер недели года в соответствии со стандартом ISO-8601 (недели начинаются с понедельника)
+ *
+ * @param Date1C $date
+ * @return int Порядковый номер недели года по 1C(1 или 2 января суббота или воскресенье это первая неделя)
+ * @throws Exception
+ */
 function WeekOfYear(Date1C $date ): int
 {
 	$ts = strtotime(date_format($date->value,"Y").'-'.date_format($date->value,"m").'-'.date_format($date->value,"d"));
@@ -425,14 +443,13 @@ function WeekOfYear(Date1C $date ): int
 
 /**
 * Возвращает порядковый номер дня в году (начиная с 1)
-*
-* @param Date1C $date
-* @return false|int , Порядковый номер дня в году начиная с 1 для $date
+* Date1C $date - дата
+* @return int , Порядковый номер дня в году начиная с 1 для $date
 */
-function DayOfYear(Date1C $date )
+function DayOfYear(Date1C $date ): int
 {
-	return strtotime(date_format($date->value,"Y").'-'.date_format($date->value,"m").'-'.date_format($date->value,"d"));
-    //return $ts //date('z', $ts)+1;
+	$ts = strtotime(date_format($date->value,"Y").'-'.date_format($date->value,"m").'-'.date_format($date->value,"d"));
+    return date('z', $ts)+1;
 }
 
 /**

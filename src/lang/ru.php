@@ -3,7 +3,7 @@
 * Модуль Русского языка для получения кода PHP из 1С
 * 
 * @author  sikuda admin@sikuda.ru
-* @version 0.2
+* @version 0.3
 */
 namespace php1C;
 
@@ -46,7 +46,6 @@ const php1C_Keywords = array(
 
 /**
 * Ключевое слово Новый
-* используется для oпределения нового типа
 */
 const php1C_type_New = 'НОВЫЙ';
 
@@ -118,4 +117,5 @@ const php1C_error_UndefineFunction = 'Непонятная функция';
 const php1C_error_BadDateType      = 'Неправильная константа типа Дата';
 const php1C_error_LostSymbol       = 'Пропущен символ';
 
+const php1C_error_BadOperTypeEqual  = "Операции сравнения равно допустима только для значений совпадающих примитивных типов (Булево-Число, Строка, Дата)";
 

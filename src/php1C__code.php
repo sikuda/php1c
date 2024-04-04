@@ -32,12 +32,12 @@ class CodeStream {
 	//make code
 	private string $codePHP = '';
 	private string $code = '';
-	private array $codestack = array();
+	private array $codeStack = array();
 
-	//Индентификаторы типов - type identification
-	private $identypes;
+	//Идентификаторы типов - type identification
+	private array $keywords;
 	//Идентификаторы функций - function identification
-	private $functions1С;
+	private array $functions1C;
 
 	/*
 	** Вставляем текущий кусочек в результат 
@@ -52,7 +52,7 @@ class CodeStream {
 	private function GetChar(){
 
 		//Для отладки
-		//if($this->itoken >= count($this->tokens)) throw new Exception('Выход за пределы массива токенов, индекс='.$this->itoken);
+		//if($this->i_token >= count($this->tokens)) throw new Exception('Выход за пределы массива токенов, индекс='.$this->i_token);
 
 		$token = $this->tokens[$this->i_token];
 		while($token->type === TokenStream::type_newline) {
@@ -76,13 +76,16 @@ class CodeStream {
 		$this->i_token++;
 	}
 
-	/**
-	* Проверка совпадения оператора
-	*
-	* @param $subtype TokenStream::const индекс операции
-	* @param $look string error::const строковое представление операции
-	*/
-	private function MatchOper($subtype, $look='???'){
+    /**
+     * Проверка совпадения оператора
+     *
+     * @param $subtype TokenStream::const индекс операции
+     * @param $look string error::const строковое представление операции
+     * @throws Exception
+     */
+	private function MatchOperation($subtype,
+                                    string $look = '???')
+    {
 		if( $this->Type === TokenStream::type_operator && $this->Index === $subtype){ 
 			$this->GetChar();
 		}
@@ -108,11 +111,13 @@ class CodeStream {
      * Получить символ из перечисления символов СИМВОЛЫ
      * @throws Exception
      */
-	private function getCharSymbol(){
+	private function getCharSymbol(): string
+    {
 		$this->GetChar();
-		$this->MatchOper(TokenStream::oper_point, '.');
+		$this->MatchOperation(TokenStream::oper_point, '.');
 		if($this->Type === TokenStream::type_variable){
-			if( fEnglishVariable )
+            //$this->Look;
+            if( fEnglishVariable )
 				switch ($this->Look) {
 					case 'VK'  : //
 					case 'CR'  : return 'chr(13)';
@@ -124,8 +129,8 @@ class CodeStream {
 					case 'PF'  : //
 					case 'FF'  : return 'chr(12)';
 					case 'Tab'  : //Т
-					case 'TAB'  : return 'chr(9)';
-				}
+                    case 'TAB' : return 'chr(9)';
+                }
 			else	
 				switch ($this->Look) {
 					case 'ВК'  : 
@@ -139,35 +144,36 @@ class CodeStream {
 					case 'ПФ'  : //
 					case 'FF'  : return 'chr(12)';
 					case 'Таб' : //
-					case 'TAB' : return 'chr(9)';
-				}
+                    case 'TAB' : return 'chr(9)';
+                }
             throw new Exception('Неопределенный символ '.$this->Look);
 		}
 		else throw new Exception('Ожидается перечисление символ, а не '.$this->Look);
 	}
 
-	/**
-	* Первичный преобразователь кода
-	*/
+    /**
+     * Первичный преобразователь кода
+     * @throws Exception
+     */
 	private function Factor(){
 		
 		//Обработка скобок и унарных операций 
 		if( $this->Type === TokenStream::type_operator && $this->Index === TokenStream::oper_open_bracket ){
 			$this->GetChar();
 			$this->code = $this->Expression7();
-			$this->MatchOper(TokenStream::oper_closebracket, ')');
+			$this->MatchOperation(TokenStream::oper_closebracket, ')');
 		}
-		//Обработка оператора ?(,,) 
+		//Обработка оператора ?(if,value1,value2)
 		elseif( $this->Type === TokenStream::type_operator && $this->Index === TokenStream::oper_question){
 			$this->GetChar();
-			$this->MatchOper(TokenStream::oper_open_bracket);
+			$this->MatchOperation(TokenStream::oper_open_bracket);
 			$condition = $this->Expression7();
-			$this->MatchOper(TokenStream::oper_comma);
+			$this->MatchOperation(TokenStream::oper_comma);
 			$first = $this->Expression7();
-			$this->MatchOper(TokenStream::oper_comma);
+			$this->MatchOperation(TokenStream::oper_comma);
 			$second = $this->Expression7();
 			$this->code = $condition.' ? '.$first.' : '.$second;
-			$this->MatchOper(TokenStream::oper_closebracket, ')');
+			$this->MatchOperation(TokenStream::oper_closebracket, ')');
 		}
 		else{
 			
@@ -220,14 +226,16 @@ class CodeStream {
 		} 
 	}
 
-	/**
-	* Выполнение кода для зависящих от дальнейших данных(унарные операции и свойства и функции объекта)
-	*
-	* @param $type TokenStream::const тип предыдущего токена
-	* @param $look string тектовое представление предыдущего токена
-	* @param $index TokenStream::const индекс предыдущего токена
-	*/
-	private function ForwardOperation($type, $look, $index=-1){
+    /**
+     * Выполнение кода для зависящих от дальнейших данных(унарные операции и свойства и функции объекта)
+     *
+     * @param $type TokenStream::const тип предыдущего токена
+     * @param $look string представление предыдущего токена
+     * @param $index int индекс предыдущего токена
+     * @throws Exception
+     */
+	private function ForwardOperation($type, string $look, int $index = -1)
+    {
 		if($type === TokenStream::type_operator){
 			//Унарный минус
 			if($index === TokenStream::oper_minus){
@@ -261,7 +269,7 @@ class CodeStream {
 				if( $this->Index === TokenStream::oper_opensqbracket){
 					$this->GetChar();
 					$this->code = '$'.$key.'->GET('.$this->Expression7().')';
-					$this->MatchOper(TokenStream::oper_closesqbracket, ']');
+					$this->MatchOperation(TokenStream::oper_closesqbracket, ']');
 				}
 				//Обработка точки - свойств или функций
 				else{
@@ -288,9 +296,11 @@ class CodeStream {
 	}
 
     /**
-    * Выдать код нового объекта по индексу со всеми параметрами
-	*/
-	private function getNewType(){
+     * Выдать код нового объекта по индексу со всеми параметрами
+     * @throws Exception
+     */
+	private function getNewType(): string
+    {
 		//определяем параметры конструктора
 		$index = $this->Index;
 		$look = $this->Look;
@@ -299,30 +309,32 @@ class CodeStream {
 		$args = '(array(';
 		$this->GetChar();
 		if($this->Type === TokenStream::type_operator && $this->Index === TokenStream::oper_open_bracket){
-			$this->MatchOper(TokenStream::oper_open_bracket, '(');
-			$notfirst = false;
+			$this->MatchOperation(TokenStream::oper_open_bracket, '(');
+			$fNoFirst = false;
 			while( $this->Type !== TokenStream::type_operator || $this->Index !== TokenStream::oper_closebracket ){
-				if($notfirst){
+				if($fNoFirst){
 					if($this->Type !== TokenStream::type_operator || $this->Index !== TokenStream::oper_comma) throw new Exception('Ожидается запятая , ');
 					$args .= ',';
 					$this->GetChar();
 				}
-				else $notfirst = true;	
+				else $fNoFirst = true;
 				$this->code = $this->Expression7();
 				$args .= $this->code;
 				$this->code = '';
 			}
-			$this->MatchOper(TokenStream::oper_closebracket, ')');	
+			$this->MatchOperation(TokenStream::oper_closebracket, ')');
 		}
 		$args .= '))';
-		if($index>=0) return 'php1C\\'.$this->identypes['php'][$index].$args; 
+		if($index>=0) return 'php1C\\'.$this->keywords['php'][$index].$args;
 		else throw new Exception('Пока тип не определен '.$look);
 	}
 
-	/**
-	* Обработка 7 уровней операторов
-	*/
-	public function Expression7($level=7){
+    /**
+     * Обработка 7 уровней операторов
+     * @throws Exception
+     */
+	public function Expression7($level=7): string
+    {
 		if($level > 2) $this->Expression7($level-1);
 		switch ($level) {
 			case 2: // Базовые операции
@@ -330,76 +342,75 @@ class CodeStream {
 				break;
 			case 3: // Умножение или деление (* /)
 		        while( $this->Type === TokenStream::type_operator && ($this->Index === TokenStream::oper_mult || $this->Index === TokenStream::oper_div)){
-		        	array_push($this->codestack, $this->code);
+		        	$this->codeStack[] = $this->code;
 		        	$index = $this->Index;
 		        	$this->GetChar();
 					$this->Expression7(2);
 					if( $index === TokenStream::oper_mult ){
-						$this->code = 'php1C\mul1C('.array_pop($this->codestack).','.$this->code.')';
+						$this->code = 'php1C\mul1C('.array_pop($this->codeStack).','.$this->code.')';
 					}else{
-						$this->code = 'php1C\div1C('.array_pop($this->codestack).','.$this->code.')';
+						$this->code = 'php1C\div1C('.array_pop($this->codeStack).','.$this->code.')';
 					}
 				}
 				break;
 			case 4: //Сложение или вычитание (+ -)
 				while( $this->Type === TokenStream::type_operator && ($this->Index === TokenStream::oper_plus || $this->Index === TokenStream::oper_minus)){
-					array_push($this->codestack, $this->code);
+					$this->codeStack[] = $this->code;
 					$index = $this->Index;
 					$this->GetChar();
 					$this->Expression7(3);
 					if( $index === TokenStream::oper_plus ){
-						$this->code = 'php1C\add1C('.array_pop($this->codestack).','.$this->code.')';
+						$this->code = 'php1C\add1C('.array_pop($this->codeStack).','.$this->code.')';
 					}else{
-						$this->code = 'php1C\sub1C('.array_pop($this->codestack).','.$this->code.')';
+						$this->code = 'php1C\sub1C('.array_pop($this->codeStack).','.$this->code.')';
 					}	
 				}
 				break;
 			case 5: //Больше меньше или равно (< <= = <> > >=)
 				while( $this->Type === TokenStream::type_operator && 
 					   ($this->Index === TokenStream::oper_less || $this->Index === TokenStream::oper_lessequal || $this->Index === TokenStream::oper_equal || $this->Index === TokenStream::oper_notequal || $this->Index === TokenStream::oper_more || $this->Index === TokenStream::oper_morequal)){
-					array_push($this->codestack, $this->code);
+					$this->codeStack[] = $this->code;
 					$index = $this->Index; 
 					$this->GetChar();
 					$this->Expression7(4);
 					switch ($index) {
 						case TokenStream::oper_less:
-							$this->code = 'php1C\less1C('.array_pop($this->codestack).','.$this->code.')';
+							$this->code = 'php1C\less1C('.array_pop($this->codeStack).','.$this->code.')';
 							break;
 						case TokenStream::oper_lessequal:
-							$this->code = 'php1C\lessequal1C('.array_pop($this->codestack).','.$this->code.')';
+							$this->code = 'php1C\lessequal1C('.array_pop($this->codeStack).','.$this->code.')';
 							break;
 						case TokenStream::oper_equal:
-							$this->code = 'php1C\equal1C('.array_pop($this->codestack).','.$this->code.')';
+							$this->code = 'php1C\equal1C('.array_pop($this->codeStack).','.$this->code.')';
 							break;
 						case TokenStream::oper_notequal:
-							$this->code = 'php1C\notequal1C('.array_pop($this->codestack).','.$this->code.')';
+							$this->code = 'php1C\notequal1C('.array_pop($this->codeStack).','.$this->code.')';
 							break;	
 						case TokenStream::oper_more:
-							$this->code = 'php1C\more1C('.array_pop($this->codestack).','.$this->code.')';
+							$this->code = 'php1C\more1C('.array_pop($this->codeStack).','.$this->code.')';
 							break;
 						case TokenStream::oper_morequal:
-							$this->code = 'php1C\morequal1C('.array_pop($this->codestack).','.$this->code.')';
+							$this->code = 'php1C\morequal1C('.array_pop($this->codeStack).','.$this->code.')';
 							break;		
 						default:
 						 	throw new Exception('Операция не принадлежит этому уровню '.$this->Look);
-						 	break;
 					}
 				}
-				break;
+                break;
 			case 6: //И
 				while( $this->Type === TokenStream::type_operator && $this->Index === TokenStream::oper_and){
-					array_push($this->codestack, $this->code);
+					$this->codeStack[] = $this->code;
 					$this->GetChar();
 					$this->Expression7(5);
-					$this->code = 'php1C\and1C('.array_pop($this->codestack).','.$this->code.')';
+					$this->code = 'php1C\and1C('.array_pop($this->codeStack).','.$this->code.')';
 				}
 				break;
 			case 7: //ИЛИ
 				while( $this->Type === TokenStream::type_operator && $this->Index === TokenStream::oper_or){
-					array_push($this->codestack, $this->code);
+					$this->codeStack[] = $this->code;
 					$this->GetChar();
 					$this->Expression7(6);
-					$this->code = 'php1C\or1C('.array_pop($this->codestack).','.$this->code.')';
+					$this->code = 'php1C\or1C('.array_pop($this->codeStack).','.$this->code.')';
 				}
 				break;
 			default:
@@ -411,9 +422,9 @@ class CodeStream {
     /**
      * Разбор аргументов функции и ее возврат строки вызова функции
      *
-     * @param $context - имя переменной контекста( типа Массив.Добавить())
+     * @param $context - имя переменной контекста
      * @param $func string название функции
-     * @param $index int индекс функции в таблице распознаных функций
+     * @param $index int индекс функции в таблице распознанных функций
      * @throws Exception
      */
 	public function splitFunction($context, string $func, int $index=-1): string
@@ -443,19 +454,18 @@ class CodeStream {
 			}
 		}
 		//$args .= ')';
-		$this->MatchOper(TokenStream::oper_closebracket, ')');
+		$this->MatchOperation(TokenStream::oper_closebracket, ')');
 		
 		if($index!=-1){
-			$func = $this->functions1С['php'][$index];
+			$func = $this->functions1C['php'][$index];
 			//$this->codePHP .= 's'.$context.'->'.$func.'s';
 			switch ($func) {
 				//обработка совпадения функций
 				case 'Date(': return 'php1C\Date1C('.$args.')';
 				case 'StrLen(': return 'php1C\StrLength('.$args.')';
 				default:
-					if(isset($context)) return $this->functions1С['php'][$index].$args.")";
-					else return 'php1C\\'.$this->functions1С['php'][$index].$args.")";
-				break;
+					if(isset($context)) return $this->functions1C['php'][$index].$args.")";
+					else return 'php1C\\'.$this->functions1C['php'][$index].$args.")";
 			}
 		} 
 		else return $func.'('.$args.")";
@@ -524,7 +534,7 @@ class CodeStream {
 								}
 								else{ 
 									$this->code = '$'.$key."=".$value.';';
-									$this->MatchOper(TokenStream::oper_semicolon, ';');
+									$this->MatchOperation(TokenStream::oper_semicolon, ';');
 									$this->pushCode($this->code);
 								}
 							}
@@ -537,7 +547,7 @@ class CodeStream {
 				case TokenStream::type_function:
 				case TokenStream::type_extinction:
 					$this->pushCode($this->Expression7());
-					$this->MatchOper(TokenStream::oper_semicolon, ';');
+					$this->MatchOperation(TokenStream::oper_semicolon, ';');
 					$this->pushCode(';');
 					break;
 				case TokenStream::type_comments:
@@ -561,24 +571,26 @@ class CodeStream {
 					 		if($handle === TokenStream::keyword_then || $handle === TokenStream::keyword_elseif){
 					 			$this->MatchKeyword(TokenStream::keyword_elseif);
 					 			$this->pushCode("elseif(");
-					 			$key = $this->Expression7();
+					 			$this->Expression7();
 						 		$this->MatchKeyword(TokenStream::keyword_then);
 						 		$this->pushCode($this->code . "){");
 					 		    //$this->code = '';
-					 			return $this->continueCode(TokenStream::keyword_elseif);
+					 			$this->continueCode(TokenStream::keyword_elseif);
 						 	}
 							else throw new Exception('Ожидается конструкция Если ... Тогда');
-					 	case TokenStream::keyword_else:
+                            break;
+                        case TokenStream::keyword_else:
 					  		if($handle === TokenStream::keyword_then || $handle === TokenStream::keyword_elseif){
 					 			$this->MatchKeyword(TokenStream::keyword_else);
 					 			$this->pushCode("}else{");
 					 			$this->continueCode(TokenStream::keyword_else);
 					 		}	
 					 		else throw new Exception('Ожидается конструкция Если ... Тогда(ИначеЕсли)');
-					 	case TokenStream::keyword_endif:
+                            break;
+                        case TokenStream::keyword_endif:
 					 		if($handle===TokenStream::keyword_then || $handle === TokenStream::keyword_elseif || $handle===TokenStream::keyword_else){
 					 			$this->MatchKeyword(TokenStream::keyword_endif);
-					 			$this->MatchOper(TokenStream::oper_semicolon, ';');
+					 			$this->MatchOperation(TokenStream::oper_semicolon, ';');
 					 			$this->pushCode("}");
 					 		}
 					 		else throw new Exception('Ожидается конструкции Если ... Тогда(ИначеЕсли,Иначе)');
@@ -593,7 +605,7 @@ class CodeStream {
 					 		//$this->code = '';
 					 		$this->continueCode(TokenStream::keyword_circle);
 					 		break;
-					 		//Для перем=.. по .. цикл КонецЦикла;
+					 		//Для перем=value1 по value2 цикл КонецЦикла;
 					 	case TokenStream::keyword_for:
 					 		$this->MatchKeyword(TokenStream::keyword_for);
 					 		if($this->Type == TokenStream::keyword_foreach){
@@ -633,12 +645,11 @@ class CodeStream {
 					 	case TokenStream::keyword_endcircle:
 					 		if($handle===TokenStream::keyword_circle){
 					 			$this->MatchKeyword(TokenStream::keyword_endcircle);
-					 			$this->MatchOper(TokenStream::oper_semicolon, ';');
+					 			$this->MatchOperation(TokenStream::oper_semicolon, ';');
 					 			$this->pushCode("}");
 					 			return;	
 					 		}
 					 		else throw new Exception('Ожидается конструкции Пока(Для) ... Цикл');
-					 		break;
 					 	case TokenStream::keyword_break:
 					 		if($handle===TokenStream::keyword_circle){
 					 			$this->MatchKeyword(TokenStream::keyword_break);
@@ -656,7 +667,7 @@ class CodeStream {
 					 		if($this->Type === TokenStream::type_variable){ 
 					 			$key = $this->Look;
 					 			$this->GetChar();
-					 			$this->MatchOper(TokenStream::oper_semicolon, ';');
+					 			$this->MatchOperation(TokenStream::oper_semicolon, ';');
 								$this->pushCode('$'.$key.' = null;');
 							}
 					 		else throw new Exception('Ожидается имя переменной');
@@ -676,7 +687,7 @@ class CodeStream {
 					 		$this->GetChar();
 					 		//не пустой возврат
 					 		if($this->Type !==  TokenStream::type_operator || $this->Index !== TokenStream::oper_semicolon) $this->pushCode($this->Expression7().';');
-							$this->MatchOper(TokenStream::oper_semicolon, ';');
+							$this->MatchOperation(TokenStream::oper_semicolon, ';');
 							$this->pushCode(';');
 							break;	
 					 	case TokenStream::keyword_endfunction:
@@ -689,10 +700,9 @@ class CodeStream {
 					 		break;		
 					 	default:
 					 		throw new Exception('Нет соответствия ключевому слову '.php1C_Keywords[$this->Index]);
-							break;	
 					}
-					break;
-				default:
+                    break;
+                default:
 					throw new Exception(php1C_error_UndefineOperator); //Подобно 1С никаких лишних $this->Look;
 			}
 		}
@@ -705,15 +715,13 @@ class CodeStream {
 	*/
 	function makeCode($buffer, $name_var=null){
 
-		//Блок разбора по токеном
-		//$this->tokens = getTokens($buffer);
 		$tokenStream = new TokenStream($buffer);
-		$restoken = $tokenStream->CodeToTokens();
-		if ($restoken !== true) {
-			return $restoken; //возврат ошибки разбора
+		$resToken = $tokenStream->CodeToTokens();
+		if ($resToken !== true) {
+			return $resToken; //возврат ошибки разбора
 		}
-		$this->functions1С = $tokenStream->functions1C;
-		$this->identypes = $tokenStream->identypes;
+		$this->functions1C = $tokenStream->functions1C;
+		$this->keywords = $tokenStream->identypes;
 		$this->tokens = $tokenStream->tokens;
 
 		//var_dump($this->tokens);
@@ -732,11 +740,8 @@ class CodeStream {
 				if(isset($name_var)){
 					if(fEnglishVariable) $name_var = str_replace(php1C_LetterLng, php1C_LetterEng, $name_var);
 					$name_var = mb_strtoupper($name_var);
-                    $REZULTAT = "";
-					//eval($this->codePHP.' php1C\\Message($'.$name_var.');');
-				 	//return '';
-                    //eval("\$name_var = \"$str\";");
-                    eval($this->codePHP);
+                    $REZULTAT = "$name_var";
+					eval($this->codePHP);
                     return $REZULTAT;
 				}
 				else return $this->codePHP;
@@ -753,7 +758,7 @@ class CodeStream {
 /**
 * Запуск получения кода PHP
 *
-* @param string $buffer строка код для преобразоания
+* @param string $buffer строка код для преобразования
 * @param string $name_var имя переменной для вывода результата выполнения кода
 */
 function makeCode($buffer, $name_var = null){
@@ -761,48 +766,3 @@ function makeCode($buffer, $name_var = null){
  	$result = $stream->makeCode($buffer, $name_var);
 	return $result;
 }
-// function makeCode($buffer, $name_var=null){
-
-// 		//Блок разбора по токеном
-// 		//$this->tokens = getTokens($buffer);
-// 		$tokenStream = new TokenStream($buffer);
-// 		$restoken = $tokenStream->CodeToTokens();
-// 		if ($restoken !== true) {
-// 			return $restoken; //возврат ошибки разбора
-// 		}
-// 		$stream = new CodeStream($tokenStream);
-// 		//$stream->functions1С = $tokenStream->functions1С;
-// 		//$stream->identypes = $tokenStream->identypes;
-// 		//$stream->tokens = $tokenStream->tokens;
-
-// 		//var_dump($stream->tokens);
-// 		//return "";
-		
-// 		//Блок преобразования в код php
-// 		try{
-// 			$stream->code = '';
-// 			$stream->codePHP = '';
-// 			$stream->GetChar();
-// 			if($stream->Type !== TokenStream::type_end_code){
-
-// 				$stream->continueCode();
-
-// 				//Вывод результата переменной
-// 				if(isset($name_var)){
-// 					if(fEnglishVariable) $name_var = str_replace(php1C_LetterLng, php1C_LetterEng, $name_var);
-// 					$name_var = mb_strtoupper($name_var);
-// 					eval($stream->codePHP.' php1C\\Message($'.$name_var.');');
-// 				 	return '';
-// 				}
-// 				else return $stream->codePHP;
-// 			}  
-// 			else return ""; //стиль 1С нет ошибки
-// 		}
-// 		catch (Exception $e) {
-// 			$token = $stream->tokens[$stream->itoken-1];
-//     		return (" {(".$token->row.",".$token->col.")}: ".$e->getMessage()); //стиль ошибки 1С
-// 		}
-//  	}
-
-
-

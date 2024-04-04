@@ -183,22 +183,23 @@ class TokenStream {
 
 	}
 
-	/**
-	* Добавление функций модуля в общую таблицу функций
-	*
-    * @param $funcRus array массив русских названий функций
-    * @param $funcEng array массив английских названий функций
-    * @return int возвращаем верхнюю границу модуля в общем списке 
-	*/
-	private function AddModule( $func, $funcPHP ){
-		if(is_array($func) && is_array($funcPHP) ){
+    /**
+     * Добавление функций модуля в общую таблицу функций
+     *
+     * @param array $func
+     * @param array $funcPHP
+     * @return int возвращаем верхнюю границу модуля в общем списке
+     */
+	private function AddModule( array $func, array $funcPHP ): int
+    {
+		//if(is_array($func) && is_array($funcPHP) ){
 			foreach ($func as $value) {
 				$this->functions1C['lng'][] = mb_strtoupper($value);
 			}
 			foreach ($funcPHP as $value) {
 				$this->functions1C['php'][] = $value;
 			}
-		}
+		//}
 		return count($this->functions1C['php']);
 	}
 

@@ -1,8 +1,8 @@
 <?php
 /**
-* Модуль работы c универсальными коллекциями значений 1С
+* Модуль работы с универсальными коллекциями значений 1С
 * 
-* Модуль для работы с массивами, структурами  в 1С и функциями для работы с ними
+* Модуль для работы с массивами, структурами в 1С и функциями для работы с ними
 * для будущего (соответствиями, списком значений, таблица значений)
 * 
 * @author  sikuda@yandex.ru
@@ -50,9 +50,9 @@ function callCollectionType(string $key, array $arguments)
  * @param array $arguments аргументы функции в массиве
  * @throws Exception
  */
-function callCollectionFunction($context, $key, $arguments)
+function callCollectionFunction($context, string $key, $arguments="")
 {
-	if($context === null){
+    if($context === null){
 	    throw new Exception("Неизвестная функция работы с коллекциями ".$key);
 	}
 	else{
@@ -84,10 +84,10 @@ function callCollectionFunction($context, $key, $arguments)
 			case 'Sort(': return $context->Sort($arguments[0], $arguments[1]);
 			case 'Del(': return $context->Del($arguments[0]);
 			default:
-				throw new Exception("Нет обработки функции для объекта коллекции ".$key."");
+				throw new Exception("Нет обработки функции для объекта коллекции ".$key);
 			}
 		}else{
-			throw new Exception("Не найдена функция у объекта коллекции  ".$key."");
+			throw new Exception("Не найдена функция у объекта коллекции  ".$key);
 		}
 	}
 }
@@ -102,14 +102,20 @@ function Array1C($args): Array1C
 	return new Array1C($args);
 }
 
+class undefined1C
+{
+    function __toString(){
+        return php1C_Undefined;
+    }
+}
+
+
 /**
 * Класс для работы с массивом 1С
 *
 */
 class Array1C{
-	/**
-	* @var array внутреннее хранение массива
-	*/
+
 	private array $value; //array of PHP
 
 	function __construct($counts=null, $copy=null){
@@ -132,13 +138,15 @@ class Array1C{
 		return "Массив";
 	}
 
-	function toArray(){
+	function toArray(): array
+    {
 		return $this->value;
 	}
 
-	function UBound(){
+	function UBound(): int
+    {
 		$key = count($this->value);
-		if(is_null($key) ) return -1;
+		if(isset($this->value) ) return -1;
 		else return $key-1;  
 	}
 
@@ -151,7 +159,8 @@ class Array1C{
 		return $this;
 	}
 
-	function Count(){
+	function Count(): int
+    {
 		return count($this->value);
 	}
 
@@ -162,10 +171,8 @@ class Array1C{
 	}
 
 	function Clear(){
-		//tocheck
 		unset($this->value);
 		$this->value = array();
-		//return array_filter($this->value, function(){ return FALSE;});
 	}
 
 	function Get($index){
@@ -173,13 +180,17 @@ class Array1C{
 	}
 
 	function Del($index){
-		//array_splice($this->value, $index, 1);
-	    unset($this->value[$index]);
+		unset($this->value[$index]);
 	}
 
 	function Set($index, $val){
 		$this->value[$index] = $val;
 	}
+
+    public function getArray()
+    {
+        return $this->value;
+    }
 }
 
 //------------------------------------------------------------------------------------------
@@ -188,10 +199,11 @@ class Array1C{
 * Получение структуры 1С 
 *
 * @param array $cnt аргументы функции в массиве
-* @return возвращает новый объект массива 1С
+* @return - возвращает новый объект массива 1С
 *
 */
-function Structure1C($args=null){
+function Structure1C($args=null): Structure1C
+{
 	return new Structure1C($args);
 }
 
@@ -238,7 +250,13 @@ class Structure1C{
 		return count($this->value);
 	}
 
-	function Property($key, $value=null){
+    /**
+     * @param $key
+     * @param $value
+     * @return bool
+     */
+    function Property($key, &$value): bool
+    {
 		if( fEnglishVariable ) $key = str_replace(php1C_LetterLng, php1C_LetterEng, $key);
 		$key = mb_strtoupper($key);
 		$value = $this->value[$key];
@@ -246,7 +264,6 @@ class Structure1C{
 	}
 
 	function Clear(){
-		//tocheck
 		unset($this->value);
 		$this->value = array();
 	}
@@ -277,13 +294,14 @@ class Structure1C{
 //------------------------------------------------------------------------------------------
 
 /**
-* Получение соответствия 1С 
-*
-* @param array $cnt аргументы функции в массиве
-* @return возвращает новый объект массива 1С
-*
-*/
-function Map1C($args=null){
+ * Получение соответствия 1С
+ *
+ * @param null $args
+ * @return Map1C - возвращает новый объект массива 1С
+ *
+ */
+function Map1C($args=null): Map1C
+{
 	return new Map1C($args);
 }
 
@@ -291,10 +309,8 @@ function Map1C($args=null){
 * Класс для работы со структурой 1С
 */
 class Map1C{
-	/**
-	* @var array внутренее хранение массива
-	*/
-	private $value; //array of PHP 
+
+	private array $value; //array of PHP
 
 	function __construct($args=null,$copy=null){
 
@@ -313,7 +329,8 @@ class Map1C{
 		}
 	}
 
-	function toArray(){
+	function toArray(): array
+    {
 		return $this->value;
 	}
 
@@ -326,11 +343,13 @@ class Map1C{
 		$this->value[strtoupper($key)] = $val;
 	}
 
-	function Count(){
+	function Count(): int
+    {
 		return count($this->value);
 	}
 
-	function Property($key, $value=null){
+	function Property($key, $value=null): bool
+    {
 		if( fEnglishVariable ) $key = str_replace(php1C_LetterLng, php1C_LetterEng, $key);
 		$key = strtoupper($key);
 		$value = $this->value[$key];
@@ -338,7 +357,6 @@ class Map1C{
 	}
 
 	function Clear(){
-		//tocheck
 		unset($this->value);
 		$this->value = array();
 	}
@@ -371,7 +389,7 @@ class Map1C{
 * Получение ТаблицыЗначений
 *
 * @param array $args аргументы функции в массиве
-* @return возвращает новый объект ТаблицаЗначений1С
+* @return - возвращает новый объект ТаблицаЗначений1С
 *
 */
 function ValueTable($args=null){
@@ -384,12 +402,12 @@ function ValueTable($args=null){
 */
 class ValueTable{
 	
-	private $rows;   //array of ValueTableRow
-	public $COLUMNS; //ValueTableColumnCollection - collection of ValueTableColumn
-	public $КОЛОНКИ;
+	private array $rows;   //array of ValueTableRow
+	public ValueTableColumnCollection $COLUMNS; //ValueTableColumnCollection - collection of ValueTableColumn
+	//public $КОЛОНКИ;
 	public $KOLONKI;
 	public $INDEXES; //CollectionIndexes коллекция из CollectionIndex
-	public $ИНДЕКСЫ;
+	//public $ИНДЕКСЫ;
 	public $INDEKSYY;
 	
 	function __construct($args=null,$copy=null){
@@ -398,10 +416,10 @@ class ValueTable{
 		else{	
 			$this->rows = array();
 			$this->COLUMNS = new ValueTableColumnCollection($this);
-			$this->КОЛОНКИ = &$this->COLUMNS;
+			//$this->КОЛОНКИ = &$this->COLUMNS;
 			$this->KOLONKI = &$this->COLUMNS;
 			$this->INDEXES = new CollectionIndexes($this);
-			$this->ИНДЕКСЫ = &$this->INDEXES;
+			//$this->ИНДЕКСЫ = &$this->INDEXES;
 			$this->INDEKSYY = &$this->INDEXES;
 		}
 	}
@@ -411,29 +429,37 @@ class ValueTable{
 		else return "ТаблицаЗначений";
 	}
 
-	function toArray(){
+	function toArray(): array
+    {
 		return $this->rows;
 	}
 
 	//Добавить новую строку в таблицу
-	function Add(){
+	function Add(): ValueTableRow
+    {
 		$row = new ValueTableRow($this);
 		$this->rows[] = $row;
 		return $row;
 	}
 
 	//Вставить новую строку в таблицу
-	function Insert($index){
+
+    /**
+     * @throws Exception
+     */
+    function Insert($index): ValueTableRow
+    {
 		if(is_int($index)){
 			$row = new ValueTableRow($this);
 			$this->rows[$index] = $row;
 			return $row;
 		}
-		else  new Exception("Индекс задан неверно");	
+		else  throw new Exception("Индекс задан неверно");
 	}
 
 	//Выгрузка колонки в Array1C
 	function UnloadColumn($col){
+        $array = new Array1C;
 		if(is_int($col)){
 			$col = $this->COLUMNS->cols[$col];
 		}elseif (is_string($col)) {
@@ -442,13 +468,12 @@ class ValueTable{
 		}
 		else throw new Exception("Не задана колонка для выгрузки ".$col);
 		if(is_object($col) && get_class($col) === 'php1C\ValueTableColumn'){
-			$array = new Array1C;
 			foreach ($this->rows as $key => $value) {
 				$val = $value->Get($col->NAME);
 				$array->Add($val);
 			}
-			return $array;
 		}
+        return $array;
 	}
 
 	//Загрузка колонки из Array1C
@@ -557,7 +582,7 @@ class ValueTable{
 
 	//Очистить значения таблицы
 	function Clear(){
-		$this->rows->setValueTable(null);
+		$this->COLUMNS->setValueTable(null);
 		unset($this->rows);
 		$this->rows = array();
 	}
@@ -578,7 +603,7 @@ class ValueTable{
 	}
 
 	//Для установки данных через точку
-	function Set($key, $val=null){
+	function Set($key, \php1C\ValueTableColumnCollection $val){
 		if(is_string($key)){
 			if( fEnglishVariable ) $key = str_replace(php1C_LetterLng, php1C_LetterEng, $key);
 			$key = strtoupper($key);
@@ -660,7 +685,7 @@ class ValueTable{
 	*
 	* @param Array1C $rows массив строк для выгрузки
 	* @param string $cols строка перечисления колонок
-	* @return возвращает новый объект ТаблицаЗначений1С
+	* @return - возвращает новый объект ТаблицаЗначений1С
 	*/
 	function Copy($rows=null, $strcols=null){
 		if(isset($row) && (!is_object($rows) || get_class($rows) !== 'php1C\Array1C')) throw new Exception("Первый параметр должен быть массивом строк или пустым");
@@ -683,7 +708,7 @@ class ValueTable{
 	* Скопировать пустые колонки ТаблицуЗначений в новую ТаблицуЗначений
 	*
 	* @param string $strcols строка перечисления колонок
-	* @return возвращает новый объект ТаблицаЗначений1С
+	* @return - возвращает новый объект ТаблицаЗначений1С
 	*/
 	function CopyColumns($strcols){
 		if(!isset($strcols)) $strcols = $this->GetAllColumns();
@@ -697,22 +722,23 @@ class ValueTable{
 		return $array;
 	}
 
-	/**
-	* Отсортировать таблицу значений по стоке с колонками
-	* 
-	* @param strcols string строка перечислений колонов и порядка сортировки ("Товар, Цена Убыв")
-	* @param cmp_object объект сортировки //TODO
-	*/
-	function Sort($strcols, $cmp_object=null){
+    /**
+     * Отсортировать таблицу значений по стоке с колонками
+     *
+     * @param string @strcols string строка перечислений колонов и порядка сортировки ("Товар, Цена Убыв")
+     * @param @cmp_object объект сортировки //TODO
+     * @throws Exception
+     */
+	function Sort($strolls, $cmp_object=null){
 
 		if (isset($cmp_object)) throw new Exception("Пока нет реализации по объекту сравнения");
 
-		if(!isset($strcols)) $strcols = $this->GetAllColumns();
-		if( fEnglishVariable ) $strcols = str_replace(php1C_LetterLng, php1C_LetterEng, $strcols);
-		if(!is_string($strcols)) throw new Exception("Первый параметр должен быть обязаельно заполнен наименованиями колонок");
+		if(!isset($strolls)) $strolls = $this->GetAllColumns();
+		if( fEnglishVariable ) $strolls = str_replace(php1C_LetterLng, php1C_LetterEng, $strolls);
+		if(!is_string($strolls)) throw new Exception("Первый параметр должен быть обязаельно заполнен наименованиями колонок");
 		$this->sort = array();
 		$this->sortdir = array();
-		$pairs = explode(',',$strcols);
+		$pairs = explode(',',$strolls);
 		foreach ($pairs as $pair) {
 		 	$keys = explode(' ',$pair);
 		  	$col = strtoupper(trim($keys[0]));
@@ -778,19 +804,23 @@ class ValueTableColumnCollection{
 		return "КоллекцияКолонокТаблицыЗначений";
 	}
 
-	function Add($key=null){
+    /**
+     * @throws Exception
+     */
+    function Add($key=null){
 		if(!isset($key)) $key = ''; //пустые имена колонок в 1С допустимы.
 		if(is_string($key)){
 			if( fEnglishVariable ) $key = str_replace(php1C_LetterLng, php1C_LetterEng, $key);		
 			$key = strtoupper($key);
 			$this->cols[$key] = new ValueTableColumn($key);
 		}
-		else  new Exception("Имя колонки должно быть строкой");	
+		else  throw new Exception("Имя колонки должно быть строкой");
 	}
 
 	function Count(){
 		return count($this->cols);
 	}
+
 }
 
 /**
@@ -803,11 +833,11 @@ class ValueTableColumn{
 	* @var array коллекция значений в колонке
 	*/
 	public $NAME; 
-	public $ИМЯ;
+	//public $ИМЯ;
 
 	function __construct($val=null){
 		$this->NAME = $val;
-		$this->ИМЯ  = &$this->NAME;
+		//$this->ИМЯ  = &$this->NAME;
 	}
 
 	function __toString(){
@@ -825,7 +855,7 @@ class ValueTableRow{
 	/**
 	* @var array коллекция значений в строке
 	*/
-	private $ValueTable; //parent  
+	private ValueTable $ValueTable; //parent
 	private $row;        //array of fields
 
 	function __construct($args=null){
@@ -878,7 +908,7 @@ class CollectionIndexes{
 
 	function __construct($parent){
 	 	$this->ValueTable = &$parent;
-	 	$this->indexs = array();
+	 	$this->indexs = CollectionIndex();
 	}
 
 	function __toString(){
@@ -900,7 +930,7 @@ class CollectionIndexes{
 		if(is_string($key)){
 			if( fEnglishVariable ) $key = str_replace(php1C_LetterLng, php1C_LetterEng, $key);
 			$key = strtoupper($key);
-			$this->cols[$key] = new CollectionIndex($key);
+			$this->indexs[$key] = new CollectionIndex($key);
 		}
 		else  throw new Exception("Имя колонки должно быть строкой");
 	}
@@ -913,7 +943,7 @@ class CollectionIndexes{
 	function Clear(): void
     {
 		unset($this->indexs);
-		$this->indexs = array();
+		$this->indexs = CollectionIndex();
 	}
 
 	function Del($key): void
@@ -928,13 +958,10 @@ class CollectionIndexes{
 * Индекс коллекции(пока пустая реальзация для ТаблицыЗначений)
 */
 class CollectionIndex{
-	/**
-	* @var array коллекция значений в строке
-	*/
-	private $name;
-	function __construct($col){
+	private string $name;
+    function __construct(string $col){
 	 	$this->name = $col;
-	}
+    }
 
 	function __toString(){
 	 	return "ИндексКоллекции";

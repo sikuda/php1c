@@ -4,11 +4,10 @@
 * Скрипт для обмена выполняемого кода по 1С (обработка UnitTests.epf)
 *
 */
-//ini_set('display_errors', 0);
-//ini_set('display_startup_errors', 0);
-//error_reporting(0);
+ini_set('display_errors', 0);
+ini_set('display_startup_errors', 0);
+error_reporting(0);
 
-$Language1C = 'ru';
 if(isset($_GET["lang"])) $Language1C = $_GET["lang"];
 require_once('src/php1C__code.php');
 
@@ -32,4 +31,4 @@ require_once('src/php1C__code.php');
 	        } 
 	    }
 	}	
-	echo $str;
+	echo \php1C\toString1C($str);

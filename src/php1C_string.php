@@ -1,96 +1,99 @@
-<?php
+<?php /** @noinspection ALL */
+
 /**
 * Модуль работы со строками 1С
 * 
 * Модуль функций для со строками 1С. (Устаревшая Найти в Общем модуле)
 * 
-* @author  sikuda admin@sikuda.ru
-* @version 0.1
+* @author  sikuda@yandex.ru
+* @version 0.3
 */
 namespace php1C;
 use Exception;
 require_once('php1C_collections.php'); //для функций СтрРазделить, СтрСоединить
 
 /**
-* Массив названий английских функций для работы со строками. Соответстует элементам русским функций.
+* Массив названий английских функций для работы со строками. Соответствует элементам русским функций.
 */   
 const php1C_functionsPHP_String = array('StrLen(',  'TrimL(','TrimR(','TrimLR(','Left(','Right(','Mid(','StrFind(','Lower(','Upper(','Title(','Char(','CharCode(',   'IsBlankString(','StrReplace(', 'StrLineCount(', 'StrGetLine(',      'StrOccurrenceCount(','StrCompare(', 'StrStartsWith(', 'StrEndsWith(',                     'StrSplit(', 'StrConcat(');
 
 /**
-* Вызывает функцию работы с датой
-*
-* @param string $key строка названии функции со скобкой
-* @param array $arguments аргументы функции в массиве
-* @return возвращает результат функции или выбрасывает исключение
-*/
-function callStringFunction($key, $arguments){
-	switch($key){
-		case 'StrLen(': return StrLength($arguments[0]);
-		case 'TrimL(': return TrimL($arguments[0]);
-		case 'TrimR(': return TrimR($arguments[0]);
-		case 'TrimLR(': return TrimLR($arguments[0]);
-		case 'Left(': return Left($arguments[0], $arguments[1]);
-		case 'Right(': return Right($arguments[0], $arguments[1]);
-		case 'Mid(': return Mid($arguments[0], $arguments[1], $arguments[2]);
-		case 'StrFind(': return StrFind($arguments[0], $arguments[1], $arguments[2],$arguments[3],$arguments[4]);
-		case 'Lower(': return Lower($arguments[0]);
-		case 'Upper(': return Upper($arguments[0]);
-		case 'Title(': return Title($arguments[0]);
-		case 'Char(': return Char($arguments[0]);
-		case 'CharCode(': return CharCode($arguments[0], $arguments[1]);
-		case 'IsBlankString(': return IsBlankString($arguments[0]);
-		case 'StrReplace(': return StrReplace($arguments[0], $arguments[1],$arguments[2]);
-		case 'StrLineCount(': return StrLineCount($arguments[0]);
-		case 'StrGetLine(': return StrGetLine($arguments[0], $arguments[1]);
-		case 'StrOccurrenceCount(': return StrOccurrenceCount($arguments[0], $arguments[1]);
-		case 'StrCompare(': return StrCompare($arguments[0], $arguments[1]);
-		case 'StrStartsWith(': return StrStartsWith($arguments[0], $arguments[1]);
-		case 'StrEndsWith(': return StrEndsWith($arguments[0], $arguments[1]);
-		case 'StrSplit(': return StrSplit($arguments[0], $arguments[1],$arguments[2]);
-		case 'StrConcat(': return StrConcat($arguments[0], $arguments[1]);
-		default:
-			throw new Exception("Неизвестная функция работы со строкой ".$key."");
-			break;
-	}
-}	
+ * Вызывает функцию работы с датой
+ *
+ * @param string $key строка в названии функции со скобкой
+ * @param array $arguments аргументы функции в массиве
+ * @throws Exception
+ */
+//function callStringFunction(string $key, array $arguments){
+//	switch($key){
+//		case 'StrLen(': return StrLength($arguments[0]);
+//		case 'TrimL(': return TrimL($arguments[0]);
+//		case 'TrimR(': return TrimR($arguments[0]);
+//		case 'TrimLR(': return TrimLR($arguments[0]);
+//		case 'Left(': return Left($arguments[0], $arguments[1]);
+//		case 'Right(': return Right($arguments[0], $arguments[1]);
+//		case 'Mid(': return Mid($arguments[0], $arguments[1], $arguments[2]);
+//		case 'StrFind(': return StrFind($arguments[0], $arguments[1], $arguments[2],$arguments[3],$arguments[4]);
+//		case 'Lower(': return Lower($arguments[0]);
+//		case 'Upper(': return Upper($arguments[0]);
+//		case 'Title(': return Title($arguments[0]);
+//		case 'Char(': return Char($arguments[0]);
+//		case 'CharCode(': return CharCode($arguments[0], $arguments[1]);
+//		case 'IsBlankString(': return IsBlankString($arguments[0]);
+//		case 'StrReplace(': return StrReplace($arguments[0], $arguments[1],$arguments[2]);
+//		case 'StrLineCount(': return StrLineCount($arguments[0]);
+//		case 'StrGetLine(': return StrGetLine($arguments[0], $arguments[1]);
+//		case 'StrOccurrenceCount(': return StrOccurrenceCount($arguments[0], $arguments[1]);
+//		case 'StrCompare(': return StrCompare($arguments[0], $arguments[1]);
+//		case 'StrStartsWith(': return StrStartsWith($arguments[0], $arguments[1]);
+//		case 'StrEndsWith(': return StrEndsWith($arguments[0], $arguments[1]);
+//		case 'StrSplit(': return StrSplit($arguments[0], $arguments[1],$arguments[2]);
+//		case 'StrConcat(': return StrConcat($arguments[0], $arguments[1]);
+//		default:
+//			throw new Exception("Неизвестная функция работы со строкой ".$key);
+//	}
+//}
 
 // -----------------------------------------------------------------------------------------------------------
 
 /**
-* Возращает длину строки текста
+* Возвращает длину строки текста
 *
-* @param  string обычно строкаа 
-* @return float длина строки 
+* @param  string $arg обычно строка обычно русская
+* @return int длина строки
 */
-function StrLength( $arg ){
-	return strlen($arg);
+function StrLength( string $arg ): int
+{
+	return mb_strlen($arg);
 }
 
 /**
-* Возращает строку без левых пробелов
+* Возвращает строку без левых пробелов
 *
-* @param  string $arg cтрока
-* @return string строка 
+* @param string $arg
+* @return string
 */
-function TrimL( $arg ){
+function TrimL(string $arg ): string
+{
 	return ltrim($arg);
 }
 
 /**
-* Возращает строку без правых пробелов(и др спец. символов пробелов)
+* Возвращает строку без правых пробелов(и др спец. символов пробелов)
 *
-* @param  string $arg cтрока
-* @return string строка  
+* @param string $arg
+* @return string
 */
-function TrimR( $arg ){
+function TrimR(string $arg ): string
+{
 	return rtrim($arg);
 }
 
 /**
-* Возращает строку без левых и правых пробелов
+* Возвращает строку без левых и правых пробелов
 *
-* @param string $arg cтрока
-* @return string строка  
+* @param string $arg
+* @return string
 */
 function TrimLR(string $arg ): string
 {
@@ -98,190 +101,166 @@ function TrimLR(string $arg ): string
 }
 
 /**
-* Возращает строку в количестве $arg2 левых элементов строки $arg1
+* Возвращает строку в количестве $arg2 левых элементов строки $arg1
 *
-* @param  $arg1 string cтрока 
-* @param  $arg2 int количество элементов строки 
+* @param  $arg1 string
+* @param  $arg2 int - количество элементов строки
 * @return string строка  
 */
-function Left( $arg1, $arg2 ){
-	return substr($arg1, 0, $arg2);
+function Left(string $arg1, int $arg2 ): string
+{
+	return mb_substr($arg1, 0, $arg2);
 }
 
 /**
-* Возращает строку в количестве $arg2 правых элементов строки $arg1
+* Возвращает строку в количестве $arg2 правых элементов строки $arg1
 *
-* @param  $arg1 string cтрока 
+* @param  $arg1 string
 * @param  $arg2 int количество элементов строки 
 * @return string строка  
 */
-function Right( $arg1, $arg2 ){
-	return substr($arg1, count($arg1)-$arg2-1, $arg2);
+function Right(string $arg1, int $arg2 ):string {
+	return mb_substr($arg1, mb_strlen($arg1)-$arg2, $arg2);
 }
 
 /**
-* Возращает строку начиная с $arg2(счет с 1) в количестве $arg3 элементов строки $arg1
+* Возвращает строку начиная с $arg2(счет с 1) в количестве $arg3 элементов строки $arg1
 *
-* @param  $arg1 string cтрока 
+* @param  $arg1 string
 * @param  $arg2 int позиция первого элемента начиная с 1 
 * @param  $arg3 int количество элементов 
 * @return string строка  
 */
-function Mid( $arg1, $arg2, $arg3 ){
+function Mid(string $arg1, int $arg2, int $arg3 ): string
+{
 	if($arg2<=0) $arg2 = 1;
-	return substr($arg1, $arg2-1, $arg3);
+	return mb_substr($arg1, $arg2-1, $arg3);
 }
 
 //TODO - пока без трех последних параметров
 /**
-* Возращает строку начиная с $arg2(счет с 1) в количестве $arg3 элементов строки $arg1
-* 
-* @param  $arg1 string cтрока 
-* @param  $arg2 string подстрока поиска
-* @param  $arg3 <> направление поиска 
-* @param  $arg4 int начальная позиция поиска (если слева то с 1) 
-* @param  $arg5 int количество вхождений в поиск 
-* @return int найденная позиция в подстроке начиная с 1, если не нашел то 0  
-*/
-function StrFind($arg1,$arg2,$arg3=1,$arg4=1,$arg5=1){
-	$res = strpos($arg1, $arg2);
+ * Возвращает строку начиная с $arg2(счет с 1) в количестве $arg3 элементов строки $arg1
+ *
+ * @param  $arg1 string
+ * @param  $arg2 string подстрока поиска
+ * @param  $arg3 int <> направление поиска
+ * @param  $arg4 int начальная позиция поиска (если слева то с 1)
+ * @param  $arg5 int количество вхождений в поиск
+ * @return int найденная позиция в подстроке начиная с 1, если не нашел то 0
+ * @throws Exception
+ */
+function StrFind(string $arg1, string $arg2, int $arg3=0, int $arg4=0, int $arg5=0): int
+{
+    if ($arg3 <> 0 || $arg4 <> 0 || $arg5 <> 0) throw new Exception("Еще не реализовано");
+	$res = mb_strpos($arg1, $arg2);
 	if($res === false) return 0;
 	else return $res+1;
 }
 
 /**
-* Возращает строку без нижнем регистре
+* Возвращает строку в нижнем регистре
 *
-* @param  string cтрока 
+* @param string $arg
 * @return string строка 
 */
-function Lower( $arg ){
-	return strtolower($arg);
+function Lower(string $arg ): string
+{
+	return mb_strtolower($arg);
 }
 
 /**
-* Возращает строку без верхнем регистре
+* Возвращает строку в верхнем регистре
 *
-* @param  string cтрока 
+* @param string $arg
 * @return string строка 
 */
-function Upper( $arg ){
-	return strtoupper($arg);
+function Upper(string $arg ): string
+{
+	return mb_strtoupper($arg);
 }
 
 /**
-* Возращает строку все первые буквы слов в верхнем регистре
+* Возвращает строку все первые буквы слов в верхнем регистре
 *
-* @param  string $str начальная cтрока 
+* @param string $str
 * @return string полученная строка 
 */
-function Title( $str ){
-	$len = strlen($str);
-	$str = strtoupper(substr($str,0,1)).substr($str,1);
+function Title(string $str ): string
+{
+	$len = mb_strlen($str);
+	$str = mb_strtoupper(mb_substr($str,0,1)).mb_substr($str,1);
 	for ($i=0; $i < $len; $i++) {
 		if($i<($len-1)){ 
-			if( strpos("\r\n\t ", substr($str,$i,1)) !== false) 
-				$str = substr($str,0,$i+1).strtoupper(substr($str,$i+1,1)).substr($str,$i+2);
-			else $str = substr($str,0,$i+1).strtolower(substr($str,$i+1,1)).substr($str,$i+2);
+			if( mb_strpos("\r\n\t ", mb_substr($str,$i,1)) !== false)
+				$str = mb_substr($str,0,$i+1).mb_strtoupper(mb_substr($str,$i+1,1)).mb_substr($str,$i+2);
+			else $str = mb_substr($str,0,$i+1).mb_strtolower(mb_substr($str,$i+1,1)).mb_substr($str,$i+2);
 		}	
 	}
 	return $str;
 }
 
 /**
-* Возращает строку из кода символа
+* Возвращает строку из кода символа
 *
-* @param  int dec код символа 
+* @param  $dec int код символа
 * @return string строка 
 */
-function Char( $dec ){
-	//us1.php.net/manual/ru/function.chr.php#55978
-	if ($dec < 128) { 
-		$utf = chr($dec); 
-	} else if ($dec < 2048) { 
-		$utf = chr(192 + (($dec - ($dec % 64)) / 64)); 
-		$utf .= chr(128 + ($dec % 64)); 
-	} else { 
-		$utf = chr(224 + (($dec - ($dec % 4096)) / 4096)); 
-		$utf .= chr(128 + ((($dec % 4096) - ($dec % 64)) / 64)); 
-		$utf .= chr(128 + ($dec % 64)); 
-	} 
-	return $utf;
+function Char(int $dec ): string
+{
+    return mb_chr($dec);
 }
 
 /**
-* Возращает код символа из буквы строки
-*
-* @param  string str входящая строка
-* @param  string num номер символа в стрке начиная с 1 
-* @return int код символа 
-*/
-function CharCode( $str, $num_letter=1){
-
-	if(!isset($num_letter)) $num_letter = 1;
-	if(!is_numeric($num_letter) || $num_letter<1) return -1;
-	$character = substr($str, $num_letter-1);
-	//get from drupal https://api.drupal.org/api/drupal/core%21lib%21Drupal%21Component%21Transliteration%21PhpTransliteration.php/function/PhpTransliteration%3A%3AordUTF8/8.2.x
-	$first_byte = ord($character[0]);
-	if (($first_byte & 0x80) == 0) {
-
-	// Single-byte form: 0xxxxxxxx.
-	return $first_byte;
-	}
-	if (($first_byte & 0xe0) == 0xc0) {
-
-	// Two-byte form: 110xxxxx 10xxxxxx.
-	return (($first_byte & 0x1f) << 6) + (ord($character[1]) & 0x3f);
-	}
-	if (($first_byte & 0xf0) == 0xe0) {
-
-	// Three-byte form: 1110xxxx 10xxxxxx 10xxxxxx.
-	return (($first_byte & 0xf) << 12) + ((ord($character[1]) & 0x3f) << 6) + (ord($character[2]) & 0x3f);
-	}
-	if (($first_byte & 0xf8) == 0xf0) {
-
-	// Four-byte form: 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx.
-	return (($first_byte & 0x7) << 18) + ((ord($character[1]) & 0x3f) << 12) + ((ord($character[2]) & 0x3f) << 6) + (ord($character[3]) & 0x3f);
-	}
-
-	// Other forms are not legal.
-	return -1;
+ * Возвращает код символа из буквы строки
+ *
+ * @param string $str входящая строка
+ * @param int $num_letter
+ * @return int код символа
+ */
+function CharCode(string $str, int $num_letter=1): int
+{
+    if($num_letter<1 || $num_letter>mb_strlen($str)) return -1;
+    $character = mb_substr($str, $num_letter-1);
+    return mb_ord($character);
 }
 
 /**
 * Проверяет строку на пустоту
 *
-* @param  string $arg входящая строка
+* @param string $arg входящая строка
 * @return bool строка пустая 
 */
-function IsBlankString($arg){
-	return strlen($arg) == 0;
+function IsBlankString(string $arg): bool
+{
+	return mb_strlen($arg) == 0;
 }
 
 /**
-* Возращает строку замены одного шаблона другим
+* Возвращает строку замены одного шаблона другим
 *
-* @param  string arg1 исходная строка
-* @param  string arg2 строка поиска
-* @param  string arg3 строка замены 
+* @param string $arg1 arg1 исходная строка
+* @param string $arg2 arg2 строка поиска
+* @param string $arg3 arg3 строка замены
 * @return string результат замены  
 */
-function StrReplace($arg1, $arg2,$arg3){
+function StrReplace(string $arg1, string $arg2, string $arg3): string
+{
 	return str_replace($arg2, $arg3, $arg1);
 }
 
 /**
-* Возращает код символа из буквы строки
+* Возвращает код символа из буквы строки
 *
-* @param  string str входящая строка
-* @return int количество строк с строке
+* @param string $str str входящая строка
+* @return int количество строк в строке
 */
-function StrLineCount($str){
+function StrLineCount(string $str): int
+{
 	return substr_count($str, chr(10)) + 1;
 }
 
 /**
-* Возращает num(начиная с 1) строку из общей строки
+* Возвращает num(начиная с 1) строку из общей строки
 *
 * @param string $str str входящая строка
 * @param int $num num номер строки в общей строке
@@ -290,19 +269,19 @@ function StrLineCount($str){
 function StrGetLine(string $str, int $num): string
 {
 	while($num>1){
-		$pos = strpos($str, chr(10));
-		$str = substr($str, $pos+1);
+		$pos = mb_strpos($str, chr(10));
+		$str = mb_substr($str, $pos+1);
 		$num--;
 	}
-	$pos = strpos($str,chr(10));
+	$pos = mb_strpos($str,chr(10));
     if($pos !== false){
-		$str = substr($str, 0, $pos);	
+		$str = mb_substr($str, 0, $pos);
 	} 
 	return $str;
 }
 
 /**
-* Возращает число вхождений подстроки в строку
+* Возвращает число вхождений подстроки в строку
 *
 * @param string $str str входящая строка
 * @param string $substr substr подстрока поиска
@@ -314,7 +293,7 @@ function StrOccurrenceCount(string $str, string $substr): int
 }
 
 /**
-* Возращает число вхождений подстроки в строку
+* Возвращает число вхождений подстроки в строку
 *
 * @param string $str1 str1 первая строка
 * @param string $str2 str2 вторая строка
@@ -329,21 +308,21 @@ function StrCompare(string $str1, string $str2): int
 }
 
 /**
-* Возращает число вхождений подстроки в строку
+* Возвращает число вхождений подстроки в строку
 *
-* @param  string $str str первая строка
-* @param  string $substr substr вторая строка
+* @param string $str str первая строка
+* @param string $substr substr вторая строка
 * @return bool число результат сравнения строк
 */
-function StrStartsWith($str, $substr): bool
+function StrStartsWith(string $str, string $substr): bool
 {
-	$res = strpos($str, $substr);
+	$res = mb_strpos($str, $substr);
 	if($res===0) return true;
 	else return false;
 }	
 
 /**
-* Возращает число вхождений подстроки в строку
+* Возвращает число вхождений подстроки в строку
 *
 * @param string $str str первая строка
 * @param string $substr substr вторая строка
@@ -351,17 +330,17 @@ function StrStartsWith($str, $substr): bool
 */
 function StrEndsWith(string $str, string $substr): bool
 {
-	$res = strrpos($str, $substr);
+	$res = mb_strrpos($str, $substr);
 	//return $res;
 	if($res == (strlen($str)-strlen($substr))) return true;
 	else return false;
 }
 
 /**
- * Возращает массив из подстрок общей строки
+ * Возвращает массив из подстрок общей строки
  *
  * @param string $str str общая строка
- * @param string $split spliter строка разделитель
+ * @param string $split строка разделитель
  * @return Array1C and empty включать в результат пустые строки
  * @throws Exception
  */
@@ -376,13 +355,13 @@ function StrSplit(string $str, string $split, $and_empty): Array1C
 }
 
 /**
-* Возращает массив из подстрок общей строки
+* Возвращает массив из подстрок общей строки
 *
 * @param  Array1C $array1C массив строк для объединения
-* @param string $split spliter строка разделитель
+* @param string $split строка разделитель
 * @return string объединенная получаемая строка   
 */
 function StrConcat(Array1C $array1C, string $split): string
 {
-	return implode($array1C->getArray(), $split);
+	return implode($split, $array1C->getArray());
 }
