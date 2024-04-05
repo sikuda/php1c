@@ -127,14 +127,14 @@ function toNumber1C(string $arg){
  */
 function add1C($arg1, $arg2){
 
-	if (is_string($arg1)) {
-        return $arg1 . $arg2;
-    }
-	elseif(is_bool($arg1) || is_numeric($arg1)){
+	if(is_bool($arg1) || is_numeric($arg1)){
 		if(is_bool($arg2) || is_numeric($arg2)) 
 			if(fPrecision1C) return bcadd($arg1,$arg2,Scale1C);
 			else return $arg1+$arg2;
 	}
+    elseif (is_string($arg1)) {
+        return $arg1 . $arg2;
+    }
 	elseif(is_object($arg1)){
 		if( (get_class($arg1) === 'php1C\Date1C') && is_numeric($arg2) && !is_string($arg2) ) return $arg1->add($arg2);
 	}
@@ -189,7 +189,11 @@ function div1C($arg1, $arg2){
 	if((is_bool($arg1) || is_numeric($arg1)) && (is_bool($arg2) || is_numeric($arg2)) ){
 		if(fPrecision1C){ 
 			if( bccomp($arg2, "0", Scale1C) === 0) throw new Exception("Деление на 0");
-			else return bcdiv($arg1,$arg2,Scale1C); 
+			else {
+                $scale = Scale1C;
+                if(is_int($arg1)) $scale = Scale1C_Int;
+                return bcround(bcdiv($arg1,$arg2,$scale+1), $scale);
+            }
 		}
 		else{
 			if(floatval($arg2) == 0) throw new Exception("Деление на 0");
@@ -197,6 +201,17 @@ function div1C($arg1, $arg2){
 		}
 	} 
 	throw new Exception("Преобразование значения к типу Число не может быть выполнено");
+}
+
+//https://www.php.net/manual/en/function.bcscale.php
+function bcround($number, $scale=0): string
+{
+    if($scale < 0) $scale = 0;
+    $sign = '';
+    if(bccomp('0', $number, 64) == 1) $sign = '-';
+    $increment = $sign . '0.' . str_repeat('0', $scale) . '5';
+    $number = bcadd($number, $increment, $scale+1);
+    return bcadd($number, '0', $scale);
 }
 
 /**

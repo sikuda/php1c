@@ -7,6 +7,7 @@
 */
 namespace php1C;
 
+const php1C_lang = "en";
 const php1C_Identifiers = '/^[_A-Za-z][_0-9A-Za-z]*/u';
 
 const php1C_LetterLng = array('A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q', 'R','S','T','U','V','W','X','Y','Z',

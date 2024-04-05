@@ -7,6 +7,7 @@
 */
 namespace php1C;
 
+const php1C_lang = "ua";
 const php1C_Identifiers = '/^[_A-Za-zА-Яа-яҐґЄєЇї][_0-9A-Za-zА-Яа-яҐґЄєЇї]*/u';
 
 //Для преобразования имен в английский

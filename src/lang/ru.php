@@ -7,6 +7,8 @@
 */
 namespace php1C;
 
+const php1C_lang = "ru";
+
 const php1C_Identifiers = '/^[_A-Za-zА-Яа-яЁё][_0-9A-Za-zА-Яа-яЁё]*/u';
 
 //Для преобразования имен в английский
