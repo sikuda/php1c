@@ -30,58 +30,6 @@ require_once('php1C_file.php');
 const php1C_functionsPHP_Com = array('Message(','Find(','ValueIsFilled(','Type(','TypeOf(','toString1C(','toNumber1C(');
 
 /**
- * Вызывает общие функции и функции объектов 1С
- *
- * @param $context - объект для вызова функции или null
- * @param string $key строка в названии функции со скобкой
- * @param array $arguments аргументы функции в массиве
- *
- * @throws Exception
- */
-//function callCommonFunction($context, string $key, array $arguments){
-//	if($context === null){
-//		switch($key){
-//		case 'Message(':
-//			if(isset($arguments[2])) throw new Exception("Ожидается ) ");
-//			Message($arguments[0]);
-//            break;
-//		case 'Find(':
-//			if(isset($arguments[2])) throw new Exception("Ожидается ) ");
-//			return Find($arguments[0], $arguments[1]);
-//		case 'ValueIsFilled(':
-//			if(isset($arguments[1])) throw new Exception("Ожидается ) ");
-//			return ValueIsFilled($arguments[0]);
-//		case 'Type(':
-//			if(isset($arguments[1])) throw new Exception("Ожидается ) ");
-//			return Type($arguments[0]);
-//		case 'TypeOf(':
-//			if(isset($arguments[1])) throw new Exception("Ожидается ) ");
-//			return TypeOf($arguments[0]);
-//		case 'toString1C(':
-//			if(isset($arguments[1])) throw new Exception("Ожидается ) ");
-//			return toString1C($arguments[0]);
-//		case 'toNumber1C(':
-//			if(isset($arguments[1])) throw new Exception("Ожидается ) ");
-//			return toNumber1C($arguments[0]);
-//		default:
-//			throw new Exception("Неизвестная общая функция ".$key);
-//		}
-//	}
-//	else{
-//		if( method_exists($context, substr($key, 0, -1) )){
-//			switch($key){
-//			case 'Find(':   return $context->Find($arguments[0]);
-//			default:
-//				throw new Exception("Нет обработки общей функции для объекта  ".$key);
-//			}
-//		}else{
-//			throw new Exception("Не найдена общая функция у объекта  ".$key);
-//		}
-//	}
-//    return false;
-//}
-
-/**
 * Выводит данные в представлении 1С (на установленном языке)
 * @param $arg
 * @return string Возвращаем значение как в 1С ('Да', 'Нет', Дату в формате 1С dd.mm.yyyy, 'Неопределенно' и другое
@@ -110,10 +58,10 @@ function toString1C($arg): string
 
 /**
 * Преобразует аргумент в число 
-* @param string $arg число как строка
+* @param string|float $arg число как строка
 * @return string|float Возвращаем значение числа как в 1С (string - для чисел повышенной точности, float - если повышенная точность не важна
 */  
-function toNumber1C(string $arg){
+function toNumber1C($arg){
 	if(fPrecision1C) return $arg;
 	else return floatval($arg);
 }
@@ -190,9 +138,9 @@ function div1C($arg1, $arg2){
 		if(fPrecision1C){ 
 			if( bccomp($arg2, "0", Scale1C) === 0) throw new Exception("Деление на 0");
 			else {
-                $scale = Scale1C;
-                if(is_int($arg1)) $scale = Scale1C_Int;
+                $scale = scaleLike1C($arg1);
                 return bcround(bcdiv($arg1,$arg2,$scale+1), $scale);
+                //return bcdiv($arg1,$arg2,$scale+1);
             }
 		}
 		else{
@@ -201,6 +149,17 @@ function div1C($arg1, $arg2){
 		}
 	} 
 	throw new Exception("Преобразование значения к типу Число не может быть выполнено");
+}
+
+function scaleLike1C(string $arg1):int
+{
+    $pos = strpos($arg1, ".");
+    if($pos === false) return  Scale1C_Int;
+    $pos1 = mb_strlen($arg1) - 1;
+    while(mb_substr($arg1,$pos1,1) == "0" && $pos1>$pos) $pos1--;
+    $pos = $pos1 - $pos;
+    if ($pos<10) return Scale1C;
+    else return intdiv($pos-10,9)*9+45;
 }
 
 //https://www.php.net/manual/en/function.bcscale.php

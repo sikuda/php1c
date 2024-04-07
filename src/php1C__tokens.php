@@ -2,8 +2,8 @@
 /**
 * Модуль для разбора кода 1С в массив токенов
 * 
-* @author  sikuda admin@sikuda.ru
-* @version 0.2 
+* @author  sikuda@yandex.ru
+* @version 0.3
 */
 
 namespace php1C;
@@ -323,7 +323,7 @@ class TokenStream {
 			}
 		}
 
-	    //Обработка метасимволов & или #
+	    //Обработка мета символов & или #
 		if ($ch === '&' || $ch === '#') {
 			$this->skipToEndLine();
 			return new Token(self::type_meta, $this->current());

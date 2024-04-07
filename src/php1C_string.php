@@ -17,43 +17,6 @@ require_once('php1C_collections.php'); //для функций СтрРазде�
 */   
 const php1C_functionsPHP_String = array('StrLen(',  'TrimL(','TrimR(','TrimLR(','Left(','Right(','Mid(','StrFind(','Lower(','Upper(','Title(','Char(','CharCode(',   'IsBlankString(','StrReplace(', 'StrLineCount(', 'StrGetLine(',      'StrOccurrenceCount(','StrCompare(', 'StrStartsWith(', 'StrEndsWith(',                     'StrSplit(', 'StrConcat(');
 
-/**
- * Вызывает функцию работы с датой
- *
- * @param string $key строка в названии функции со скобкой
- * @param array $arguments аргументы функции в массиве
- * @throws Exception
- */
-//function callStringFunction(string $key, array $arguments){
-//	switch($key){
-//		case 'StrLen(': return StrLength($arguments[0]);
-//		case 'TrimL(': return TrimL($arguments[0]);
-//		case 'TrimR(': return TrimR($arguments[0]);
-//		case 'TrimLR(': return TrimLR($arguments[0]);
-//		case 'Left(': return Left($arguments[0], $arguments[1]);
-//		case 'Right(': return Right($arguments[0], $arguments[1]);
-//		case 'Mid(': return Mid($arguments[0], $arguments[1], $arguments[2]);
-//		case 'StrFind(': return StrFind($arguments[0], $arguments[1], $arguments[2],$arguments[3],$arguments[4]);
-//		case 'Lower(': return Lower($arguments[0]);
-//		case 'Upper(': return Upper($arguments[0]);
-//		case 'Title(': return Title($arguments[0]);
-//		case 'Char(': return Char($arguments[0]);
-//		case 'CharCode(': return CharCode($arguments[0], $arguments[1]);
-//		case 'IsBlankString(': return IsBlankString($arguments[0]);
-//		case 'StrReplace(': return StrReplace($arguments[0], $arguments[1],$arguments[2]);
-//		case 'StrLineCount(': return StrLineCount($arguments[0]);
-//		case 'StrGetLine(': return StrGetLine($arguments[0], $arguments[1]);
-//		case 'StrOccurrenceCount(': return StrOccurrenceCount($arguments[0], $arguments[1]);
-//		case 'StrCompare(': return StrCompare($arguments[0], $arguments[1]);
-//		case 'StrStartsWith(': return StrStartsWith($arguments[0], $arguments[1]);
-//		case 'StrEndsWith(': return StrEndsWith($arguments[0], $arguments[1]);
-//		case 'StrSplit(': return StrSplit($arguments[0], $arguments[1],$arguments[2]);
-//		case 'StrConcat(': return StrConcat($arguments[0], $arguments[1]);
-//		default:
-//			throw new Exception("Неизвестная функция работы со строкой ".$key);
-//	}
-//}
-
 // -----------------------------------------------------------------------------------------------------------
 
 /**

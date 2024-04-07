@@ -4,12 +4,11 @@
 * Модуль работы с числами и форматированием 1С
 * 
 * 
-* @author  sikuda admin@sikuda.ru
-* @version 0.1
+* @author  sikuda@yandex.ru
+* @version 0.3
 */
 namespace php1C;
 use Exception;
-use function bcpow;
 
 
 /**
@@ -17,40 +16,6 @@ use function bcpow;
 */   
 const php1C_functionsPHP_Number = array('Int(','Round(','Log(','Log10(','Sin(','Cos(','Tan(','ASin(','ACos(','ATan(','Exp(','Pow(','Sqrt(','Format(', 'NumberInWords(', 'NStr('
 	, 'PeriodPresentation(', 'StrTemplate(', 'StringWithNumber(');
-
-
-/**
- * Вызывает функцию работы с числами
- *
- * @param string $key строка в названии функции со скобкой
- * @param array $arguments аргументы функции в массиве
- * @throws Exception
- */
-//function callNumberFunction(string $key, array $arguments){
-//	switch($key){
-//		case 'Int(': return Int($arguments[0]);
-//		case 'Round(': return Round($arguments[0],$arguments[1]);
-//		case 'Log(': return Log($arguments[0]);
-//		case 'Log10(': return Log10($arguments[0]);
-//    	case 'Sin(': return Sin($arguments[0]);
-//        case 'Cos(': return Cos($arguments[0]);
-//        case 'Tan(': return Tan($arguments[0]);
-//        case 'ASin(': return ASin($arguments[0]);
-//        case 'ACos(': return ACos($arguments[0]);
-//        case 'ATan(': return ATan($arguments[0]);
-//        case 'Exp(': return Exp($arguments[0]);
-//        case 'Pow(': return Pow($arguments[0],$arguments[1]);
-//        case 'Sqrt(': return Sqrt($arguments[0]);
-//        case 'NumberInWords(': return NumberInWords($arguments[0],$arguments[1]);
-//        case 'NStr(': return NStr($arguments[0]);
-//        case 'Format(': return Format($arguments[0], $arguments[1]);
-//        case 'PeriodPresentation(': return PeriodPresentation($arguments[0],$arguments[1],$arguments[2]);
-//        case 'StrTemplate(': return StrTemplate($arguments[0],$arguments[1],$arguments[2],$arguments[3],$arguments[4],$arguments[5],$arguments[6],$arguments[7],$arguments[8],$arguments[9],$arguments[10]);
-//        case 'StringWithNumber(': return StringWithNumber($arguments[0],$arguments[1],$arguments[2],$arguments[3]);
-//        default:
-//			throw new Exception("Неизвестная функция работы с числами и форматированием ".$key);
-//	}
-//}
 
 // -----------------------------------------------------------------------------------------------------------
 

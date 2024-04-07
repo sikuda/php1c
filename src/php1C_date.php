@@ -19,49 +19,6 @@ use DateInterval;
 */
 const php1C_functionsPHP_Date = array('Date(','CurrentDate(', 'Year(', 'Month(','Day(', 'Hour(', 'Minute(', 'Second(', 'BegOfYear(', 'BegOfQuarter(',  'BegOfMonth(', 'BegOfWeek('   ,'BegOfDay(' ,'BegOfHour(' ,'BegOfMinute(', 'EndOfYear(','EndOfQuarter(', 'EndOfMonth(', 'EndOfWeek(',  'EndOfDay(','EndOfHour(','EndOfMinute(','WeekOfYear(', 'DayOfYear(', 'WeekDay(',   'AddMonth(');
 
-/**
- * Вызывает функцию работы с датой
- *
- * @param string $key строка в названии функции со скобкой
- * @param array $arguments аргументы функции в массиве
- * @throws Exception
- */
-//function callDateFunction(string $key, array $arguments){
-//	switch($key){
-//		case 'Date(': return Date1C($arguments[0], $arguments[1], $arguments[2], $arguments[3], $arguments[4], $arguments[5]);
-//		case 'CurrentDate(':
-//			if(isset($arguments[0])) throw new Exception("Ожидается символ ')'");
-//			else return CurrentDate();
-//		case 'Year(': return Year($arguments[0]);
-//		case 'Month(': return Month($arguments[0]);
-//		case 'Day(': return Day($arguments[0]);
-//		case 'Hour(': return Hour($arguments[0]);
-//		case 'Minute(': return Minute($arguments[0]);
-//		case 'Second(': return Second($arguments[0]);
-//		case 'BegOfYear(': return BegOfYear($arguments[0]);
-//		case 'BegOfQuarter(': return BegOfQuarter($arguments[0]);
-//		case 'BegOfMonth(': return BegOfMonth($arguments[0]);
-//		case 'BegOfWeek(': return BegOfWeek($arguments[0]);
-//		case 'BegOfDay(': return BegOfDay($arguments[0]);
-//		case 'BegOfHour(': return BegOfHour($arguments[0]);
-//		case 'BegOfMinute(': return BegOfMinute($arguments[0]);
-//		case 'EndOfYear(': return EndOfYear($arguments[0]);
-//		case 'EndOfQuarter(': return EndOfQuarter($arguments[0]);
-//		case 'EndOfMonth(': return EndOfMonth($arguments[0]);
-//		case 'EndOfWeek(': return  EndOfWeek($arguments[0]);
-//		case 'EndOfDay(': return EndOfDay($arguments[0]);
-//		case 'EndOfHour(': return EndOfHour($arguments[0]);
-//		case 'EndOfMinute(': return EndOfMinute($arguments[0]);
-//		case 'WeekOfYear(': return WeekOfYear($arguments[0]);
-//		case 'DayOfYear(': return DayOfYear($arguments[0]);
-//		case 'WeekDay(': return WeekDay($arguments[0]);
-//		case 'AddMonth(': return AddMonth($arguments[0], $arguments[1]);
-//		default:
-//			throw new Exception("Неизвестная функция работы с датой ".$key);
-//	}
-//}
-
-
 // ----------------------------------------------------------------------------------------------------------------------
 
 /**

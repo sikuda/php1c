@@ -186,7 +186,8 @@ class CodeStream {
 			}	
 			if ($this->Type === TokenStream::type_string) $this->code = '"'.$this->Look.'"';
 			if ($this->Type === TokenStream::type_date) $this->code = 'php1C\Date1C("'.$this->Look.'")';
-						
+			if(fPrecision1C && $this->Type=== TokenStream::type_number) $this->code = '"'.$this->Look.'"';
+
 			if($this->Type === TokenStream::type_keyword){
 				switch ($this->Index) {
 					case TokenStream::keyword_val:
@@ -256,7 +257,7 @@ class CodeStream {
 				else throw new Exception('Ожидается идентификатор типа, а не '.$this->Look);
 			}
 			elseif( $this->Type === TokenStream::type_operator && ( $index === TokenStream::oper_mult || $index === TokenStream::oper_div )){
-				throw new Exception('Двойной оператор '.$this->getOperator($this->code));	
+				throw new Exception('Двойной оператор '.$this->code);
 			}	
 		}
 		elseif($type === TokenStream::type_variable){
