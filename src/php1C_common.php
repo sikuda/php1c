@@ -274,6 +274,16 @@ function notequal1C($arg1, $arg2): bool
 	throw new Exception(php1C_error_BadOperTypeEqual);
 }
 
+function morequal1C($arg1, $arg2): bool
+{
+    return equal1C($arg1,$arg2) || more1C($arg1, $arg2);
+}
+
+function lessqual1C($arg1, $arg2): bool
+{
+    return equal1C($arg1,$arg2) || less1C($arg1, $arg2);
+}
+
 // ---------------------- Общие функции -----------------------------
 
 /**
