@@ -1,4 +1,4 @@
-<?php /** @noinspection PhpUnused */
+<?php
 
 /**
 * Модуль работы с числами и форматированием 1С
@@ -215,6 +215,7 @@ function Format($val, string $str_format): string
 		$dec = $ar_format['ЧРД'];
 		if(!isset($dec)) $dec= '.';
 		$th = $ar_format['ЧРГ'];
+        if ($ar_format['ЧГ']==='0') $th="";
 		if(!isset($th)) $th= ' ';
 		return number_format($val, $pr, $dec, $th); 
 	}
@@ -233,9 +234,10 @@ function Format($val, string $str_format): string
 			}
 			$frm = $ar_format['ДЛФ'];
 			if(isset($frm)){
+                $php1C_endOfYear = char(160).'г.';
 				$frm = str_replace(
-					array('\'','\"','ДД',    'DD',   'Д',    'D',    'В',     'T'),
-					array('',  '',  'd.m.Y' ,'d.m.Y','d.m.Y','d.m.Y','h:m:s' ,'h:m:s' ,), 
+					array('\'','\"','ДД',                   'DD',                   'Д',    'D',    'В',     'T'),
+					array(  '',  '','j F Y'.$php1C_endOfYear,'j F Y'.$php1C_endOfYear,'d.m.Y','d.m.Y','H:m:s' ,'H:m:s' ,),
 				$frm);
                 if(method_exists($val,'toFormat'))
 				    return $val->toFormat($frm);

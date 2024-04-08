@@ -85,6 +85,8 @@ const php1C_functions_Number = array('INT(','ROUND(','LOG(','LOG10(','SIN(','COS
 */   
 const php1C_functions_Date = array('DATE(','CURRENTDATE(', 'YEAR(', 'MONTH(','DAY(', 'HOUR(', 'MINUTE(', 'SECOND(', 'BEGOFYEAR(', 'BEGOFQUARTER(', 'BEGOFMONTH(', 'BEGOFWEEK(' ,'BEGOFDAY(' ,'BEGOFHOUR(' ,'BEGOFMINUTE(', 'ENDOFYEAR(','ENDOFQUARTER(', 'ENDOFMONTH(', 'ENDOFWEEK(', 'ENDOFDAY(','ENDOFHOUR(','ENDOFMINUTE(','WEEKOFYEAR(', 'DAYOFYEAR(', 'WEEKDAY(', 'ADDMONTH(');
 
+const php1C_MonthsLang = array('January','February','March','April','May','June','July','August','September','October','November','December');
+//$php1C_endOfYear = char(160).'y.';
 /**
 * Массив названий английских функций для работы с датой. Соответствует элементам русским функций.
 */   

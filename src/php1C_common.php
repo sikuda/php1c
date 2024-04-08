@@ -119,9 +119,12 @@ function sub1C($arg1, $arg2){
  */
 function mul1C($arg1, $arg2){
 
-	if((is_bool($arg1) || is_numeric($arg1)) && !is_string($arg1) && (is_bool($arg2) || is_numeric($arg2)) && !is_string($arg2) ) 
-		if(fPrecision1C) return bcmul($arg1,$arg2,Scale1C);
-			else return $arg1*$arg2;
+	if((is_bool($arg1) || is_numeric($arg1)) && (is_bool($arg2) || is_numeric($arg2)) )
+        if(fPrecision1C) {
+            $scale = scaleLike1C($arg1);
+            return bcmul($arg1,$arg2,$scale);
+        }
+        else return $arg1*$arg2;
 	throw new Exception("Преобразование значения к типу Число не может быть выполнено");
 }
 
@@ -255,12 +258,25 @@ function equal1C($arg1, $arg2): bool
 {
 	if(is_bool($arg1)) $arg1 = tran_bool($arg1);
 	if(is_bool($arg2)) $arg2 = tran_bool($arg2);
-	if(is_numeric($arg1) || is_string($arg1) || (is_object($arg1) && get_class($arg1) === 'php1C\Date1C')) return $arg1 === $arg2;
+
+	if(is_numeric($arg1) || is_string($arg1) || (is_object($arg1) && get_class($arg1) === 'php1C\Date1C'))
+        if(fPrecision1C && is_numeric($arg1) && is_string($arg1) ){
+            return shrinkLastsZero($arg1) === shrinkLastsZero($arg2);
+        }
+        else return $arg1 === $arg2;
 	throw new Exception(php1C_error_BadOperTypeEqual);
 }
 
+function shrinkLastsZero(string $arg){
+    $pos = strpos($arg, ".");
+    if($pos === false) return  $arg;
+    $pos1 = mb_strlen($arg) - 1;
+    while(mb_substr($arg,$pos1,1) == "0" && $pos1>$pos) $pos1--;
+    return mb_substr($arg, 0, $pos1);
+}
+
 /**
- * Операция Равно в 1С
+ * Операция НЕ Равно в 1С
  * @param $arg1
  * @param $arg2
  * @return bool Результат операции Равно

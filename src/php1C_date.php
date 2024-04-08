@@ -19,6 +19,8 @@ use DateInterval;
 */
 const php1C_functionsPHP_Date = array('Date(','CurrentDate(', 'Year(', 'Month(','Day(', 'Hour(', 'Minute(', 'Second(', 'BegOfYear(', 'BegOfQuarter(',  'BegOfMonth(', 'BegOfWeek('   ,'BegOfDay(' ,'BegOfHour(' ,'BegOfMinute(', 'EndOfYear(','EndOfQuarter(', 'EndOfMonth(', 'EndOfWeek(',  'EndOfDay(','EndOfHour(','EndOfMinute(','WeekOfYear(', 'DayOfYear(', 'WeekDay(',   'AddMonth(');
 
+const php1C_Months = array('January','February','March','April','May','June','July','August','September','October','November','December');
+
 // ----------------------------------------------------------------------------------------------------------------------
 
 /**
@@ -61,7 +63,10 @@ class Date1C {
     */
 	function toFormat($str): string
     {
-		return $this->value->format($str);
+		return str_replace(
+            php1C_Months,
+            php1C_MonthsLang,
+             $this->value->format($str));
 	}
 
     /**
