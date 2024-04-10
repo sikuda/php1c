@@ -77,7 +77,7 @@ function add1C($arg1, $arg2){
 
 	if(is_bool($arg1) || is_numeric($arg1)){
 		if(is_bool($arg2) || is_numeric($arg2)) 
-			if(fPrecision1C) return bcadd($arg1,$arg2,Scale1C);
+			if(fPrecision1C) return shrinkLastsZero(bcadd($arg1,$arg2,Scale1C));
 			else return $arg1+$arg2;
 	}
     elseif (is_string($arg1)) {
@@ -99,8 +99,8 @@ function add1C($arg1, $arg2){
 function sub1C($arg1, $arg2){
 
 	if(is_bool($arg1) || is_numeric($arg1)){
-		if(is_bool($arg2) || is_numeric($arg2)) 
-			if(fPrecision1C) return bcsub($arg1,$arg2,Scale1C);
+		if(is_bool($arg2) || is_numeric($arg2))
+            if(fPrecision1C) return shrinkLastsZero(bcsub($arg1,$arg2,Scale1C));
 			else return $arg1-$arg2;
 	}
 	elseif(is_object($arg1)){
@@ -122,7 +122,7 @@ function mul1C($arg1, $arg2){
 	if((is_bool($arg1) || is_numeric($arg1)) && (is_bool($arg2) || is_numeric($arg2)) )
         if(fPrecision1C) {
             $scale = scaleLike1C($arg1);
-            return bcmul($arg1,$arg2,$scale);
+            return shrinkLastsZero(bcmul($arg1,$arg2,$scale));
         }
         else return $arg1*$arg2;
 	throw new Exception("Преобразование значения к типу Число не может быть выполнено");
@@ -142,7 +142,7 @@ function div1C($arg1, $arg2){
 			if( bccomp($arg2, "0", Scale1C) === 0) throw new Exception("Деление на 0");
 			else {
                 $scale = scaleLike1C($arg1);
-                return bcround(bcdiv($arg1,$arg2,$scale+1), $scale);
+                return shrinkLastsZero(bcround(bcdiv($arg1,$arg2,$scale+1), $scale));
                 //return bcdiv($arg1,$arg2,$scale+1);
             }
 		}
@@ -154,6 +154,12 @@ function div1C($arg1, $arg2){
 	throw new Exception("Преобразование значения к типу Число не может быть выполнено");
 }
 
+/**
+ * Алгоритм числа знаков после запятой в вычислениях в 1С
+ * https://mista.ru/topic/892985#20
+ * @param string $arg1
+ * @return int
+ */
 function scaleLike1C(string $arg1):int
 {
     $pos = strpos($arg1, ".");
@@ -165,7 +171,13 @@ function scaleLike1C(string $arg1):int
     else return intdiv($pos-10,9)*9+45;
 }
 
-//https://www.php.net/manual/en/function.bcscale.php
+
+/**
+ * //https://www.php.net/manual/en/function.bcscale.php
+ * @param $number
+ * @param $scale
+ * @return string
+ */
 function bcround($number, $scale=0): string
 {
     if($scale < 0) $scale = 0;
@@ -174,6 +186,21 @@ function bcround($number, $scale=0): string
     $increment = $sign . '0.' . str_repeat('0', $scale) . '5';
     $number = bcadd($number, $increment, $scale+1);
     return bcadd($number, '0', $scale);
+}
+
+/**
+ * Убрать последние нули в числе
+ * @param string $arg
+ * @return string
+ */
+function shrinkLastsZero(string $arg): string
+{
+    $pos = strpos($arg, ".");
+    if($pos === false) return  $arg;
+    $pos1 = mb_strlen($arg) - 1;
+    while(mb_substr($arg,$pos1,1) == "0" && $pos1>$pos) $pos1--;
+    if(mb_substr($arg,$pos1,1) == ".") $pos1--;
+    return mb_substr($arg, 0, $pos1+1);
 }
 
 /**
@@ -265,14 +292,6 @@ function equal1C($arg1, $arg2): bool
         }
         else return $arg1 === $arg2;
 	throw new Exception(php1C_error_BadOperTypeEqual);
-}
-
-function shrinkLastsZero(string $arg){
-    $pos = strpos($arg, ".");
-    if($pos === false) return  $arg;
-    $pos1 = mb_strlen($arg) - 1;
-    while(mb_substr($arg,$pos1,1) == "0" && $pos1>$pos) $pos1--;
-    return mb_substr($arg, 0, $pos1);
 }
 
 /**
