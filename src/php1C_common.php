@@ -29,6 +29,13 @@ require_once('php1C_file.php');
 */   
 const php1C_functionsPHP_Com = array('Message(','Find(','ValueIsFilled(','Type(','TypeOf(','toString1C(','toNumber1C(');
 
+class undefined1C
+{
+    function __toString(){
+        return php1C_Undefined;
+    }
+}
+
 /**
 * Выводит данные в представлении 1С (на установленном языке)
 * @param $arg

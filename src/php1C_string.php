@@ -326,5 +326,5 @@ function StrSplit(string $str, string $split, $and_empty): Array1C
 */
 function StrConcat(Array1C $array1C, string $split): string
 {
-	return implode($split, $array1C->getArray());
+	return implode($split, $array1C->toArray());
 }

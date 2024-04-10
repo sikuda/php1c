@@ -3,14 +3,14 @@
 * Модуль работы с универсальными коллекциями значений 1С
 * 
 * Модуль для работы с массивами, структурами в 1С и функциями для работы с ними
-* для будущего (соответствиями, списком значений, таблица значений)
+* (соответствиями, списком значений, таблица значений)
 * 
 * @author  sikuda@yandex.ru
-* @version 0.1
+* @version 0.3
 */
 namespace php1C;
 use Exception;
-require_once('php1C__tokens.php');
+//require_once('php1C__tokens.php');
 
 /**
 * Массив названий типов для работы с коллекциями переименовании
@@ -42,57 +42,6 @@ function callCollectionType(string $key, array $arguments)
     }
 }
 
-/**
- * Вызывает функции и функции объектов 1С работы с коллекциями
- *
- * @param $context - объект для вызова функции или null
- * @param string $key строка в названии функции со скобкой
- * @param array $arguments аргументы функции в массиве
- * @throws Exception
- */
-function callCollectionFunction($context, string $key, $arguments="")
-{
-    if($context === null){
-	    throw new Exception("Неизвестная функция работы с коллекциями ".$key);
-	}
-	else{
-		if( method_exists($context, substr($key, 0, -1) )){ 
-			switch($key){
-			case 'UBound(': return $context->UBound();
-			case 'Insert(': return $context->Insert($arguments[0], $arguments[1]);
-			case 'Add(':    if(isset($arguments[0])) return $context->Add($arguments[0]);
-							else return $context->Add();
-			case 'Count(':  return $context->Count();
-			//case 'Find(':   return $context->Find($arguments[0]);
-			//case 'Clear(':  return $context->Clear();
-			case 'Get(':    return $context->Get($arguments[0]);	
-			//case 'Del(':    return $context->Del($arguments[0]);
-			case 'Set(':    return $context->Set($arguments[0], $arguments[1]);
-			case 'Property(': return $context->Property($arguments[0], $arguments[1]);
-			case 'LoadColumn(': return $context->LoadColumn($arguments[0], $arguments[1]);
-			case 'UnloadColumn(': return $context->UnloadColumn($arguments[0]);
-			case 'FillValues(': return $context->FillValues($arguments[0], $arguments[1]);
-			case 'IndexOf(': return $context->IndexOf($arguments[0]);
-			case 'Total(': return $context->Total($arguments[0]);
-			case 'Find(': return $context->Total($arguments[0],$arguments[1]);
-			case 'FindRows(': return $context->FindRows($arguments[0]);
-			case 'Clear(': return $context->Clear();
-			case 'GroupBy(': return $context->GroupBy($arguments[0], $arguments[1]);
-			case 'Move(': return $context->Move($arguments[0], $arguments[1]);
-			case 'Copy(': return $context->Copy($arguments[0], $arguments[1]);
-			case 'CopyColumns(': return $context->CopyColumns($arguments[0]);
-			case 'Sort(': return $context->Sort($arguments[0], $arguments[1]);
-			case 'Del(': return $context->Del($arguments[0]);
-			default:
-				throw new Exception("Нет обработки функции для объекта коллекции ".$key);
-			}
-		}else{
-			throw new Exception("Не найдена функция у объекта коллекции  ".$key);
-		}
-	}
-}
-
-
 //---------------------------------------------------------------------------------------------------------
 /**
  * @throws Exception
@@ -101,14 +50,6 @@ function Array1C($args): Array1C
 {
 	return new Array1C($args);
 }
-
-class undefined1C
-{
-    function __toString(){
-        return php1C_Undefined;
-    }
-}
-
 
 /**
 * Класс для работы с массивом 1С
@@ -146,15 +87,15 @@ class Array1C{
 	function UBound(): int
     {
 		$key = count($this->value);
-		if(isset($this->value) ) return -1;
-		else return $key-1;  
+        return $key-1;
 	}
 
 	function Insert($index, $val){
 		$this->value[$index] = $val;
 	}
 
-	function Add($val){
+	function Add($val): Array1C
+    {
 		$this->value[] = $val;
 		return $this;
 	}
@@ -187,10 +128,6 @@ class Array1C{
 		$this->value[$index] = $val;
 	}
 
-    public function getArray()
-    {
-        return $this->value;
-    }
 }
 
 //------------------------------------------------------------------------------------------
@@ -214,7 +151,7 @@ class Structure1C{
 	/**
 	* @var array внутренее хранение массива
 	*/
-	private $value; //array of PHP 
+	private array $value; //array of PHP
 
 	function __construct($args=null,$copy=null){
 
@@ -233,7 +170,8 @@ class Structure1C{
 		}
 	}
 
-	function toArray(){
+	function toArray(): array
+    {
 		return $this->value;
 	}
 
@@ -282,7 +220,11 @@ class Structure1C{
 	}
 
 	//Для установки данных через точку
-	function Set($key, $val=null){
+
+    /**
+     * @throws Exception
+     */
+    function Set($key, $val=null){
 		if( fEnglishVariable ) $key = str_replace(php1C_LetterLng, php1C_LetterEng, $key);
 		$key = mb_strtoupper($key);
 		if(array_key_exists($key, $this->value)) $this->value[$key] = $val;
@@ -392,7 +334,8 @@ class Map1C{
 * @return - возвращает новый объект ТаблицаЗначений1С
 *
 */
-function ValueTable($args=null){
+function ValueTable($args=null): ValueTable
+{
 	return new ValueTable($args);
 }
 
