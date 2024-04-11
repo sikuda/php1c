@@ -99,7 +99,7 @@ class Date1C {
 /**
  * Основная функция создания даты из строки или из последовательности чисел
  *
- * @param string|numeric $str - год
+ * @param string|Date1C $str - год
  * @param int $month - номер месяца с 1
  * @param int $day - дата в месяце
  * @param int $hour - час
@@ -109,13 +109,19 @@ class Date1C {
  * @return Date1C Возвращает класс Date1C или вызывается исключение
  * @throws Exception
  */
-function Date1C($str, int $month=1, int $day=1, int $hour=0, int $minute=0, int $second=0): Date1C
+function Date1C($str, int $month=0, int $day=0, int $hour=0, int $minute=0, int $second=0): Date1C
 {
-	if(is_string($str)){
-		if(strlen($str)==8 || strlen($str)==12 || strlen($str)==14) return new Date1C($str);	
-		else throw new Exception('Преобразование значения к типу Дата не может быть выполнено. Длина строки не 8, не 12 и не 14');
-	} 
-	elseif(is_numeric($str)){
+//	if(is_string($str)){
+//		if(mb_strlen($str)==8 || mb_strlen($str)==12 || mb_strlen($str)==14) return new Date1C($str);
+//		else throw new Exception('Преобразование значения к типу Дата не может быть выполнено. Длина строки не 8, не 12 и не 14');
+//	}
+//	else
+    if (is_object($str) && get_class($str) == "php1C\Date1C") return $str;
+
+    if(is_numeric($str)){
+
+        if(is_string($str))
+    		if(mb_strlen($str)==8 || mb_strlen($str)==12 || mb_strlen($str)==14) return new Date1C($str);
 
 		$check_date = checkdate( $month, $day, $str ) && ($hour >= 0) && ($hour < 60) && ($minute >=0) && ($minute < 60) && ($second >= 0) && ($second < 60);
 		$str = str_pad($str,4,"0",STR_PAD_LEFT).str_pad($month,2,"0",STR_PAD_LEFT).str_pad($day,2,"0",STR_PAD_LEFT).str_pad($hour,2,"0",STR_PAD_LEFT).str_pad($minute,2,"0",STR_PAD_LEFT).str_pad($second,2,"0",STR_PAD_LEFT);
@@ -227,7 +233,7 @@ function BegOfQuarter(Date1C $date ): Date1C
 {
 	$month = 3*intdiv(intval(date_format($date->value,"m"))-1,3)+1;
     /** @var int $month */
-    return Date1C(intval(date_format($date->value,"Y")), $month);
+    return Date1C(intval(date_format($date->value,"Y")), $month, 1);
 }
 
 /**

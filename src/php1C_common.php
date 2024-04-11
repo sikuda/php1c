@@ -91,7 +91,7 @@ function add1C($arg1, $arg2){
         return $arg1 . $arg2;
     }
 	elseif(is_object($arg1)){
-		if( (get_class($arg1) === 'php1C\Date1C') && is_numeric($arg2) && !is_string($arg2) ) return $arg1->add($arg2);
+		if( (get_class($arg1) === 'php1C\Date1C') && is_numeric($arg2) ) return $arg1->add($arg2);
 	}
 	throw new Exception("Преобразование значения к типу Число не может быть выполнено");
 }

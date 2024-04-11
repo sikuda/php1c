@@ -10,7 +10,7 @@
 */
 namespace php1C;
 use Exception;
-
+require_once( 'php1C__tokens.php');
 require_once( 'php1C_common.php');
 
 /**
