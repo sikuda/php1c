@@ -295,7 +295,7 @@ function StrEndsWith(string $str, string $substr): bool
 {
 	$res = mb_strrpos($str, $substr);
 	//return $res;
-	if($res == (strlen($str)-strlen($substr))) return true;
+	if($res == (mb_strlen($str)-mb_strlen($substr))) return true;
 	else return false;
 }
 

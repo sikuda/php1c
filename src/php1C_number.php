@@ -207,7 +207,7 @@ function Format($val, string $str_format): string
 	}
 	elseif(is_numeric($val)){
 		$pr = $ar_format['ЧДЦ'];
-		if(!isset($pr)){
+		if(!isset($pr) && !$ar_format['ЧЦ']){
 			$pr = strpos( strval($val), '.');
 			if($pr === false) $pr = 0;
 			else $pr = strlen(strval($val)) - $pr - 1;
@@ -216,8 +216,15 @@ function Format($val, string $str_format): string
 		if(!isset($dec)) $dec= '.';
 		$th = $ar_format['ЧРГ'];
         if ($ar_format['ЧГ']==='0') $th="";
-		if(!isset($th)) $th= ' ';
-		return number_format($val, $pr, $dec, $th); 
+		if(!isset($th)) $th= mb_chr(160);
+
+        $res = number_format($val, $pr, $dec, $th);
+        if (isset($ar_format['ЧВН']) && isset($ar_format['ЧЦ'])){
+            if (intval($ar_format['ЧЦ']) > strlen($res))
+                return str_repeat('0', intval($ar_format['ЧЦ']) - strlen($res)).$res;
+            else return str_repeat('9', intval($ar_format['ЧЦ']));
+        }
+        else return $res;
 	}
 	elseif(is_object($val)){
 		//Это дата
@@ -226,8 +233,8 @@ function Format($val, string $str_format): string
             $frm = $ar_format['ДФ'];
 			if(isset($frm)){
 				$frm = str_replace(
-					array('\'','\"','гггг','yyyy','гг','yy','дд','dd','ММ','MM','чч','hh','ЧЧ','HH','мм','mm'),
-					array('',  '',  'Y'   ,'Y'   ,'y' ,'y' ,'d' ,'d' ,'m', 'm' ,'h' ,'h' ,'H' ,'H' ,'i' ,'i'), 
+					array('\'','\"','гггг','yyyy','гг','yy','дд','dd','ММ','MM','чч','hh','ЧЧ','HH','мм','mm','сс','ss'),
+					array('',  '',  'Y'   ,'Y'   ,'y' ,'y' ,'d' ,'d' ,'m', 'm' ,'h' ,'h' ,'H' ,'H' ,'i' ,'i','s','s'),
 				$frm);
                 if(method_exists($val,'toFormat'))
 				    return $val->toFormat($frm);
