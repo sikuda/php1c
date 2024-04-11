@@ -2,18 +2,14 @@
 /**
 * Модуль для разбора кода 1С в массив токенов
 * 
-* @author  sikuda admin@sikuda.ru
-* @version 0.2 
+* @author  sikuda@yandex.ru
+* @version 0.3
 */
 
 namespace php1C;
 use Exception;
 
-/*
-*  Для подключение всех списков функций подключаем 
-*/
 require_once('php1C_common.php');
-
 
 /**
 * Класс токена - элемент кода
@@ -24,8 +20,8 @@ class Token {
 	public $index   = -1;
 
 	//pointer to handle error
-	public $row = 0;
-    public $col = 0;
+	public int $row = 0;
+    public int $col = 0;
 	
 	function __construct($type = 0, $context = '', $index=-1){
 		$this->type = $type;
@@ -34,31 +30,30 @@ class Token {
 	}
 }
 
-
 /**
 * Класс обработки потока кода 1С в массив токенов
 */
 class TokenStream {
 
 	//array of token
-    public $tokens  = 0;
-    private $itoken = 0;
+    public array $tokens;
+    //private int $i_token = 0;
 
     //common 
 	private $str = '';
-	private $start = 0;
-	private $pos = 0;
+	private int $start = 0;
+	private int $pos = 0;
 
 	//pointer to handle error
-	public $row = 1;
-    public $col = 1;
+	public int $row = 1;
+    public int $col = 1;
 
     //Типы(types)
-    const type_end_code  = -1; 	
+    const type_end_code  = -1;
     const type_undefined = 0;
     const type_newline   = 1;
     const type_space     = 2;
-    const type_tabspace  = 3;
+    const type_tablespace  = 3;
     const type_comments  = 10;
     const type_meta      = 11;
     const type_number    = 12;
@@ -68,13 +63,13 @@ class TokenStream {
     const type_keyword   = 16;
     const type_identification = 17;
     const type_function       = 18;
-    const type_extfunction    = 19;
+    const type_extinction    = 19;
     const type_variable       = 50;
     
     //Операции(operations)
 	const oper_undefined    = 0;
-	const oper_openbracket  = 1;
-	const oper_closebracket = 2; 
+	const oper_open_bracket  = 1;
+	const oper_closebracket = 2;
 	const oper_plus         = 3;
 	const oper_minus        = 4;
 	const oper_div          = 5;
@@ -131,11 +126,14 @@ class TokenStream {
 		"lng" => array(), // типы на языке в верхнем регистре для поиска	
         "php" => array()  // типы по английски как будет в коде			
 	);
-	public $indexTypesColl = -1; 
-	
-	public $functions1С = array(
+	public int $indexTypesColl = -1;
+
+    /**
+     * @var array|array[]
+     */
+    public array $functions1C = array(
 		"lng" => array(),  // функции на языке в верхнем регистре для поиска
-		"php" => array()   // функции по английски как будет в коде 
+		"php" => array()   // функции по-английски как будет в коде
 	);
 	//Индексы функций модулей
 	public $indexFuncCom = -1;
@@ -146,7 +144,7 @@ class TokenStream {
 
 	/**
 	* Конструктор класса
-	* Заполняет массив функций для распознания.
+	* заполняет массив функций для распознания.
 	*/
 	function __construct($str = ''){
 
@@ -171,60 +169,68 @@ class TokenStream {
     * @param $typesPHP array массив английских названий типов в PHP
     * @return int возвращаем верхнюю границу модуля в общем списке 
 	*/
-	private function AddTypes( $types, $typesPHP ){
+	private function AddTypes( $types, $typesPHP ): int
+    {
 		if(is_array($types) && is_array($typesPHP) ){
 			foreach ($types as $value) {
-				array_push($this->identypes['lng'], mb_strtoupper($value));
+				$this->identypes['lng'][] = mb_strtoupper($value);
 			}
 			foreach ($typesPHP as $value) {
-				array_push($this->identypes['php'], $value);
+				$this->identypes['php'][] = $value;
 			}
 		}
 		return count($this->identypes['php']);
 
 	}
 
-	/**
-	* Добавление функций модуля в общую таблицу функций
-	*
-    * @param $funcRus array массив русских названий функций
-    * @param $funcEng array массив английских названий функций
-    * @return int возвращаем верхнюю границу модуля в общем списке 
-	*/
-	private function AddModule( $func, $funcPHP ){
-		if(is_array($func) && is_array($funcPHP) ){
+    /**
+     * Добавление функций модуля в общую таблицу функций
+     *
+     * @param array $func
+     * @param array $funcPHP
+     * @return int возвращаем верхнюю границу модуля в общем списке
+     */
+	private function AddModule( array $func, array $funcPHP ): int
+    {
+		//if(is_array($func) && is_array($funcPHP) ){
 			foreach ($func as $value) {
-				array_push($this->functions1С['lng'], mb_strtoupper($value));
+				$this->functions1C['lng'][] = mb_strtoupper($value);
 			}
 			foreach ($funcPHP as $value) {
-				array_push($this->functions1С['php'], $value);
+				$this->functions1C['php'][] = $value;
 			}
-		}
-		return count($this->functions1С['php']);
+		//}
+		return count($this->functions1C['php']);
 	}
 
 	/**
 	* Функции для разбора кода в токен
 	*/
-    public function eol(){ 
+    public function eol(): bool
+    {
     	return $this->pos >= mb_strlen($this->str); 
     }
-	public function current(){ 
+	public function current(): string
+    {
 		if($this->pos==$this->start) return '';
 		else return mb_substr($this->str,$this->start,$this->pos-$this->start); 
 	}
-	public function future(){ 
+	public function future(): string
+    {
 		return mb_substr($this->str,$this->pos); 
 	}
-	private function prev() { 
+	private function prev(): string
+    {
 		if($this->pos>=0) return mb_substr($this->str,$this->pos-1,1);
 		else return ''; 
 	}
-	private function curr() {
+	private function curr(): string
+    {
 		if ($this->pos <= mb_strlen($this->str)) return mb_substr($this->str, $this->pos, 1) ;
 		else return '';	
 	}
-	private function next() {
+	private function next(): string
+    {
 		if ($this->pos < mb_strlen($this->str)) return mb_substr($this->str, $this->pos+1, 1);
 		else return '';	
 	}
@@ -274,10 +280,11 @@ class TokenStream {
 		$this->col = 1; 
 		return $this->eatTo("\n");
 	}
-	
-	/**
-	* Прочитать очередной токен из строки
-	*/
+
+    /**
+     * Прочитать очередной токен из строки
+     * @throws Exception
+     */
 	private function readToken(){
 
 		if($this->eol()) return new Token(self::type_end_code, self::type_undefined);
@@ -305,7 +312,7 @@ class TokenStream {
 		
 		if( $ch === "\t" ){
 		    $this->move(1);
-		 	return new Token(self::type_tabspace, $ch);
+		 	return new Token(self::type_tablespace, $ch);
 		}
 
         //Обработка комментариев
@@ -316,7 +323,7 @@ class TokenStream {
 			}
 		}
 
-	    //Обработка метасимволов & или #
+	    //Обработка мета символов & или #
 		if ($ch === '&' || $ch === '#') {
 			$this->skipToEndLine();
 			return new Token(self::type_meta, $this->current());
@@ -381,7 +388,7 @@ class TokenStream {
 			}	
 
 			switch($ch){
-				case '(': return new Token(self::type_operator, '(', self::oper_openbracket);
+				case '(': return new Token(self::type_operator, '(', self::oper_open_bracket);
 				case ')': return new Token(self::type_operator, ')', self::oper_closebracket);
 				case '+': return new Token(self::type_operator, '+', self::oper_plus);
 				case '-': return new Token(self::type_operator, '-', self::oper_minus);
@@ -409,21 +416,21 @@ class TokenStream {
 			elseif($current == php1C_AND ) return new Token(self::type_operator, php1C_AND, self::oper_and);
 			elseif($current == php1C_NOT ) return new Token(self::type_operator, php1C_NOT, self::oper_not);	
 			elseif($this->curr() == '('){
-				//Идентификатор типа  с аргументами
+				//Идентификатор типа с аргументами
 				$key = array_search($current, $this->identypes['lng']);
 				if( $key !== false ) return new Token(self::type_identification, $this->identypes['php'][$key], $key);
 				$this->move();
 				//Общая функция на языке
-				$key = array_search($current.'(', $this->functions1С['lng']);
+				$key = array_search($current.'(', $this->functions1C['lng']);
 				if( $key !== false ) return new Token(self::type_function, $current, $key); 
 				else{
-					//нераспознаные функции переводим на английский
-					return new Token(self::type_extfunction, str_replace(php1C_LetterLng, php1C_LetterEng, $current));	
+					//нераспознанные функции переводим на английский
+					return new Token(self::type_extinction, str_replace(php1C_LetterLng, php1C_LetterEng, $current));
 				}
-				throw new Exception( php1C_error_UndefineFunction.' ('.$current.')'); 
+				//throw new Exception( php1C_error_UndefineFunction.' ('.$current.')');
 		    } 
 			else{
-				//Индентификатор без аргументов
+				//Идентификатор без аргументов
 				$key = array_search($current, php1C_Keywords);
 				if( $key !== false ) return new Token(self::type_keyword, $current, $key);
 				else{
@@ -475,7 +482,7 @@ class TokenStream {
 			$this->tokens[$key]->row = $this->row;
 			$this->start = 0;
 			$this->pos = 0;
-			$this->itoken = 0;
+			//$this->i_token = 0;
 
 			//echo '+11';
 			return true;

@@ -10,12 +10,11 @@
 * @version 0.1
 */
 namespace php1C;
-use Exception;
 //require_once( 'php1C_date.php'); //todo
 
 
 class File1C {
-	private $fileName;
+	private string $fileName;
 	function __construct($buffer = '') {
        if(is_string($buffer)) $this->fileName = $buffer;
     }
@@ -25,9 +24,10 @@ class File1C {
 	*
 	* @return string 
 	*/
-	public function Name(){
+	public function Name(): string
+    {
 		$pos = strrpos($this->fileName,'/');
-		if($pos==false) return $this->fileName;
+		if(!$pos) return $this->fileName;
 		return substr($this->fileName,$pos);	
 	}
 
@@ -36,7 +36,8 @@ class File1C {
 	*
 	* @return string 
 	*/
-	public function BaseName(){
+	public function BaseName(): string
+    {
 		return strstr($this->Name(),'.', true);		
 	}
 
@@ -45,7 +46,8 @@ class File1C {
 	*
 	* @return string 
 	*/
-	public function FullName(){
+	public function FullName(): string
+    {
 		return $this->fileName;		
 	}
 
@@ -54,7 +56,8 @@ class File1C {
 	*
 	* @return string 
 	*/
-	public function Path(){
+	public function Path(): string
+    {
 		return strstr($this->fileName,'.', true);		
 	}
 
@@ -63,8 +66,9 @@ class File1C {
 	*
 	* @return string 
 	*/
-	public function Extension(){
-		return ltrim(strstr($this->fileName,'.'), '.');	;		
+	public function Extension(): string
+    {
+		return ltrim(strstr($this->fileName,'.'), '.');
 	}
 
 	/**
@@ -72,7 +76,8 @@ class File1C {
 	*
 	* @return bool 
 	*/
-	public function Exist(){
+	public function Exist(): bool
+    {
 		if(file_exists($this->fileName) == 1) return true;
 		else return false;	
 	}
@@ -82,7 +87,8 @@ class File1C {
 	*
 	* @return bool 
 	*/
-	public function IsFile(){
+	public function IsFile(): bool
+    {
 		if(is_file($this->fileName)) return true;
 		else return false;	
 	}
@@ -92,27 +98,33 @@ class File1C {
 	*
 	* @return bool 
 	*/
-	public function IsDirectory(){
+	public function IsDirectory(): bool
+    {
 		if(is_dir($this->fileName)) return true;
 		else return false;		
 	}
 
 	//filemtime() 
-	public function GetModificationTime(){
+	public function GetModificationTime(): string
+    {
 		return ''; //todo
 	}
-	public function GetModificationUniversalTime(){
+	public function GetModificationUniversalTime(): string
+    {
 		return ''; //todo	
 	}
 	//touch()
-	public function SetModificationTime(){
+	public function SetModificationTime(): string
+    {
 		return ''; //todo		
 	}
-	public function SetModificationUniversalTime (){
+	public function SetModificationUniversalTime (): string
+    {
 		return ''; //todo			
 	}
 }
 
-function File1C($name){
+function File1C($name): File1C
+{
 	return new File1C( $name);
 }

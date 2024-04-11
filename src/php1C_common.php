@@ -1,19 +1,15 @@
-<?php
+<?php /** @_noinspection ALL */
+
 /**
 * Общий модуль работы с 1С
 * 
 * Модуль для работы 1С
 * 
-* @author  sikuda admin@sikuda.ru
-*/
-
-/**
-* Подключаем пространство имен
+* @author  sikuda@yandex.ru
 */
 namespace php1C;
 use Exception;
 
-//Подключаем язык
 require_once('php1C_settings.php');
 if (Language1C === 'en') {
  	require_once('lang/en.php');   
@@ -22,9 +18,6 @@ else{
 	require_once('lang/ru.php');
 }
 
-/*
-*  Подключаем все модули для 1С
-*/
 require_once('php1C_number.php');
 require_once('php1C_string.php');
 require_once('php1C_date.php');
@@ -32,158 +25,133 @@ require_once('php1C_collections.php');
 require_once('php1C_file.php');
 
 /**
-* Массив функций PHP для общей работы с 1С. Соответстует элементам в языковых файлах.
+* Массив функций PHP для общей работы с 1С. Соответствует элементам в языковых файлах.
 */   
 const php1C_functionsPHP_Com = array('Message(','Find(','ValueIsFilled(','Type(','TypeOf(','toString1C(','toNumber1C(');
 
-/**
-* Вызывает общие функции и функции объектов 1С 
-*
-* @param object $context объект для вызова функции или null
-* @param string $key строка названии функции со скобкой
-* @param array $arguments аргументы функции в массиве
-* @return возвращает результат функции или выбрасывает исключение
-*/
-function callCommonFunction($context=null, $key, $arguments){
-	if($context === null){
-		switch($key){
-		case 'Message(':
-			if(isset($arguments[2])) throw new Exception("Ожидается ) ");
-			return Message($arguments[0], $arguments[1]);
-		case 'Find(':
-			if(isset($arguments[2])) throw new Exception("Ожидается ) ");
-			return Find($arguments[0], $arguments[1]);
-		case 'ValueIsFilled(':
-			if(isset($arguments[1])) throw new Exception("Ожидается ) ");
-			return ValueIsFilled($arguments[0]);
-		case 'Type(':
-			if(isset($arguments[1])) throw new Exception("Ожидается ) ");
-			return Type($arguments[0]);
-		case 'TypeOf(':
-			if(isset($arguments[1])) throw new Exception("Ожидается ) ");
-			return TypeOf($arguments[0]);
-		case 'toString1C(':
-			if(isset($arguments[1])) throw new Exception("Ожидается ) ");
-			return toString1C($arguments[0]);
-		case 'toNumber1C(':
-			if(isset($arguments[1])) throw new Exception("Ожидается ) ");
-			return toNumber1C($arguments[0]);		
-		default:
-			throw new Exception("Неизвестная общая функция ".$key."");
-		}	
-	}
-	else{
-		if( method_exists($context, substr($key, 0, -1) )){ 
-			switch($key){
-			case 'Find(':   return $context->Find($arguments[0]);
-			default:
-				throw new Exception("Нет обработки общей функции для объекта  ".$key."");
-			}
-		}else{
-			throw new Exception("Не найдена общая функция у объекта  ".$key."");
-		}
-	}
+class undefined1C
+{
+    function __toString(){
+        return php1C_Undefined;
+    }
 }
 
 /**
 * Выводит данные в представлении 1С (на установленном языке)
-* @param any $arg
-* @return string Возвращем значение как в 1С ('Да', 'Нет', Дату в формате 1С dd.mm.yyyy, 'Неопределено' и другое
+* @param $arg
+* @return string Возвращаем значение как в 1С ('Да', 'Нет', Дату в формате 1С dd.mm.yyyy, 'Неопределенно' и другое
 */  
-function toString1C($arg){
-	if(!isset($arg)) return php1C_Undefined; //"Неопределено";
+function toString1C($arg): string
+{
+	if(!isset($arg)) return php1C_Undefined;
 	if(is_bool($arg)){
 		if($arg === true ) return php1C_Bool[0]; //"Да";
 		else return php1C_Bool[1]; //"Нет";
 	}
 	$val = strval($arg);
 	//делаем пробелы между тысячными, миллионам и тд.
-	if(Regionalset_grouping && is_numeric($arg)){
-		$res = strpos($val, '.');
-		if($res === false) $res = strlen($val)-1;
-		while($res>3){
-			$val = substr($val, 0, $res-2)+' '+substr(string, $res-2, 3);
-			$res-=3;
-		}
+	if(Regional_grouping && is_numeric($arg)){
+		$pos_point = strpos($val, '.');
+        $val_int = $val;
+        $val_fraction = "";
+		if($pos_point !== false){
+            $val_int = substr($val, 0, $pos_point);
+            $val_fraction = substr($val, -$pos_point);
+        }
+		$val = implode(" ", str_split($val_int,3)).$val_fraction;
 	} 
     return $val;
 }
 
 /**
 * Преобразует аргумент в число 
-* @param stirng $arg число как строка
-* @return (string or float) Возвращем значение числа как в 1С (string - для чисел повышенной точности, float - если повышенная точность не важна
+* @param string|float $arg число как строка
+* @return string|float Возвращаем значение числа как в 1С (string - для чисел повышенной точности, float - если повышенная точность не важна
 */  
 function toNumber1C($arg){
-	if(fPrecision1C) return strval($arg);
+	if(fPrecision1C) return $arg;
 	else return floatval($arg);
 }
 
 /**
-* Сложение двух переменных в 1С
-* @param any $arg1
-* @param any $arg2
-* @return any Результат сложение в зависемости от типа переменных (string, bool, Date1C)
-*/
+ * Сложение двух переменных в 1С
+ * @param $arg1
+ * @param $arg2
+ * @return string Результат сложение в зависимости от типа переменных (string, bool, Date1C)
+ * @throws Exception
+ */
 function add1C($arg1, $arg2){
 
-	if (is_string($arg1)) return $arg1 . (string)$arg2;
-	elseif(is_bool($arg1) || is_numeric($arg1)){
+	if(is_bool($arg1) || is_numeric($arg1)){
 		if(is_bool($arg2) || is_numeric($arg2)) 
-			if(fPrecision1C) return bcadd($arg1,$arg2,Scale1C);
+			if(fPrecision1C) return shrinkLastsZero(bcadd($arg1,$arg2,Scale1C));
 			else return $arg1+$arg2;
 	}
+    elseif (is_string($arg1)) {
+        return $arg1 . $arg2;
+    }
 	elseif(is_object($arg1)){
-		if( (get_class($arg1) === 'php1C\Date1C') && is_numeric($arg2) && !is_string($arg2) ) return $arg1->add($arg2);
+		if( (get_class($arg1) === 'php1C\Date1C') && is_numeric($arg2) ) return $arg1->add($arg2);
 	}
 	throw new Exception("Преобразование значения к типу Число не может быть выполнено");
 }
 
 /**
-* Вычитание двух переменных в 1С
-* @param any $arg1
-* @param any $arg2
-* @return float, Date1C Результат вычитания в зависемости от типа переменных (float, Date1C, исключение)
-*/
+ * Вычитание двух переменных в 1С
+ * @param $arg1
+ * @param $arg2
+ * @return float, Date1C Результат вычитания в зависимости от типа переменных (float, Date1C, исключение)
+ * @throws Exception
+ */
 function sub1C($arg1, $arg2){
 
 	if(is_bool($arg1) || is_numeric($arg1)){
-		if(is_bool($arg2) || is_numeric($arg2)) 
-			if(fPrecision1C) return bcsub($arg1,$arg2,Scale1C);
+		if(is_bool($arg2) || is_numeric($arg2))
+            if(fPrecision1C) return shrinkLastsZero(bcsub($arg1,$arg2,Scale1C));
 			else return $arg1-$arg2;
 	}
 	elseif(is_object($arg1)){
-		if( (get_class($arg1) === 'php1C\Date1C') && is_numeric($arg2) && !is_string($arg2) ) return $arg1->sub($arg2);
+		if( $arg1.is_object(Date1C::class) && is_numeric($arg2) && !is_string($arg2) )
+            return $arg1->sub($arg2);
 	}	
 	throw new Exception("Преобразование значения к типу Число не может быть выполнено");
 }
 
 /**
-* Умножение двух переменных в 1С
-* @param any $arg1
-* @param any $arg2
-* @return float Результат сложение в зависемости от типа переменных (float или исключение)
-*/
+ * Умножение двух переменных в 1С
+ * @param $arg1
+ * @param $arg2
+ * @return float Результат сложение в зависимости от типа переменных (float или исключение)
+ * @throws Exception
+ */
 function mul1C($arg1, $arg2){
 
-	if((is_bool($arg1) || is_numeric($arg1)) && !is_string($arg1) && (is_bool($arg2) || is_numeric($arg2)) && !is_string($arg2) ) 
-		if(fPrecision1C) return bcmul($arg1,$arg2,Scale1C);
-			else return $arg1*$arg2;
+	if((is_bool($arg1) || is_numeric($arg1)) && (is_bool($arg2) || is_numeric($arg2)) )
+        if(fPrecision1C) {
+            $scale = scaleLike1C($arg1);
+            return shrinkLastsZero(bcmul($arg1,$arg2,$scale));
+        }
+        else return $arg1*$arg2;
 	throw new Exception("Преобразование значения к типу Число не может быть выполнено");
 }
 
 /**
-* Деление двух переменных в 1С
-* @param any $arg1
-* @param any $arg2
-* @return float Результат сложение в зависемости от типа переменных (float или исключение)
-*/
+ * Деление двух переменных в 1С
+ * @param $arg1
+ * @param $arg2
+ * @return float Результат сложение в зависимости от типа переменных (float или исключение)
+ * @throws Exception
+ */
 function div1C($arg1, $arg2){
 
 	if((is_bool($arg1) || is_numeric($arg1)) && (is_bool($arg2) || is_numeric($arg2)) ){
 		if(fPrecision1C){ 
 			if( bccomp($arg2, "0", Scale1C) === 0) throw new Exception("Деление на 0");
-			else return bcdiv($arg1,$arg2,Scale1C); 
+			else {
+                $scale = scaleLike1C($arg1);
+                return shrinkLastsZero(bcround(bcdiv($arg1,$arg2,$scale+1), $scale));
+                //return bcdiv($arg1,$arg2,$scale+1);
+            }
 		}
 		else{
 			if(floatval($arg2) == 0) throw new Exception("Деление на 0");
@@ -194,23 +162,74 @@ function div1C($arg1, $arg2){
 }
 
 /**
-* Операция преобразования bool в 0 или 1
-* @param any $arg1
-* @param any $arg2
-* @return float преобразование bool в 0 или 1
-*/
-function tran_bool($arg){
-	if($arg === true) return (float)1;
-	else return (float)0;
+ * Алгоритм числа знаков после запятой в вычислениях в 1С
+ * https://mista.ru/topic/892985#20
+ * @param string $arg1
+ * @return int
+ */
+function scaleLike1C(string $arg1):int
+{
+    $pos = strpos($arg1, ".");
+    if($pos === false) return  Scale1C_Int;
+    $pos1 = mb_strlen($arg1) - 1;
+    while(mb_substr($arg1,$pos1,1) == "0" && $pos1>$pos) $pos1--;
+    $pos = $pos1 - $pos;
+    if ($pos<10) return Scale1C;
+    else return intdiv($pos-10,9)*9+45;
+}
+
+
+/**
+ * //https://www.php.net/manual/en/function.bcscale.php
+ * @param $number
+ * @param $scale
+ * @return string
+ */
+function bcround($number, $scale=0): string
+{
+    if($scale < 0) $scale = 0;
+    $sign = '';
+    if(bccomp('0', $number, 64) == 1) $sign = '-';
+    $increment = $sign . '0.' . str_repeat('0', $scale) . '5';
+    $number = bcadd($number, $increment, $scale+1);
+    return bcadd($number, '0', $scale);
 }
 
 /**
-* Операция ИЛИ в 1С
-* @param any $arg1
-* @param any $arg2
-* @return bool Результат операции ИЛИ 
+ * Убрать последние нули в числе
+ * @param string $arg
+ * @return string
+ */
+function shrinkLastsZero(string $arg): string
+{
+    $pos = strpos($arg, ".");
+    if($pos === false) return  $arg;
+    $pos1 = mb_strlen($arg) - 1;
+    while(mb_substr($arg,$pos1,1) == "0" && $pos1>$pos) $pos1--;
+    if(mb_substr($arg,$pos1,1) == ".") $pos1--;
+    return mb_substr($arg, 0, $pos1+1);
+}
+
+/**
+* Операция преобразования bool в 0 или 1
+* @param $arg
+* @return float преобразование bool в 0 или 1
 */
-function or1C($arg1, $arg2){
+function tran_bool($arg): float
+{
+	if($arg === true) return 1.0;
+	else return 0.0;
+}
+
+/**
+ * Операция ИЛИ в 1С
+ * @param $arg1
+ * @param $arg2
+ * @return bool Результат операции ИЛИ
+ * @throws Exception
+ */
+function or1C($arg1, $arg2): bool
+{
 	if(is_bool($arg1)) $arg1 = tran_bool($arg1);
 	if(is_bool($arg2)) $arg2 = tran_bool($arg2);
 	if(isset($arg1) && !is_string($arg1) && !is_object($arg1)) return $arg1 || $arg2;
@@ -218,12 +237,14 @@ function or1C($arg1, $arg2){
 }
 
 /**
-* Операция И в 1С
-* @param any $arg1
-* @param any $arg2
-* @return bool Результат операции И 
-*/
-function and1C($arg1, $arg2){
+ * Операция И в 1С
+ * @param $arg1
+ * @param $arg2
+ * @return bool Результат операции И
+ * @throws Exception
+ */
+function and1C($arg1, $arg2): bool
+{
 	if(is_bool($arg1)) $arg1 = tran_bool($arg1);
 	if(is_bool($arg2)) $arg2 = tran_bool($arg2);
 	if(isset($arg1) && !is_string($arg1) && !is_object($arg1)) return $arg1 && $arg2;
@@ -231,92 +252,88 @@ function and1C($arg1, $arg2){
 }
 
 /**
-* Операция Меньше в 1С
-* @param any $arg1
-* @param any $arg2
-* @return bool Результат операции Меньше 
-*/
-function less1C($arg1, $arg2){
+ * Операция Меньше в 1С
+ * @param $arg1
+ * @param $arg2
+ * @return bool Результат операции Меньше
+ * @throws Exception
+ */
+function less1C($arg1, $arg2): bool
+{
 	if(is_bool($arg1)) $arg1 = tran_bool($arg1);
 	if(is_bool($arg2)) $arg2 = tran_bool($arg2);
 	if(is_numeric($arg1) || is_string($arg1) || (is_object($arg1) && get_class($arg1) === 'php1C\Date1C')) return $arg1 < $arg2;
-	throw new Exception("Операции сравнения на больше-меньше допустимы только для значений совпадающих примитивных типов (Булево, Число, Строка, Дата)");
+	throw new Exception(php1C_error_BadOperTypeEqual);
 }
 
 /**
-* Операция Меньше или равно в 1С
-* @param any $arg1
-* @param any $arg2
-* @return float Результат операции Меньше или равно 
-*/
-function lessequal1C($arg1, $arg2){
-	if(is_bool($arg1)) $arg1 = tran_bool($arg1);
-	if(is_bool($arg2)) $arg2 = tran_bool($arg2);
-	if(is_numeric($arg1) || is_string($arg1) || (is_object($arg1) && get_class($arg1) === 'php1C\Date1C')) return $arg1 <= $arg2;
-	throw new Exception("Операции сравнения на меньше или равно допустима только для значений совпадающих примитивных типов (Булево-Число, Строка, Дата)");
-}
-
-/**
-* Операция Больше в 1С
-* @param any $arg1
-* @param any $arg2
-* @return bool Результат операции Больше 
-*/
-function more1C($arg1, $arg2){
+ * Операция Больше в 1С
+ * @param $arg1
+ * @param $arg2
+ * @return bool Результат операции Больше
+ * @throws Exception
+ */
+function more1C($arg1, $arg2): bool
+{
 	if(is_bool($arg1)) $arg1 = tran_bool($arg1);
 	if(is_bool($arg2)) $arg2 = tran_bool($arg2);
 	if(is_numeric($arg1) || is_string($arg1) || (is_object($arg1) && get_class($arg1) === 'Date1C')) return $arg1 > $arg2;
-	throw new Exception("Операции сравнения на больше допустима только для значений совпадающих примитивных типов (Булево-Число, Строка, Дата)");
+	throw new Exception(php1C_error_BadOperTypeEqual);
 }
 
 /**
-* Операция Больше или равно в 1С
-* @param any $arg1
-* @param any $arg2
-* @return bool Результат операции Больше или равно 
-*/
-function morequal1C($arg1, $arg2){
+ * Операция Равно в 1С
+ * @param $arg1
+ * @param $arg2
+ * @return bool Результат операции Равно
+ * @throws Exception
+ */
+function equal1C($arg1, $arg2): bool
+{
 	if(is_bool($arg1)) $arg1 = tran_bool($arg1);
 	if(is_bool($arg2)) $arg2 = tran_bool($arg2);
-	if(is_numeric($arg1) || is_string($arg1) || (is_object($arg1) && get_class($arg1) === 'php1C\Date1C')) return $arg1 >= $arg2;
-	throw new Exception("Операции сравнения на больше или равно допустима только для значений совпадающих примитивных типов (Булево-Число, Строка, Дата)");
+
+	if(is_numeric($arg1) || is_string($arg1) || (is_object($arg1) && get_class($arg1) === 'php1C\Date1C'))
+        if(fPrecision1C && is_numeric($arg1) && is_string($arg1) ){
+            return shrinkLastsZero($arg1) === shrinkLastsZero($arg2);
+        }
+        else return $arg1 === $arg2;
+	throw new Exception(php1C_error_BadOperTypeEqual);
 }
 
 /**
-* Операция Равно в 1С
-* @param any $arg1
-* @param any $arg2
-* @return bool Результат операции Равно 
-*/
-function equal1C($arg1, $arg2){
-	if(is_bool($arg1)) $arg1 = tran_bool($arg1);
-	if(is_bool($arg2)) $arg2 = tran_bool($arg2);
-	if(is_numeric($arg1) || is_string($arg1) || (is_object($arg1) && get_class($arg1) === 'php1C\Date1C')) return $arg1 === $arg2;
-	throw new Exception("Операции сравнения равно допустима только для значений совпадающих примитивных типов (Булево-Число, Строка, Дата)");
-}
-
-/**
-* Операция Равно в 1С
-* @param any $arg1
-* @param any $arg2
-* @return bool Результат операции Равно 
-*/
-function notequal1C($arg1, $arg2){
+ * Операция НЕ Равно в 1С
+ * @param $arg1
+ * @param $arg2
+ * @return bool Результат операции Равно
+ * @throws Exception
+ */
+function notequal1C($arg1, $arg2): bool
+{
 	if(is_bool($arg1)) $arg1 = tran_bool($arg1);
 	if(is_bool($arg2)) $arg2 = tran_bool($arg2);
 	if(is_numeric($arg1) || is_string($arg1) || (is_object($arg1) && get_class($arg1) === 'php1C\Date1C')) return $arg1 !== $arg2;
-	throw new Exception("Операции сравнения равно допустима только для значений совпадающих примитивных типов (Булево-Число, Строка, Дата)");
+	throw new Exception(php1C_error_BadOperTypeEqual);
+}
+
+function morequal1C($arg1, $arg2): bool
+{
+    return equal1C($arg1,$arg2) || more1C($arg1, $arg2);
+}
+
+function lessqual1C($arg1, $arg2): bool
+{
+    return equal1C($arg1,$arg2) || less1C($arg1, $arg2);
 }
 
 // ---------------------- Общие функции -----------------------------
 
 /**
-* Выводит сообщение через echo
-*
-* @param string $mess
-* @param integer $status (пока не используется)
-*/
-function Message($mess='', $status=0){
+ * Выводит сообщение через echo
+ *
+ * @param string $mess
+ */
+function Message(string $mess=''){
 	echo toString1C($mess);
 }
 
@@ -326,22 +343,23 @@ function Message($mess='', $status=0){
 *
 * @param string $str строка в которой ищут
 * @param string $substr строка поиска(которую ищут)
-* @return возвращает позицию найденной строки начиная с 1. Если ничего не нашло возвратит 0
+* @return int позицию найденной строки начиная с 1. Если ничего не найдено возвратит 0
 */
-function Find($str='', $substr=''){
+function Find(string $str='', string $substr=''): int
+{
 	$res = mb_strpos($str, $substr);
 	if($res === false) return 0;
 	else return $res+1;
 }
 
 /**
-* Проверяет заполненность параметра по 1C
-*
-* @param string $str строка в которой ищут
-* @param string $substr строка поиска(которую ищут)
-* @return Истина если значение заполнено иначе ложь
-*/
-function ValueIsFilled($val){
+ * Проверяет заполненность параметра по 1C
+ *
+ * @param $val
+ * @return bool если значение заполнено иначе ложь
+ */
+function ValueIsFilled($val): bool
+{
 	if(is_object($val)){
 		switch (get_class($val)) {
 		 	case 'php1C\Date1C': return $val != "01.01.0001 00:00:00";
@@ -359,10 +377,7 @@ function ValueIsFilled($val){
 * Класс для работы с типами 1С
 */
 class Type1C{
-	/**
-	* @var string строка описание типа
-	*/
-	private $val; 
+	private string $val;
 
     function __construct($str = '') {
 		$this->val = $str;
@@ -376,15 +391,15 @@ class Type1C{
 /**
 * ТипЗнч - Возвращает тип значения 1C
 *
-* @param  any $val объект для получения типа
-* @return object Type1C 
+* @param  $val - объект для получения типа
+* @return Type1C
 */
-function TypeOf($val){
-
-	$str = "Неопределено";
-	if(is_bool($val)) $str = "Булево"; 
-	elseif(is_numeric($val)) $str = "Число"; 
-	elseif(is_string($val)) $str = "Строка"; 
+function TypeOf($val): Type1C
+{
+	$str = php1C_Undefined;
+	if(is_bool($val)) $str = php1C_strBool;
+	elseif(is_numeric($val)) $str = php1C_Number;
+	elseif(is_string($val)) $str = php1C_String;
 	elseif(is_object($val)) $str = $val->__toString();
 	return new Type1C($str);
 
@@ -394,9 +409,10 @@ function TypeOf($val){
 * Тип - Возвращает тип 1С по его описанию в строке
 *
 * @param string $str строка описание типа
-* @return object Type1C 
+* @return Type1C
 */
-function Type($str){
+function Type(string $str): Type1C
+{
 	return new Type1C($str);
 }	
 

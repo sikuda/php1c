@@ -8,8 +8,7 @@ ini_set('display_errors', 0);
 ini_set('display_startup_errors', 0);
 error_reporting(0);
 
-$lang = $_GET["lang"];
-if(isset($lang)) define(Language1C, $lang); 
+if(isset($_GET["lang"])) $Language1C = $_GET["lang"];
 require_once('src/php1C__code.php');
 
     $str = 'Silence is gold';
@@ -24,7 +23,7 @@ require_once('src/php1C__code.php');
     	//$str .= '2'.isset($iscode);
     	if(isset($_GET["code"])) $str = php1C\makeCode($code);
     	else{	
-	    	if (Language1C === 'en') {
+	    	if ($Language1C === 'en') {
 	            $str = php1C\makeCode($code, "Result");    
 	        }
 	        else{
@@ -32,5 +31,4 @@ require_once('src/php1C__code.php');
 	        } 
 	    }
 	}	
-	echo $str;
-?>
+	echo \php1C\toString1C($str);

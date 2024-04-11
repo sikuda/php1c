@@ -1,4 +1,4 @@
-function (){
+function main(){
 
 	var token = function(){
 		this.type = 0;
@@ -67,13 +67,13 @@ function (){
 		const str_Identifiers = '/^[_A-Za-zА-Яа-яЁё][_0-9A-Za-zА-Яа-яЁё]*/u';
 
 		//Ключевые слова - type_keyword
-		const keywordsRus = array('НЕОПРЕДЕЛЕНО', 'ИСТИНА','ЛОЖЬ', 'ЕСЛИ', 'ТОГДА', 'ИНАЧЕЕСЛИ', 'ИНАЧЕ',   'КОНЕЦЕСЛИ','ПОКА',  'ДЛЯ', 'КАЖДОГО', 'ПО','В', 'ЦИКЛ','КОНЕЦЦИКЛА','ПРЕРВАТЬ','ПРОДОЛЖИТЬ'),
-		const keywordsEng = array('Undefined',    'true',  'false','if(',  '){',    '} elseif {','} else {','}',        'while(','for(','foreach(','',  'in','){',  '}',         'break',   'continue'),
+		const keywordsRus = array('НЕОПРЕДЕЛЕНО', 'ИСТИНА','ЛОЖЬ', 'ЕСЛИ', 'ТОГДА', 'ИНАЧЕЕСЛИ', 'ИНАЧЕ',   'КОНЕЦЕСЛИ','ПОКА',  'ДЛЯ', 'КАЖДОГО', 'ПО','В', 'ЦИКЛ','КОНЕЦЦИКЛА','ПРЕРВАТЬ','ПРОДОЛЖИТЬ')
+		const keywordsEng = array('Undefined',    'true',  'false','if(',  '){',    '} elseif {','} else {','}',        'while(','for(','foreach(','',  'in','){',  '}',         'break',   'continue')
 		const keyword_undefined = 0; const keyword_true = 1; const keyword_false = 2; const keyword_if = 3; const keyword_then = 4; const keyword_elseif = 5; const keyword_else = 6; const keyword_endif = 7; const keyword_while = 8; const keyword_for = 9; const keyword_foreach = 10; const keyword_to = 11; const keyword_in = 12; const keyword_circle = 13; const keyword_endcircle = 14; const keyword_break = 15;  const keyword_continue = 16; 
 
 		//Индентификаторы типов - type_identification
-		this.identypesRus = array('МАССИВ','ФАЙЛ'),
-		this.identypesEng = array('Array1C', 'File1C'),
+		this.identypesRus = array('МАССИВ','ФАЙЛ')
+		this.identypesEng = array('Array1C', 'File1C')
 			
 		this.functions1СRus = array();  // функции по русски в верхнем регистре для поиска
 		this.functions1СEng = array(),  // функции по английски в вернем регистре для поиска
@@ -83,4 +83,4 @@ function (){
 		this.indexFuncComm = -1;
 
 	}
-}();
+}
