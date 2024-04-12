@@ -8,8 +8,7 @@
 
 namespace php1C;
 use Exception;
-
-require_once('php1C_common.php');
+//require_once('php1C_common.php');
 
 /**
 * Класс токена - элемент кода
@@ -40,7 +39,7 @@ class TokenStream {
     //private int $i_token = 0;
 
     //common 
-	private $str = '';
+	private $str;
 	private int $start = 0;
 	private int $pos = 0;
 
@@ -67,30 +66,29 @@ class TokenStream {
     const type_variable       = 50;
     
     //Операции(operations)
-	const oper_undefined    = 0;
-	const oper_open_bracket  = 1;
-	const oper_closebracket = 2;
-	const oper_plus         = 3;
-	const oper_minus        = 4;
-	const oper_div          = 5;
-	const oper_mult         = 6;
-	const oper_point        = 7;
-	const oper_equal        = 8;
-	const oper_semicolon    = 9;
-	const oper_comma        = 10;
-	const oper_less         = 11;
-	const oper_lessequal    = 12;
-	const oper_more         = 13;
-	const oper_morequal     = 14;
-	const oper_question     = 15;
-	const oper_notequal     = 16;
-	const oper_or           = 20;
-	const oper_xor          = 21; //todo
-	const oper_and          = 22;
-	const oper_not          = 23;
-	const oper_new          = 25;
-	const oper_opensqbracket  = 26;
-	const oper_closesqbracket = 27;
+    const operation_open_bracket  = 1;
+	const operation_close_bracket = 2;
+	const operation_plus         = 3;
+	const operation_minus        = 4;
+	const operation_div          = 5;
+	const operation_multi         = 6;
+	const operation_point        = 7;
+	const operation_equal        = 8;
+	const operation_semicolon    = 9;
+	const operation_comma        = 10;
+	const operation_less         = 11;
+	const operation_less_equal    = 12;
+	const operation_more         = 13;
+	const operation_more_equal     = 14;
+	const operation_question     = 15;
+	const operation_notequal     = 16;
+	const operation_or           = 20;
+	//const operation_xor        = 21;
+    const operation_and          = 22;
+	const operation_not          = 23;
+	const operation_new          = 25;
+	const operation_open_sq_bracket  = 26;
+	const operation_close_sq_bracket = 27;
 	
 	//Ключевые слова(keywords)
 	const keyword_undefined = 0; 
@@ -105,26 +103,26 @@ class TokenStream {
 	const keyword_for    = 9; 
 	const keyword_foreach = 10; 
 	const keyword_to     = 11; 
-	const keyword_in     = 12; 
+	//const keyword_in     = 12;
 	const keyword_from   = 13;
 	const keyword_circle = 14; 
-	const keyword_endcircle = 15; 
+	const keyword_end_circle = 15; 
 	const keyword_break  = 16;  
 	const keyword_continue = 17; 
 	const keyword_function = 18; 
 	const keyword_procedure = 19; 
-	const keyword_endfunction = 20; 
-	const keyword_endprocedure = 21; 
+	const keyword_end_function = 20; 
+	const keyword_end_procedure = 21; 
 	const keyword_return  = 22; 
 	const keyword_var     = 23; 
 	const keyword_chars   = 24; 
 	const keyword_export  = 25; 
 	const keyword_val     =26;
 
-	//Индентификаторы типов - type_identification
-	public $identypes = array(
+	//Идентификаторы типов - type_identification
+	public array $idTypes = array(
 		"lng" => array(), // типы на языке в верхнем регистре для поиска	
-        "php" => array()  // типы по английски как будет в коде			
+        "php" => array()  // типы по-английски как будет в коде			
 	);
 	public int $indexTypesColl = -1;
 
@@ -136,11 +134,11 @@ class TokenStream {
 		"php" => array()   // функции по-английски как будет в коде
 	);
 	//Индексы функций модулей
-	public $indexFuncCom = -1;
-	public $indexFuncStr = -1;
-	public $indexFuncNum = -1;
-	public $indexFuncDate = -1;
-	public $indexFuncColl = -1;
+	public int $indexFuncCom = -1;
+	public int $indexFuncStr = -1;
+	public int $indexFuncNum = -1;
+	public int $indexFuncDate = -1;
+	public int $indexFuncColl = -1;
 
 	/**
 	* Конструктор класса
@@ -152,7 +150,7 @@ class TokenStream {
 		$this->str = $str;
 
 		//Добавление в таблицы общих типов
-		$this->indexTypesColl  = $this->AddTypes( php1C_types_Collection,  php1C_typesPHP_Collection);
+		$this->indexTypesColl  = $this->AddTypes();
 
 		//Добавление в таблицы общих функций 
 		$this->indexFuncCom  = $this->AddModule( php1C_functions_Com,  php1C_functionsPHP_Com);
@@ -165,21 +163,17 @@ class TokenStream {
 	/**
 	* Добавление типов в общую таблицу типов
 	*
-    * @param $types array массив названий типов на выбранном языке
-    * @param $typesPHP array массив английских названий типов в PHP
-    * @return int возвращаем верхнюю границу модуля в общем списке 
+     * @return int возвращаем верхнюю границу модуля в общем списке
 	*/
-	private function AddTypes( $types, $typesPHP ): int
+	private function AddTypes(): int
     {
-		if(is_array($types) && is_array($typesPHP) ){
-			foreach ($types as $value) {
-				$this->identypes['lng'][] = mb_strtoupper($value);
-			}
-			foreach ($typesPHP as $value) {
-				$this->identypes['php'][] = $value;
-			}
-		}
-		return count($this->identypes['php']);
+        foreach (php1C_types_Collection as $value) {
+            $this->idTypes['lng'][] = mb_strtoupper($value);
+        }
+        foreach (php1C_typesPHP_Collection as $value) {
+            $this->idTypes['php'][] = $value;
+        }
+		return count($this->idTypes['php']);
 
 	}
 
@@ -192,14 +186,12 @@ class TokenStream {
      */
 	private function AddModule( array $func, array $funcPHP ): int
     {
-		//if(is_array($func) && is_array($funcPHP) ){
-			foreach ($func as $value) {
-				$this->functions1C['lng'][] = mb_strtoupper($value);
-			}
-			foreach ($funcPHP as $value) {
-				$this->functions1C['php'][] = $value;
-			}
-		//}
+        foreach ($func as $value) {
+            $this->functions1C['lng'][] = mb_strtoupper($value);
+        }
+        foreach ($funcPHP as $value) {
+            $this->functions1C['php'][] = $value;
+        }
 		return count($this->functions1C['php']);
 	}
 
@@ -219,11 +211,11 @@ class TokenStream {
     {
 		return mb_substr($this->str,$this->pos); 
 	}
-	private function prev(): string
-    {
-		if($this->pos>=0) return mb_substr($this->str,$this->pos-1,1);
-		else return ''; 
-	}
+//	private function prev(): string
+//    {
+//		if($this->pos>=0) return mb_substr($this->str,$this->pos-1,1);
+//		else return '';
+//	}
 	private function curr(): string
     {
 		if ($this->pos <= mb_strlen($this->str)) return mb_substr($this->str, $this->pos, 1) ;
@@ -238,36 +230,40 @@ class TokenStream {
 		$this->pos+= $count;
 	}
 	
-	private function match($pattern){
-		$text = $this->future();
-		if( preg_match($pattern, $text) === 1 ) return true;
-		else return false;
-	}
-	private function matchMove($pattern){
-		$text = $this->future();
-		if( preg_match($pattern, $text, $matches) === 1 ){
+//	private function match($pattern): bool
+//    {
+//		$text = $this->future();
+//		if( preg_match($pattern, $text) === 1 ) return true;
+//		else return false;
+//	}
+	private function matchMove(): bool
+    {
+        $text = $this->future();
+		if( preg_match(php1C_Identifiers, $text, $matches) === 1 ){
 			$this->move(mb_strlen($matches[0]));
 			return true;
 		}
 		else return false;
 	}
-	private function eatWhile($pattern) {
-		$start = $this->pos;
-		while ( preg_match($pattern, $this->curr())) { $this->pos++; }
-		return $this->pos > $start;
-	}
-	private function eatSymbols($pattern) {
-		$start = $this->pos;
-		$pattern = '/['.$pattern.']/';
+	private function eatWhile(): void
+    {
+        while ( preg_match('/[0-9]/', $this->curr())) { $this->pos++; }
+    }
+	private function eatSymbols(): bool
+    {
+        $start = $this->pos;
+        //$pattern = '/['. "\r" .']/';
+        $pattern = '/\r/';
 		while ( preg_match($pattern, $this->curr())) { $this->pos++; }
 		return $this->pos > $start;
 	}
 
-	private function eatTo($pattern) {
+	private function eatTo($pattern): bool
+    {
 		while ( !$this->eol() ){
 			$ch = $this->curr();
-			$strpos = strpos( $pattern, $ch); 
-			if( $strpos === false) $this->pos++;
+			$posStr = strpos( $pattern, $ch);
+			if( $posStr === false) $this->pos++;
 			else {
 				$this->pos++;
 				return true;	
@@ -275,29 +271,31 @@ class TokenStream {
 		}
 		return false;
 	}
-	private function skipToEndLine() {
+	private function skipToEndLine(): void
+    {
 		$this->row += 1;
-		$this->col = 1; 
-		return $this->eatTo("\n");
-	}
+		$this->col = 1;
+        $this->eatTo("\n");
+    }
 
     /**
      * Прочитать очередной токен из строки
      * @throws Exception
      */
-	private function readToken(){
+	private function readToken(): Token
+    {
 
 		if($this->eol()) return new Token(self::type_end_code, self::type_undefined);
 
 		//Съедаем все возвраты каретки
-		if( $this->eatSymbols("\r") ){
+		if( $this->eatSymbols() ){
 		     //$this->col += ($this->pos - $this->start);
 		 	$this->start = $this->pos;
 		    if($this->eol()) return new Token(self::type_end_code, self::type_undefined);
 		}
 				
 		$ch = $this->curr();
-		$prev = $this->prev();
+		//$prev = $this->prev();
 
 		//Обработка новой строки
 		if( $ch === "\n" ){
@@ -311,7 +309,7 @@ class TokenStream {
 		}
 		
 		if( $ch === "\t" ){
-		    $this->move(1);
+		    $this->move();
 		 	return new Token(self::type_tablespace, $ch);
 		}
 
@@ -331,10 +329,10 @@ class TokenStream {
 
 		//Обработка чисел с одной точкой и лидирующей цифрой.
 		if( is_numeric($ch) ){
-			$this->eatWhile('/[0-9]/');
+			$this->eatWhile();
 			if($this->curr() === '.'){
 				$this->move();
-				$this->eatWhile('/[0-9]/');	
+				$this->eatWhile();
 			} 
 			return new Token(self::type_number, $this->current());
 		}
@@ -354,7 +352,7 @@ class TokenStream {
 			while( !$this->eol() ){
 				$this->move();
 				if($ch === "'"){
-					//только правильные даты 191711070000 или 194506240000 или 19450509000000
+					//только правильные даты 191711070000, 194506240000 или 19450509000000
 					if( mb_strlen($value) == 14 || mb_strlen($value) == 12 || mb_strlen($value) == 8){
 						if( !checkdate(mb_substr($value, 4, 2), mb_substr($value, 6, 2),mb_substr($value, 0, 4))){
 							throw new Exception(php1C_error_BadDateType);	
@@ -375,50 +373,50 @@ class TokenStream {
 			if($ch=='<'){
 				if( $this->curr()=='>'){
 				$this->move();
-				return new Token(self::type_operator,'<>',self::oper_notequal);
+				return new Token(self::type_operator,'<>',self::operation_notequal);
 				}
 				elseif($this->curr()=='='){
 					$this->move();
-					return new Token(self::type_operator,'<=',self::oper_lessequal);
+					return new Token(self::type_operator,'<=',self::operation_less_equal);
 				}
 			}
 			if($ch=='>' && $this->curr()=='='){
 				$this->move();
-				return new Token(self::type_operator,'>=',self::oper_morequal);
+				return new Token(self::type_operator,'>=',self::operation_more_equal);
 			}	
 
 			switch($ch){
-				case '(': return new Token(self::type_operator, '(', self::oper_open_bracket);
-				case ')': return new Token(self::type_operator, ')', self::oper_closebracket);
-				case '+': return new Token(self::type_operator, '+', self::oper_plus);
-				case '-': return new Token(self::type_operator, '-', self::oper_minus);
-				case '/': return new Token(self::type_operator, '/', self::oper_div);
-				case '*': return new Token(self::type_operator, '*', self::oper_mult);
-				case '.': return new Token(self::type_operator, '.', self::oper_point);
-				case '=': return new Token(self::type_operator, '=', self::oper_equal);
-				case ';': return new Token(self::type_operator, ';', self::oper_semicolon);
-				case ',': return new Token(self::type_operator, ',', self::oper_comma);
-				case '<': return new Token(self::type_operator, '<', self::oper_less);
-				case '>': return new Token(self::type_operator, '>', self::oper_more);
-				case '?': return new Token(self::type_operator, '?', self::oper_question);
-				case '[': return new Token(self::type_operator, '[', self::oper_opensqbracket);
-				case ']': return new Token(self::type_operator, ']', self::oper_closesqbracket);
+				case '(': return new Token(self::type_operator, '(', self::operation_open_bracket);
+				case ')': return new Token(self::type_operator, ')', self::operation_close_bracket);
+				case '+': return new Token(self::type_operator, '+', self::operation_plus);
+				case '-': return new Token(self::type_operator, '-', self::operation_minus);
+				case '/': return new Token(self::type_operator, '/', self::operation_div);
+				case '*': return new Token(self::type_operator, '*', self::operation_multi);
+				case '.': return new Token(self::type_operator, '.', self::operation_point);
+				case '=': return new Token(self::type_operator, '=', self::operation_equal);
+				case ';': return new Token(self::type_operator, ';', self::operation_semicolon);
+				case ',': return new Token(self::type_operator, ',', self::operation_comma);
+				case '<': return new Token(self::type_operator, '<', self::operation_less);
+				case '>': return new Token(self::type_operator, '>', self::operation_more);
+				case '?': return new Token(self::type_operator, '?', self::operation_question);
+				case '[': return new Token(self::type_operator, '[', self::operation_open_sq_bracket);
+				case ']': return new Token(self::type_operator, ']', self::operation_close_sq_bracket);
 			}
 			throw new Exception(php1C_error_UndefineOperator.' '.$ch);	
 		}
 	    
 		//Обработка переменных, ключевых слов или функций
-		if( $this->matchMove(php1C_Identifiers)){
+		if( $this->matchMove()){
 			
 			$current = mb_strtoupper($this->current());
-			if($current == php1C_type_New ) return new Token(self::type_operator, php1C_type_New, self::oper_new);
-			elseif($current == php1C_OR ) return new Token(self::type_operator, php1C_OR, self::oper_or);
-			elseif($current == php1C_AND ) return new Token(self::type_operator, php1C_AND, self::oper_and);
-			elseif($current == php1C_NOT ) return new Token(self::type_operator, php1C_NOT, self::oper_not);	
+			if($current == php1C_type_New ) return new Token(self::type_operator, php1C_type_New, self::operation_new);
+			elseif($current == php1C_OR ) return new Token(self::type_operator, php1C_OR, self::operation_or);
+			elseif($current == php1C_AND ) return new Token(self::type_operator, php1C_AND, self::operation_and);
+			elseif($current == php1C_NOT ) return new Token(self::type_operator, php1C_NOT, self::operation_not);	
 			elseif($this->curr() == '('){
 				//Идентификатор типа с аргументами
-				$key = array_search($current, $this->identypes['lng']);
-				if( $key !== false ) return new Token(self::type_identification, $this->identypes['php'][$key], $key);
+				$key = array_search($current, $this->idTypes['lng']);
+				if( $key !== false ) return new Token(self::type_identification, $this->idTypes['php'][$key], $key);
 				$this->move();
 				//Общая функция на языке
 				$key = array_search($current.'(', $this->functions1C['lng']);
@@ -427,7 +425,7 @@ class TokenStream {
 					//нераспознанные функции переводим на английский
 					return new Token(self::type_extinction, str_replace(php1C_LetterLng, php1C_LetterEng, $current));
 				}
-				//throw new Exception( php1C_error_UndefineFunction.' ('.$current.')');
+				//throw new Exception( php1C_error_UndefinedFunction.' ('.$current.')');
 		    } 
 			else{
 				//Идентификатор без аргументов
@@ -435,7 +433,7 @@ class TokenStream {
 				if( $key !== false ) return new Token(self::type_keyword, $current, $key);
 				else{
 					//Идентификатор типа без скобок
-					$key = array_search($current, $this->identypes['lng']);
+					$key = array_search($current, $this->idTypes['lng']);
 					if( $key !== false ) return new Token(self::type_identification, $current, $key);
 					//Нераспознанные переменные
 					if( fEnglishVariable ) return new Token(self::type_variable, str_replace(php1C_LetterLng, php1C_LetterEng, $current));
