@@ -8,7 +8,7 @@
 
 namespace php1C;
 use Exception;
-//require_once('php1C_common.php');
+require_once('php1C_common.php');
 
 /**
 * Класс токена - элемент кода

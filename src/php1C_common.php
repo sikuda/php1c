@@ -1,4 +1,4 @@
-<?php /** @_noinspection ALL */
+<?php
 
 /**
 * Общий модуль работы с 1С
@@ -10,19 +10,19 @@
 namespace php1C;
 use Exception;
 
-//require_once('php1C_settings.php');
-//if (Language1C === 'en') {
-// 	require_once('lang/en.php');
-//}
-//else{
-//	require_once('lang/ru.php');
-//}
-//
-//require_once('php1C_number.php');
-//require_once('php1C_string.php');
-//require_once('php1C_date.php');
-//require_once('php1C_collections.php');
-//require_once('php1C_file.php');
+require_once('php1C_settings.php');
+if (Language1C === 'en') {
+ 	require_once('lang/en.php');
+}
+else{
+	require_once('lang/ru.php');
+}
+
+require_once('php1C_number.php');
+require_once('php1C_string.php');
+require_once('php1C_date.php');
+require_once('php1C_collections.php');
+require_once('php1C_file.php');
 
 /**
 * Массив функций PHP для общей работы с 1С. Соответствует элементам в языковых файлах.
@@ -64,11 +64,12 @@ function toString1C($arg): string
 }
 
 /**
-* Преобразует аргумент в число 
-* @param string|float $arg число как строка
-* @return string|float Возвращаем значение числа как в 1С (string - для чисел повышенной точности, float - если повышенная точность не важна
-*/  
-function toNumber1C($arg){
+ * Преобразует аргумент в число
+ * @param $arg
+ * @return mixed - Возвращаем значение числа как в 1С (string - для чисел повышенной точности, float - если повышенная точность не важна
+ */
+function toNumber1C($arg)
+{
 	if(fPrecision1C) return $arg;
 	else return floatval($arg);
 }
@@ -80,7 +81,7 @@ function toNumber1C($arg){
  * @return string Результат сложение в зависимости от типа переменных (string, bool, Date1C)
  * @throws Exception
  */
-function add1C($arg1, $arg2){
+function add1C($arg1, $arg2) {
 
 	if(is_bool($arg1) || is_numeric($arg1)){
 		if(is_bool($arg2) || is_numeric($arg2)) 
@@ -100,7 +101,7 @@ function add1C($arg1, $arg2){
  * Вычитание двух переменных в 1С
  * @param $arg1
  * @param $arg2
- * @return float, Date1C Результат вычитания в зависимости от типа переменных (float, Date1C, исключение)
+ * @return mixed - Date1C Результат вычитания в зависимости от типа переменных (float, Date1C, исключение)
  * @throws Exception
  */
 function sub1C($arg1, $arg2){
@@ -121,10 +122,11 @@ function sub1C($arg1, $arg2){
  * Умножение двух переменных в 1С
  * @param $arg1
  * @param $arg2
- * @return float Результат сложение в зависимости от типа переменных (float или исключение)
+ * @return float|int|string - Результат сложение в зависимости от типа переменных (float или исключение)
  * @throws Exception
  */
-function mul1C($arg1, $arg2){
+function mul1C($arg1, $arg2)
+{
 
 	if((is_bool($arg1) || is_numeric($arg1)) && (is_bool($arg2) || is_numeric($arg2)) )
         if(fPrecision1C) {
@@ -139,7 +141,7 @@ function mul1C($arg1, $arg2){
  * Деление двух переменных в 1С
  * @param $arg1
  * @param $arg2
- * @return float Результат сложение в зависимости от типа переменных (float или исключение)
+ * @return float|int|string Результат сложение в зависимости от типа переменных (float или исключение)
  * @throws Exception
  */
 function div1C($arg1, $arg2){

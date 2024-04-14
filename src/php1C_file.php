@@ -10,7 +10,7 @@
 * @version 0.1
 */
 namespace php1C;
-//require_once( 'php1C_date.php'); //todo
+require_once( 'php1C_date.php');
 
 
 class File1C {

@@ -10,7 +10,7 @@
 */
 namespace php1C;
 use Exception;
-//require_once('php1C__tokens.php');
+require_once('php1C__tokens.php');
 
 /**
 * Массив названий типов для работы с коллекциями переименовании
@@ -193,7 +193,7 @@ class Structure1C{
      * @param $value
      * @return bool
      */
-    function Property($key, &$value): bool
+    function Property($key, &$value=null): bool
     {
 		if( fEnglishVariable ) $key = str_replace(php1C_LetterLng, php1C_LetterEng, $key);
 		$key = mb_strtoupper($key);

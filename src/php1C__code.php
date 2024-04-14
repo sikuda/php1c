@@ -9,8 +9,8 @@
 */
 namespace php1C;
 use Exception;
-//require_once( 'php1C__tokens.php');
-//require_once( 'php1C_common.php');
+require_once( 'php1C__tokens.php');
+require_once( 'php1C_common.php');
 
 /**
 * Класс обработки потока кода 1С
@@ -266,7 +266,7 @@ class CodeStream {
 				if( $this->Index === TokenStream::operation_open_sq_bracket){
 					$this->GetChar();
 					$this->code = '$'.$key.'->GET('.$this->Expression7().')';
-					$this->MatchOperation(TokenStream::operation_close_bracket, ']');
+                    $this->MatchOperation(TokenStream::operation_close_sq_bracket, ']');
 				}
 				//Обработка точки - свойств или функций
 				else{
@@ -377,19 +377,19 @@ class CodeStream {
 							$this->code = 'php1C\less1C('.array_pop($this->codeStack).','.$this->code.')';
 							break;
 						case TokenStream::operation_less_equal:
-							$this->code = 'php1C\lessequal1C('.array_pop($this->codeStack).','.$this->code.')';
+							$this->code = 'php1C\less_equal1C('.array_pop($this->codeStack).','.$this->code.')';
 							break;
 						case TokenStream::operation_equal:
 							$this->code = 'php1C\equal1C('.array_pop($this->codeStack).','.$this->code.')';
 							break;
 						case TokenStream::operation_notequal:
-							$this->code = 'php1C\notequal1C('.array_pop($this->codeStack).','.$this->code.')';
+							$this->code = 'php1C\not_equal1C('.array_pop($this->codeStack).','.$this->code.')';
 							break;	
 						case TokenStream::operation_more:
 							$this->code = 'php1C\more1C('.array_pop($this->codeStack).','.$this->code.')';
 							break;
 						case TokenStream::operation_more_equal:
-							$this->code = 'php1C\morequal1C('.array_pop($this->codeStack).','.$this->code.')';
+							$this->code = 'php1C\more_equal1C('.array_pop($this->codeStack).','.$this->code.')';
 							break;		
 						default:
 						 	throw new Exception('Операция не принадлежит этому уровню '.$this->Look);
@@ -739,9 +739,8 @@ class CodeStream {
 				if(isset($name_var)){
 					if(fEnglishVariable) $name_var = str_replace(php1C_LetterLng, php1C_LetterEng, $name_var);
 					$name_var = mb_strtoupper($name_var);
-                    $RESULTANT = "$name_var";
-					eval($this->codePHP);
-                    return $RESULTANT;
+                    eval($this->codePHP);
+                    return ${$name_var};
 				}
 				else return $this->codePHP;
 			}  
