@@ -87,6 +87,7 @@ function add1C($arg1, $arg2) {
 		if(is_bool($arg2) || is_numeric($arg2)) 
 			if(fPrecision1C) return shrinkLastsZero(bcadd($arg1,$arg2,Scale1C));
 			else return $arg1+$arg2;
+        elseif(is_string($arg2)) return $arg1 . $arg2;
 	}
     elseif (is_string($arg1)) {
         return $arg1 . $arg2;
@@ -112,7 +113,7 @@ function sub1C($arg1, $arg2){
 			else return $arg1-$arg2;
 	}
 	elseif(is_object($arg1)){
-		if( $arg1.is_object(Date1C::class) && is_numeric($arg2) && !is_string($arg2) )
+		if( $arg1.is_object(Date1C::class) && is_numeric($arg2) )
             return $arg1->sub($arg2);
 	}	
 	throw new Exception("Преобразование значения к типу Число не может быть выполнено");
