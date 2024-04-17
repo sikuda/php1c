@@ -616,11 +616,13 @@ class ValueTable{
 		if(is_object($row) && get_class($row) === 'php1C\ValueTableRow'){
 			$row = $this->IndexOf($row);
 		}
-		if(!is_float($row) && !is_int($row)) throw new Exception("Первый параметр должен быть числом или строкой ТаблицыЗначений");
-		if(!is_float($offset) && !is_int($offset)) throw new Exception("Второй параметр должен быть числом");
-		$row_object = $this->rows[$row];
-		array_splice($this->rows,$row,1);
-		array_splice($this->rows,$row+$offset,0,array($row_object));
+        $row_int = intval($row);
+        $offset_int = intval($offset);
+		//if(!is_float($row) && !is_int($row)) throw new Exception("Первый параметр должен быть числом или строкой ТаблицыЗначений");
+		//if(!is_float($offset) && !is_int($offset)) throw new Exception("Второй параметр должен быть числом");
+		$row_object = $this->rows[$row_int];
+		array_splice($this->rows,$row_int,1);
+		array_splice($this->rows,$row_int+$offset_int,0,array($row_object));
 	}
 
 	/** 
@@ -811,7 +813,8 @@ class ValueTableRow{
 	}
 
 	function setValueTable($parent){
-		$this->ValueTable = &$parent;
+        if ($parent === null) unset($this->ValueTable);
+		else $this->ValueTable = &$parent;
 	}
 
 	//Для получения данных через точку
@@ -847,11 +850,11 @@ class CollectionIndexes{
 	* @var array коллекция значений в строке
 	*/
 	private $ValueTable;
-	private $indexs;
+	private array $indexs;
 
 	function __construct($parent){
 	 	$this->ValueTable = &$parent;
-	 	$this->indexs = CollectionIndex();
+	 	$this->indexs = array();
 	}
 
 	function __toString(){
@@ -886,7 +889,7 @@ class CollectionIndexes{
 	function Clear(): void
     {
 		unset($this->indexs);
-		$this->indexs = CollectionIndex();
+		$this->indexs = array();
 	}
 
 	function Del($key): void
