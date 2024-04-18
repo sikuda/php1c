@@ -1,4 +1,4 @@
-<?php /** @_noinspection ALL */
+<?php
 
 /**
 * Общий модуль работы с 1С
@@ -12,7 +12,7 @@ use Exception;
 
 require_once('php1C_settings.php');
 if (Language1C === 'en') {
- 	require_once('lang/en.php');   
+ 	require_once('lang/en.php');
 }
 else{
 	require_once('lang/ru.php');
@@ -64,11 +64,12 @@ function toString1C($arg): string
 }
 
 /**
-* Преобразует аргумент в число 
-* @param string|float $arg число как строка
-* @return string|float Возвращаем значение числа как в 1С (string - для чисел повышенной точности, float - если повышенная точность не важна
-*/  
-function toNumber1C($arg){
+ * Преобразует аргумент в число
+ * @param $arg
+ * @return mixed - Возвращаем значение числа как в 1С (string - для чисел повышенной точности, float - если повышенная точность не важна
+ */
+function toNumber1C($arg)
+{
 	if(fPrecision1C) return $arg;
 	else return floatval($arg);
 }
@@ -80,12 +81,13 @@ function toNumber1C($arg){
  * @return string Результат сложение в зависимости от типа переменных (string, bool, Date1C)
  * @throws Exception
  */
-function add1C($arg1, $arg2){
+function add1C($arg1, $arg2) {
 
 	if(is_bool($arg1) || is_numeric($arg1)){
 		if(is_bool($arg2) || is_numeric($arg2)) 
 			if(fPrecision1C) return shrinkLastsZero(bcadd($arg1,$arg2,Scale1C));
 			else return $arg1+$arg2;
+        elseif(is_string($arg2)) return $arg1 . $arg2;
 	}
     elseif (is_string($arg1)) {
         return $arg1 . $arg2;
@@ -100,7 +102,7 @@ function add1C($arg1, $arg2){
  * Вычитание двух переменных в 1С
  * @param $arg1
  * @param $arg2
- * @return float, Date1C Результат вычитания в зависимости от типа переменных (float, Date1C, исключение)
+ * @return mixed - Date1C Результат вычитания в зависимости от типа переменных (float, Date1C, исключение)
  * @throws Exception
  */
 function sub1C($arg1, $arg2){
@@ -111,7 +113,7 @@ function sub1C($arg1, $arg2){
 			else return $arg1-$arg2;
 	}
 	elseif(is_object($arg1)){
-		if( $arg1.is_object(Date1C::class) && is_numeric($arg2) && !is_string($arg2) )
+		if( $arg1.is_object(Date1C::class) && is_numeric($arg2) )
             return $arg1->sub($arg2);
 	}	
 	throw new Exception("Преобразование значения к типу Число не может быть выполнено");
@@ -121,10 +123,11 @@ function sub1C($arg1, $arg2){
  * Умножение двух переменных в 1С
  * @param $arg1
  * @param $arg2
- * @return float Результат сложение в зависимости от типа переменных (float или исключение)
+ * @return float|int|string - Результат сложение в зависимости от типа переменных (float или исключение)
  * @throws Exception
  */
-function mul1C($arg1, $arg2){
+function mul1C($arg1, $arg2)
+{
 
 	if((is_bool($arg1) || is_numeric($arg1)) && (is_bool($arg2) || is_numeric($arg2)) )
         if(fPrecision1C) {
@@ -139,7 +142,7 @@ function mul1C($arg1, $arg2){
  * Деление двух переменных в 1С
  * @param $arg1
  * @param $arg2
- * @return float Результат сложение в зависимости от типа переменных (float или исключение)
+ * @return float|int|string Результат сложение в зависимости от типа переменных (float или исключение)
  * @throws Exception
  */
 function div1C($arg1, $arg2){
@@ -149,8 +152,7 @@ function div1C($arg1, $arg2){
 			if( bccomp($arg2, "0", Scale1C) === 0) throw new Exception("Деление на 0");
 			else {
                 $scale = scaleLike1C($arg1);
-                return shrinkLastsZero(bcround(bcdiv($arg1,$arg2,$scale+1), $scale));
-                //return bcdiv($arg1,$arg2,$scale+1);
+                return shrinkLastsZero(round1C(bcdiv($arg1,$arg2,$scale+1), $scale));
             }
 		}
 		else{
@@ -182,10 +184,10 @@ function scaleLike1C(string $arg1):int
 /**
  * //https://www.php.net/manual/en/function.bcscale.php
  * @param $number
- * @param $scale
+ * @param int $scale
  * @return string
  */
-function bcround($number, $scale=0): string
+function round1C($number, int $scale=0): string
 {
     if($scale < 0) $scale = 0;
     $sign = '';
@@ -316,12 +318,18 @@ function notequal1C($arg1, $arg2): bool
 	throw new Exception(php1C_error_BadOperTypeEqual);
 }
 
-function morequal1C($arg1, $arg2): bool
+/**
+ * @throws Exception
+ */
+function more_equal1C($arg1, $arg2): bool
 {
     return equal1C($arg1,$arg2) || more1C($arg1, $arg2);
 }
 
-function lessqual1C($arg1, $arg2): bool
+/**
+ * @throws Exception
+ */
+function less_equal1C($arg1, $arg2): bool
 {
     return equal1C($arg1,$arg2) || less1C($arg1, $arg2);
 }
