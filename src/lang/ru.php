@@ -115,11 +115,33 @@ const php1C_NOT = 'НЕ';
 /*
 * Представление ошибок на языке
 */
+const php1C_error_BadConstTypeNumber = 'Неправильная константа типа число ';
+const php1C_error_BadDateType      = 'Неправильная константа типа Дата';
+const php1C_error_BadNonOperAfterVar ='Неизвестный не оператор после переменной ';
+const php1C_error_BadOperTypeEqual = "Операции сравнения равно допустима только для значений совпадающих примитивных типов (Булево-Число, Строка, Дата)";
+const php1C_error_DoubleOper = 'Двойной оператор ';
+const php1C_error_LostSymbol = 'Пропущен символ ';
+const php1C_error_Expected = "Ожидается -";
+const php1C_error_ExpectedComma = 'Ожидается запятая , ';
+const php1C_error_ExpectedConstructionIfThen = 'Ожидается конструкция Если ... Тогда';
+const php1C_error_ExpectedConstructionIfThenElseIf = 'Ожидается конструкция Если ... Тогда(ИначеЕсли)';
+const php1C_error_ExpectedConstructionWhileDo = 'Ожидается конструкции Пока(Для) ... Цикл';
+const php1C_error_ExpectedIdentType = 'Ожидается идентификатор типа, а не ';
+const php1C_error_ExpectedFunctionObject = 'Предполагается функция объекта ';
+const php1C_error_ExpectedNameVar = 'Ожидается имя переменной';
+const php1C_error_ExpectedNameFunction ='Ожидается название функции или процедуры';
+const php1C_error_ExpectedOperator = "Ожидается оператор";
+const php1C_error_NonKeyword = 'Нет соответствия ключевому слову ';
+const php1C_error_NonSymbol = "Неопределенный символ "; //Из Массива Символы
+const php1C_error_NonSymbol2  = 'Ожидается символ из перечисления, а не ';
+const php1C_error_OperBadLevel  = 'Операция не принадлежит этому уровню ';
+const php1C_error_UndefineFunction = 'Непонятная функция';
 const php1C_error_UndefineOperator = 'Неопознанный оператор ';
 const php1C_error_UndefineSymbol   = 'Непонятный символ';
-const php1C_error_UndefineFunction = 'Непонятная функция';
-const php1C_error_BadDateType      = 'Неправильная константа типа Дата';
-const php1C_error_LostSymbol       = 'Пропущен символ';
+const php1C_error_UndefineType   = 'Пока тип не определен '
 
-const php1C_error_BadOperTypeEqual  = "Операции сравнения равно допустима только для значений совпадающих примитивных типов (Булево-Число, Строка, Дата)";
+;
+
+
+
 
