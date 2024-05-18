@@ -91,7 +91,10 @@ class Array1C{
 	}
 
 	function Insert($index, $val){
-		$this->value[$index] = $val;
+        if( isset($this->value[$index])){
+            array_splice($this->value, $index, 0, $val);
+        }
+		else $this->value[$index] = $val;
 	}
 
 	function Add($val): Array1C
