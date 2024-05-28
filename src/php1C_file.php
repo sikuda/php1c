@@ -7,14 +7,22 @@
 * TO DO! 
 *
 * @author  sikuda admin@sikuda.ru
-* @version 0.1
+* @version 0.3
 */
 namespace php1C;
 require_once( 'php1C_date.php');
 
+const php1C_typesPHP_File = array('File1C');
 
+const php1C_functionsPHP_Collections = array();
+
+
+/**
+ * Файл на сервере
+ */
 class File1C {
-	private string $fileName;
+
+    private string $fileName;
 	function __construct($buffer = '') {
        if(is_string($buffer)) $this->fileName = $buffer;
     }
@@ -26,9 +34,9 @@ class File1C {
 	*/
 	public function Name(): string
     {
-		$pos = strrpos($this->fileName,'/');
+		$pos = mb_strrpos($this->fileName,'/');
 		if(!$pos) return $this->fileName;
-		return substr($this->fileName,$pos);	
+		return mb_substr($this->fileName,$pos);
 	}
 
 	/**
@@ -58,7 +66,7 @@ class File1C {
 	*/
 	public function Path(): string
     {
-		return strstr($this->fileName,'.', true);		
+		return strstr($this->fileName,'.', true);
 	}
 
 	/**
@@ -104,27 +112,91 @@ class File1C {
 		else return false;		
 	}
 
-	//filemtime() 
-	public function GetModificationTime(): string
+    /**
+     * GetModificationTime
+     * @throws \Exception
+     */
+    public function GetModificationTime(): Date1C
     {
-		return ''; //todo
+		return Date1C( date("YmdHis", filemtime($this->fileName)));
 	}
-	public function GetModificationUniversalTime(): string
+	public function GetModificationUniversalTime(): Date1C
     {
-		return ''; //todo	
+        return Date1C( date("YmdHis", filemtime($this->fileName)));
 	}
 	//touch()
-	public function SetModificationTime(): string
+	function SetModificationTime(Date1C $date)
     {
-		return ''; //todo		
+        touch($this->fileName, $date->value->getOffset());
 	}
-	public function SetModificationUniversalTime (): string
-    {
-		return ''; //todo			
+	function SetModificationUniversalTime (Date1C $date){
+        touch($this->fileName, $date->value->getOffset());
 	}
-}
+    //s ize of file
+    function size(){
+        $size = filesize($this->fileName);
+        if($size === false) return 0;
+        else return $size;
+    }
 
+}
 function File1C($name): File1C
 {
 	return new File1C( $name);
+}
+
+/*
+ * Новый ЧтениеТекста(<ИмяФайла>, <Кодировка>, <РазделительСтрок>, <КонвертируемыйРазделительСтрок>, <МонопольныйРежим>)
+ * */
+class TextReader1C{
+    private string $fileName;
+    private $handle;
+    function __construct(string $buffer = '') {
+        $this->fileName = $buffer;
+    }
+    function Open(){
+        $this->handle = fopen($this->fileName, 'r');
+    }
+    function Close(){
+        fclose($this->handle);
+    }
+    function Read(){
+        return fgets($this->handle);
+    }
+    function ReadLine(string $delim="\n"): string {
+        return stream_get_line($this->handle, PHP_INT_MAX, $delim);
+    }
+}
+
+function TextReader1C(string $name): TextReader1C
+{
+    return new TextReader1C($name);
+}
+
+/*
+ * Новый ЗаписьТекста(<ИмяФайла>, <Кодировка>, <РазделительСтрок>, <Дописывать>, <КонвертируемыйРазделительСтрок>)
+ */
+class TextWriter1C{
+    private string $fileName;
+    private $handle;
+    function __construct($buffer = '') {
+        if(is_string($buffer)) $this->fileName = $buffer;
+    }
+    function Open(){
+        $this->handle = fopen($this->fileName, 'w');
+    }
+    function Close(){
+        fclose($this->handle);
+    }
+    function Write(string $data){
+        fwrite($this->handle, $data);
+    }
+    function WriteLine(string $data, string $delim="\n"){
+        fwrite($this->handle, $data.$delim);
+    }
+}
+
+function TextWriter1C(string $name): TextWriter1C
+{
+    return new TextWriter1C($name);
 }
