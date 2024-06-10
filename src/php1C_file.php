@@ -14,7 +14,7 @@ require_once( 'php1C_date.php');
 
 const php1C_typesPHP_File = array('File1C');
 
-const php1C_functionsPHP_Collections = array();
+//const php1C_functionsPHP_Collections = array();
 
 
 /**

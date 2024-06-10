@@ -111,11 +111,6 @@ class Date1C {
  */
 function Date1C($str, int $month=0, int $day=0, int $hour=0, int $minute=0, int $second=0): Date1C
 {
-//	if(is_string($str)){
-//		if(mb_strlen($str)==8 || mb_strlen($str)==12 || mb_strlen($str)==14) return new Date1C($str);
-//		else throw new Exception('Преобразование значения к типу Дата не может быть выполнено. Длина строки не 8, не 12 и не 14');
-//	}
-//	else
     if (is_object($str) && get_class($str) == "php1C\Date1C") return $str;
 
     if(is_numeric($str)){

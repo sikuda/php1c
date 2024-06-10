@@ -181,7 +181,8 @@ class CodeStream {
 			}	
 			if ($this->Type === TokenStream::type_string) $this->code = '"'.$this->Look.'"';
 			if ($this->Type === TokenStream::type_date) $this->code = 'php1C\Date1C("'.$this->Look.'")';
-			if(fPrecision1C && $this->Type=== TokenStream::type_number) $this->code = '"'.$this->Look.'"';
+            //fPrecision1C==true
+			if($this->Type=== TokenStream::type_number) $this->code = 'php1C\Number1C("'.$this->Look.'")';
 
 			if($this->Type === TokenStream::type_keyword){
 				switch ($this->Index) {

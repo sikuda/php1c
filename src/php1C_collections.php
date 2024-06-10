@@ -482,7 +482,7 @@ class ValueTable{
 		foreach ($this->rows as $key => $value) {
 			$val = $value->Get($col);
 			if(is_numeric($val)){
-				$sum += toNumber1C($val);
+				$sum += Number1C($val);
 			}	
 		}
 		return $sum;

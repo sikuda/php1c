@@ -19,6 +19,106 @@ const php1C_functionsPHP_Number = array('Int(','Round(','Log(','Log10(','Sin(','
 
 // -----------------------------------------------------------------------------------------------------------
 
+class Number1C
+{
+    /**
+     * @var string внутреннее хранение числа
+     */
+    private string $value;
+
+    function __construct($val) {
+        if (is_numeric($val)) { $this->value = strval($val); }
+        else throw new Exception(php1C_error_ConvertToNumberBad);
+    }
+
+    function __toString(){
+        return $this->value;
+    }
+
+    /**
+     * @throws Exception
+     */
+    function add($arg): Number1C {
+        $res = bcadd($this->value, strval($arg),Scale1C);
+        return new Number1C($this->shrinkLastsZero($res));
+    }
+
+    function sub($arg): Number1C {
+        $res = bcsub($this->value, strval($arg),Scale1C);
+        return new Number1C($this->shrinkLastsZero($res));
+    }
+
+    /**
+     * @throws Exception
+     */
+    function mul($arg): Number1C {
+        $scale = $this->scaleLike1C($this->value);
+        return new Number1C($this->shrinkLastsZero(bcmul($this->value, $arg, $scale)));
+    }
+
+    function div($arg): Number1C {
+
+        if( bccomp($arg, "0", Scale1C) === 0) throw new Exception("Деление на 0");
+        else {
+            $scale = $this->scaleLike1C($this->value);
+            return Number1C($this->shrinkLastsZero($this->round1C(bcdiv($this->value, $arg,$scale+1), $scale)));
+        }
+    }
+
+    /**
+     * Алгоритм числа знаков после запятой в вычислениях в 1С
+     * https://mista.ru/topic/892985#20
+     * @param string $arg1
+     * @return int
+     */
+    private function scaleLike1C(string $arg1):int
+    {
+        $pos = strpos($arg1, ".");
+        if($pos === false) return  Scale1C_Int;
+        $pos1 = mb_strlen($arg1) - 1;
+        while(mb_substr($arg1,$pos1,1) == "0" && $pos1>$pos) $pos1--;
+        $pos = $pos1 - $pos;
+        if ($pos<10) return Scale1C;
+        else return intdiv($pos-10,9)*9+45;
+    }
+
+
+    /**
+     * //https://www.php.net/manual/en/function.bcscale.php
+     * @param $number
+     * @param int $scale
+     * @return string
+     */
+    private function round1C($number, int $scale=0): string
+    {
+        if($scale < 0) $scale = 0;
+        $sign = '';
+        if(bccomp('0', $number, 64) == 1) $sign = '-';
+        $increment = $sign . '0.' . str_repeat('0', $scale) . '5';
+        $number = bcadd($number, $increment, $scale+1);
+        return bcadd($number, '0', $scale);
+    }
+
+    /**
+     * Убрать последние нули в числе
+     * @param string $arg
+     * @return Number1C
+     */
+    private function shrinkLastsZero(string $arg): string
+    {
+        $pos = strpos($arg, ".");
+        if($pos === false) return  $arg;
+        $pos1 = mb_strlen($arg) - 1;
+        while(mb_substr($arg,$pos1,1) == "0" && $pos1>$pos) $pos1--;
+        if(mb_substr($arg,$pos1,1) == ".") $pos1--;
+        return mb_substr($arg, 0, $pos1+1);
+    }
+}
+
+function Number1C($arg){
+    return new Number1C($arg);
+}
+
 /**
 * Возвращает целое число от вещественного числа
 *

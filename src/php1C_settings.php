@@ -11,7 +11,7 @@ const fEnglishVariable = true;
 const fEnglishTypes = true;
 
 //true - Использовать повышенную точность вычислений как в 1С, false - стандартные вычисления php
-const fPrecision1C = true;
+//const fPrecision1C = true;
 const Scale1C = 36;
 const Scale1C_Int = 27;
 
