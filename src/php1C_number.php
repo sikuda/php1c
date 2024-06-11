@@ -333,7 +333,8 @@ function Format($val, string $str_format): string
 		if($val) return $ar_format['БИ'];
 		else return $ar_format['БЛ'];	
 	}
-	elseif(is_numeric($val)){
+	elseif($val instanceof Number1C){
+        $val = $val->getValue();
 		$pr = $ar_format['ЧДЦ'];
 		if(!isset($pr) && !$ar_format['ЧЦ']){
 			$pr = strpos( strval($val), '.');
@@ -354,56 +355,58 @@ function Format($val, string $str_format): string
         }
         else return $res;
 	}
-	elseif(is_object($val)){
-		//Это дата
-        $name = get_class($val);
-		if( $name === 'php1C\Date1C'){
-            $frm = $ar_format['ДФ'];
-			if(isset($frm)){
-				$frm = str_replace(
-					array('\'','\"','гггг','yyyy','гг','yy','дд','dd','ММ','MM','чч','hh','ЧЧ','HH','мм','mm','сс','ss'),
-					array('',  '',  'Y'   ,'Y'   ,'y' ,'y' ,'d' ,'d' ,'m', 'm' ,'h' ,'h' ,'H' ,'H' ,'i' ,'i','s','s'),
-				$frm);
-                if(method_exists($val,'toFormat'))
-				    return $val->toFormat($frm);
-			}
-			$frm = $ar_format['ДЛФ'];
-			if(isset($frm)){
-                $php1C_endOfYear = char(160).'г.';
-				$frm = str_replace(
-					array('\'','\"','ДД',                   'DD',                   'Д',    'D',    'В',     'T'),
-					array(  '',  '','j F Y'.$php1C_endOfYear,'j F Y'.$php1C_endOfYear,'d.m.Y','d.m.Y','H:m:s' ,'H:m:s' ,),
-				$frm);
-                if(method_exists($val,'toFormat'))
-				    return $val->toFormat($frm);
-			} 
-		}
+	elseif($val instanceof Date1C){
+    //Это дата
+        $frm = $ar_format['ДФ'];
+        if(isset($frm)){
+            $frm = str_replace(
+                array('\'','\"','гггг','yyyy','гг','yy','дд','dd','ММ','MM','чч','hh','ЧЧ','HH','мм','mm','сс','ss'),
+                array('',  '',  'Y'   ,'Y'   ,'y' ,'y' ,'d' ,'d' ,'m', 'm' ,'h' ,'h' ,'H' ,'H' ,'i' ,'i','s','s'),
+            $frm);
+            if(method_exists($val,'toFormat'))
+                return $val->toFormat($frm);
+        }
+        $frm = $ar_format['ДЛФ'];
+        if(isset($frm)){
+            $php1C_endOfYear = char(160).'г.';
+            $frm = str_replace(
+                array('\'','\"','ДД',                   'DD',                   'Д',    'D',    'В',     'T'),
+                array(  '',  '','j F Y'.$php1C_endOfYear,'j F Y'.$php1C_endOfYear,'d.m.Y','d.m.Y','H:m:s' ,'H:m:s' ,),
+            $frm);
+            if(method_exists($val,'toFormat'))
+                return $val->toFormat($frm);
+        }
     }
+
 	return strval($val);
 }
 
 /**
 * Представление числа прописью.
 *
-* @param  $val
+* @param  string|Number1C
 * @param  string $frm форматная строка
 * @return string - результат  
 */
-function NumberInWords($val, string $frm): string{
+function NumberInWords($val, string $frm=""): string{
+    if ($val instanceof Number1C) $val = $val->getValue();
 	return 'Еще не реализовано'.$val.$frm;
 }
 
 /**
+ * Число прописью
 * Функция заглушка, возвращает русскую строку или самому строчку
 *
 * @param  string $str Строки на разных языках, разделенные символом ";" (точка с запятой).
  * Строка на одном языке состоит из кода языка, указанного в метаданных,
  * символа "=" (равно) и собственно строки текста на данном языке в одинарных кавычках,
  * двойных кавычках или без кавычек (когда указывается только один язык).
-* @return string - результат  
+* @return string|Number1C - результат
 */
-function NStr(string $str): string
+function NStr($str): string
 {
+    if ($str instanceof Number1C) $str = $str->getValue();
+
 	$ar_format = array();
 	$ar_str = explode( ';', $str);
 	foreach ($ar_str as $value) {
@@ -422,7 +425,7 @@ function NStr(string $str): string
 * @param  string $frm строка форматирования
 * @return string - результат  
 */
-function PeriodPresentation(Date1C $date1,Date1C $date2,string $frm): string
+function PeriodPresentation(Date1C $date1, Date1C $date2, string $frm=""): string
 {
 	return 'Еще не реализовано'.$date1.$date2.$frm;
 }
@@ -431,7 +434,7 @@ function PeriodPresentation(Date1C $date1,Date1C $date2,string $frm): string
 * Функция заглушка, возвращает русскую строку или самому строчку
 *
 * @param string $str строка шаблон для вывода
-* @param  $val1 - число
+* @param  $val1 - string|Number1C
 * @param  $val2 - число
 * @param  $val3 - число
 * @param  $val4 - число
@@ -443,8 +446,19 @@ function PeriodPresentation(Date1C $date1,Date1C $date2,string $frm): string
 * @param  $val10 - число
 * @return string - результат  
 */
-function StrTemplate(string $str, $val1, $val2, $val3, $val4, $val5, $val6, $val7, $val8, $val9, $val10): string
+function StrTemplate(string $str, $val1="", $val2="", $val3="", $val4="", $val5="", $val6="", $val7="", $val8="", $val9="", $val10=""): string
 {
+    if($val1 instanceof Number1C) $val1 = $val1->getValue();
+    if($val2 instanceof Number1C) $val1 = $val2->getValue();
+    if($val3 instanceof Number1C) $val1 = $val3->getValue();
+    if($val4 instanceof Number1C) $val1 = $val4->getValue();
+    if($val5 instanceof Number1C) $val1 = $val5->getValue();
+    if($val6 instanceof Number1C) $val1 = $val6->getValue();
+    if($val7 instanceof Number1C) $val1 = $val7->getValue();
+    if($val8 instanceof Number1C) $val1 = $val8->getValue();
+    if($val9 instanceof Number1C) $val1 = $val9->getValue();
+    if($val10 instanceof Number1C) $val1 = $val10->getValue();
+
 	return 'Еще не реализовано'.$str.$val1.$val2.$val3.$val4.$val5.$val6.$val7.$val8.$val9.$val10;
 }
 
@@ -452,10 +466,11 @@ function StrTemplate(string $str, $val1, $val2, $val3, $val4, $val5, $val6, $val
 * Функция заглушка, Представление строки числа в требуемой форме.
 *
 * @param  string $str str строка шаблон для вывода
-* @param  $val - первое число
+* @param  $val - string|Number1C
 * @param  string $prm параметры
 * @return string - результат  
 */
-function StringWithNumber(string $str, $val, string $frm, string $prm): string{
+function StringWithNumber(string $str, $val="", string $frm="", string $prm=""): string{
+    if($val instanceof Number1C) $val = $val->getValue();
 	return 'Еще не реализовано'.$str.$val.$frm.$prm;
 }
