@@ -31,6 +31,10 @@ class Number1C
         else throw new Exception(php1C_error_ConvertToNumberBad);
     }
 
+    function getValue() {
+        return $this->value;
+    }
+
     function __toString(){
         return $this->value;
     }
@@ -63,6 +67,27 @@ class Number1C
             $scale = $this->scaleLike1C($this->value);
             return Number1C($this->shrinkLastsZero($this->round1C(bcdiv($this->value, $arg,$scale+1), $scale)));
         }
+    }
+
+    function or(Number1C $arg): bool{
+        return $this->value || $arg->getValue();
+    }
+    function and(Number1C $arg): bool{
+        return $this->value && $arg->getValue();
+    }
+    function equal(Number1C $arg): bool{
+        return $this->cmp($arg) === 0;
+    }
+    function less(Number1C $arg): bool{
+        return $this->cmp($arg) === -1;
+    }
+    function more(Number1C $arg): bool{
+        return $this->cmp($arg) === 1;
+    }
+
+    private function cmp($arg): int {
+        $scale = $this->scaleLike1C($this->value);
+        return bccomp($this->value, $arg->getValue(), $scale);
     }
 
     /**
@@ -239,11 +264,14 @@ function Exp($val): float
  * @param  $val - число экспоненты
  * @param  $exp - степень экспоненты
  * @return float|int|object|string - результат
+ * @throws Exception
  */
 function Pow($val, $exp){
-    if (fPrecision1C) return bcpow($val, $exp, Scale1C);
-	return \pow($val, $exp);
+    if($val instanceof Number1C && $exp instanceof Number1C)
+        return new Number1C(bcpow($val->getValue(), $exp->getValue(), Scale1C));
+    return \pow($val, $exp);
 }
+
 
 /**
  * Возвращает e в степени число
@@ -251,8 +279,8 @@ function Pow($val, $exp){
  * @param  $val - параметр корня
  */
 function Sqrt($val){
-    if (fPrecision1C) return bcsqrt($val, Scale1C);
-	else return \sqrt($val);
+    if($val instanceof Number1C) return new Number1C(bcsqrt($val->getValue(), Scale1C));
+    else return \sqrt($val);
 }
 
 //--------------------------------------- Форматирование -------------------------------------------

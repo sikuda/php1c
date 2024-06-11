@@ -170,14 +170,15 @@ function div1C($arg1, $arg2){
 }
 
 /**
-* Операция преобразования bool в 0 или 1
-* @param $arg
-* @return float преобразование bool в 0 или 1
-*/
-function tran_bool($arg): float
+ * Операция преобразования bool в 0 или 1
+ * @param $arg
+ * @return float преобразование bool в 0 или 1
+ * @throws Exception
+ */
+function tran_bool($arg): Number1C
 {
-	if($arg === true) return 1.0;
-	else return 0.0;
+	if($arg === true) return new Number1C(1);
+	else return Number1C(0);
 }
 
 /**
@@ -191,7 +192,7 @@ function or1C($arg1, $arg2): bool
 {
 	if(is_bool($arg1)) $arg1 = tran_bool($arg1);
 	if(is_bool($arg2)) $arg2 = tran_bool($arg2);
-	if(isset($arg1) && !is_string($arg1) && !is_object($arg1)) return $arg1 || $arg2;
+	if($arg1 instanceof Number1C && $arg2 instanceof Number1C) return $arg1->or($arg2);
 	throw new Exception(php1C_error_ConvertToNumberBad );
 }
 
@@ -206,7 +207,8 @@ function and1C($arg1, $arg2): bool
 {
 	if(is_bool($arg1)) $arg1 = tran_bool($arg1);
 	if(is_bool($arg2)) $arg2 = tran_bool($arg2);
-	if(isset($arg1) && !is_string($arg1) && !is_object($arg1)) return $arg1 && $arg2;
+    if($arg1 instanceof Number1C && $arg2 instanceof Number1C) return $arg1->and($arg2);
+	//if(isset($arg1) && !is_string($arg1) && !is_object($arg1)) return $arg1 && $arg2;
 	throw new Exception(php1C_error_ConvertToNumberBad );
 }
 
@@ -221,7 +223,8 @@ function less1C($arg1, $arg2): bool
 {
 	if(is_bool($arg1)) $arg1 = tran_bool($arg1);
 	if(is_bool($arg2)) $arg2 = tran_bool($arg2);
-	if(is_numeric($arg1) || is_string($arg1) || (is_object($arg1) && get_class($arg1) === 'php1C\Date1C')) return $arg1 < $arg2;
+    if($arg1 instanceof Date1C && $arg2 instanceof Date1C) return $arg1 < $arg2;
+    if($arg1 instanceof Number1C && $arg2 instanceof Number1C) return $arg1->less($arg2);
 	throw new Exception(php1C_error_BadOperTypeEqual);
 }
 
@@ -236,7 +239,8 @@ function more1C($arg1, $arg2): bool
 {
 	if(is_bool($arg1)) $arg1 = tran_bool($arg1);
 	if(is_bool($arg2)) $arg2 = tran_bool($arg2);
-	if(is_numeric($arg1) || is_string($arg1) || (is_object($arg1) && get_class($arg1) === 'Date1C')) return $arg1 > $arg2;
+    if($arg1 instanceof Number1C && $arg2 instanceof Number1C) return $arg1->more($arg2);
+    if($arg1 instanceof Date1C && $arg2 instanceof Date1C) return $arg1 > $arg2;
 	throw new Exception(php1C_error_BadOperTypeEqual);
 }
 
@@ -252,11 +256,14 @@ function equal1C($arg1, $arg2): bool
 	if(is_bool($arg1)) $arg1 = tran_bool($arg1);
 	if(is_bool($arg2)) $arg2 = tran_bool($arg2);
 
-	if(is_numeric($arg1) || is_string($arg1) || (is_object($arg1) && get_class($arg1) === 'php1C\Date1C'))
-        if(fPrecision1C && is_numeric($arg1) && is_string($arg1) ){
-            return shrinkLastsZero($arg1) === shrinkLastsZero($arg2);
-        }
-        else return $arg1 === $arg2;
+    if($arg1 instanceof Number1C) {
+        if ($arg2 instanceof Number1C) return $arg1->equal($arg2);
+    }
+    elseif($arg1 instanceof Date1C) {
+        if ($arg2 instanceof Date1C) return $arg1 === $arg2;
+    }
+    elseif(is_string($arg1) )
+        if(is_string($arg2)) return strcmp($arg1, $arg2) === 0;
 	throw new Exception(php1C_error_BadOperTypeEqual);
 }
 
@@ -269,10 +276,7 @@ function equal1C($arg1, $arg2): bool
  */
 function notequal1C($arg1, $arg2): bool
 {
-	if(is_bool($arg1)) $arg1 = tran_bool($arg1);
-	if(is_bool($arg2)) $arg2 = tran_bool($arg2);
-	if(is_numeric($arg1) || is_string($arg1) || (is_object($arg1) && get_class($arg1) === 'php1C\Date1C')) return $arg1 !== $arg2;
-	throw new Exception(php1C_error_BadOperTypeEqual);
+    return !equal1C($arg1, $arg2);
 }
 
 /**
@@ -327,6 +331,7 @@ function ValueIsFilled($val): bool
 {
 	if(is_object($val)){
 		switch (get_class($val)) {
+            case 'php1C\Number1C': return !$val->equal(Number1C(0));
 		 	case 'php1C\Date1C': return $val != "01.01.0001 00:00:00";
 		 	case 'php1C\Array1C':
 		 	case 'php1C\ValueTable':
@@ -363,11 +368,10 @@ function TypeOf($val): Type1C
 {
 	$str = php1C_Undefined;
 	if(is_bool($val)) $str = php1C_strBool;
-	elseif(is_numeric($val)) $str = php1C_Number;
 	elseif(is_string($val)) $str = php1C_String;
-	elseif(is_object($val)) $str = $val->__toString();
-	return new Type1C($str);
-
+	elseif($val instanceof Date1C) $str = php1C_Date;
+    elseif ($val instanceof Number1C) $str = php1C_Number;
+    return new Type1C($str);
 }
 
 /**

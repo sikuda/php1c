@@ -99,6 +99,7 @@ const php1C_functions_Collections = array('ВГРАНИЦА(', 'ВСТАВИТЬ
 const php1C_Undefined = "Неопределенно";
 const php1C_strBool = "Булево";
 const php1C_Number = "Число";
+const php1C_Date = "Дата";
 const php1C_String = "Строка";
 const php1C_Bool           = array("Да","Нет");
 const php1C_double_quotes  = "\" (двойная кавычка)";
