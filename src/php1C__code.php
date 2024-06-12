@@ -175,7 +175,7 @@ class CodeStream {
 			//$this->codePHP .= 'f'.$this->Look.'-'.$this->Type.'f';
 			//$this->pushCode($this->code);
 			$this->code = $this->Look;
-			if($this->Type === TokenStream::type_variable){
+			if($this->Type === TokenStream::type_variable || $this->Type === TokenStream::type_identification){
 				$key = $this->Look;
 				$this->code = "$".$key; 
 			}	
@@ -256,7 +256,7 @@ class CodeStream {
 				throw new Exception(php1C_error_DoubleOper.$this->code);
 			}	
 		}
-		elseif($type === TokenStream::type_variable){
+		elseif($type === TokenStream::type_variable || $type === TokenStream::type_identification){
 			$key = $look;
 			$this->code = "$".$key;
 			//Обработка свойств и функций объекта
@@ -500,12 +500,14 @@ class CodeStream {
 						} 
 						else throw new Exception(php1C_error_UndefineOperator); //Подобно 1С никаких лишних $this->Look;
 						break;
-				//Переменная - присвоение или функция			
+				//Переменная или идентификатор - переменная + присвоение или функция
 				case TokenStream::type_variable:
+                case TokenStream::type_identification:
 					$key = $this->Look;
 					$context = '$'.$key;
 					$curr = '';
-					$this->GetChar();
+					//$this->GetChar();
+                    $this->Factor();
 					if( $this->Type === TokenStream::type_operator){
 
 						while($this->Index === TokenStream::operation_point){
@@ -637,19 +639,20 @@ class CodeStream {
 								$this->MatchKeyword(TokenStream::keyword_to);
 						 		$this->code = $this->Expression7();
 						 		$this->pushCode('$'.$iterator.'<='.$this->code. ';');
-						 		$this->pushCode('$'.$iterator.'++){');
+						 		$this->pushCode('$'.$iterator.'=$'.$iterator.'->add(1)){');
 						 		$this->GetChar();
 						 		$this->continueCode(TokenStream::keyword_circle);
 					 		}
 					 		break;	
 					 	case TokenStream::keyword_end_circle:
-					 		if($handle===TokenStream::keyword_circle){
+					 		//if($handle===TokenStream::keyword_circle){
 					 			$this->MatchKeyword(TokenStream::keyword_end_circle);
 					 			$this->MatchOperation(TokenStream::operation_semicolon, ';');
 					 			$this->pushCode("}");
 					 			return;	
-					 		}
-					 		else throw new Exception(php1C_error_ExpectedConstructionWhileDo);
+					 		//}
+                            //break;
+					 		//else throw new Exception(php1C_error_ExpectedConstructionWhileDo);
 					 	case TokenStream::keyword_break:
 					 		if($handle===TokenStream::keyword_circle){
 					 			$this->MatchKeyword(TokenStream::keyword_break);
@@ -657,10 +660,11 @@ class CodeStream {
 					 		}	
 					 		break;	
 					 	case TokenStream::keyword_continue:
-					 		if($handle===TokenStream::keyword_circle){
+					 		//if($handle===TokenStream::keyword_circle){
 					 			$this->MatchKeyword(TokenStream::keyword_continue);
 					 			$this->pushCode('continue;');
-					  		}	
+                                $this->MatchOperation(TokenStream::operation_semicolon, ';');
+					  		//}
 					 		break;
 					 	case TokenStream::keyword_var:
 					 		$this->GetChar();

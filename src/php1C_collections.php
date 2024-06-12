@@ -91,6 +91,7 @@ class Array1C{
 	}
 
 	function Insert($index, $val){
+        $index = $this->intIndex($index);
         if( isset($this->value[$index])){
             array_splice($this->value, $index, 0, $val);
         }
@@ -108,10 +109,16 @@ class Array1C{
 		return count($this->value);
 	}
 
-	function Find($val){
+    /**
+     * @throws Exception
+     */
+    function Find($val){
 		$key = array_search($val, $this->value);
 		if($key === FALSE) return new undefined1C();
-		else return $key;
+		else {
+            if(is_numeric($key)) return new Number1C(strval($key));
+            else return $key;
+        }
 	}
 
 	function Clear(){
@@ -120,17 +127,24 @@ class Array1C{
 	}
 
 	function Get($index){
+        $index = $this->intIndex($index);
 		return $this->value[$index];
 	}
 
 	function Del($index){
+        $index = $this->intIndex($index);
 		unset($this->value[$index]);
 	}
 
 	function Set($index, $val){
+        $index = $this->intIndex($index);
 		$this->value[$index] = $val;
 	}
 
+    private function intIndex($index):int{
+        if($index instanceof Number1C) $index = intval($index->getValue());
+        return $index;
+    }
 }
 
 //------------------------------------------------------------------------------------------
