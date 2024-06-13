@@ -506,9 +506,9 @@ class CodeStream {
 					$key = $this->Look;
 					$context = '$'.$key;
 					$curr = '';
-					//$this->GetChar();
-                    $this->Factor();
-					if( $this->Type === TokenStream::type_operator){
+					$this->GetChar();
+                    //$this->Factor();
+                    if( $this->Type === TokenStream::type_operator){
 
 						while($this->Index === TokenStream::operation_point){
 							if(!empty($curr)) $context .= '->'.$curr;

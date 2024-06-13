@@ -64,7 +64,6 @@ class Array1C{
 		if(is_array($copy)) $this->value = $copy;
 		else{	
 			$this->value = array();
-			$cnt = 0;
 			if(is_array($counts) && (count($counts)>0)){
 				if( count($counts) > 1 ) throw new Exception("Многомерные массивы пока не поддерживаются");
 				$cnt = $counts[0];

@@ -8,28 +8,32 @@
 <link rel="stylesheet" href="./lib/1c.css">
 <body>
   <h4>Выбор языка для 1С</h4>
-  <input type="radio" name="lang" value="ru" checked onclick="changeLang('ru')" > Русский<br>
-  <input type="radio" name="lang" value="en" onclick="changeLang('en')" > Английский<br>
+  <label>
+    <input type="radio" name="lang" value="ru" checked onclick="changeLang('ru')"/>
+  </label>Русский<br>
+  <label>
+    <input type="radio" name="lang" value="en" onclick="changeLang('en')"/>
+  </label> Английский<br>
   <!-- <input type="radio" name="lang" value="ua"> Украинский<br><br> -->
-    
+
   <h4>Открытый проект преобразования кода 1С в PHP. <br><a href='https://github.com/sikuda/php1c.ru'>https://github.com/sikuda/php1c.ru</a></h4>
   <p>Хотите попробовать выполнить или преобразовать Ваш кусочек кода 1С? Вставьте его в первое поле и нажмите кнопку Преобразовать в PHP для преобразования этого кода.</p>
   <div width="100%">
-    <textarea id="code" name="code" width="50%"></textarea>
+    <label for="code"></label><textarea id="code" name="code" width="50%"></textarea>
   </div>
   <div align="center">
     <input type="button" onclick="doExecute()"  value="Выполнить" style="font-size:1.5em"/>
   </div> 
   <br>
   <div>
-    <textarea name="codeResult" id="codeResult"></textarea>
+    <label for="codeResult"></label><textarea name="codeResult" id="codeResult"></textarea>
   </div>  
   <div align="center">
     <input type="button" onclick="doCount()" value="Преобразовать в PHP" style="font-size:1.5em"/>
   </div>
   <br>
   <div>
-    <textarea name="codePHP" id="codePHP"></textarea>
+    <label for="codePHP"></label><textarea name="codePHP" id="codePHP"></textarea>
   </div>  
 
   <script type="text/javascript">
@@ -80,7 +84,7 @@
       var context = editor.getValue();
       var xhttp = new XMLHttpRequest();
       xhttp.onreadystatechange = function() {
-        if (this.readyState == 4 && this.status == 200) {
+        if (this.readyState === 4 && this.status === 200) {
           var str = xhttp.responseText;
           editorResult.setValue(str);
         }
@@ -97,7 +101,7 @@
       var context = editor.getValue();
       var xhttp2 = new XMLHttpRequest();
       xhttp2.onreadystatechange = function() {
-        if (this.readyState == 4 && this.status == 200) {
+        if (this.readyState === 4 && this.status === 200) {
           var str = xhttp2.responseText;
           editorPHP.setValue(str);
         }
@@ -111,7 +115,7 @@
     }
 
     function changeLang(lang) {
-      if( lang == 'en') editor.setValue('var Result;\n\nProcedure fAdd(Y,z)\n  Return "4"+Y+z;\nEndProcedure\nResult = fAdd(5,7);');
+      if( lang === 'en') editor.setValue('var Result;\n\nProcedure fAdd(Y,z)\n  Return "4"+Y+z;\nEndProcedure\nResult = fAdd(5,7);');
       else editor.setValue('Перем Результат; \nПроцедура Сложение( d, Я) \nВозврат "4" + d + Я; \nКонецПроцедуры  \nРезультат=Сложение(1, 2);');
     }
   </script> 
