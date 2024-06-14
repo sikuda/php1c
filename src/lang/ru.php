@@ -96,7 +96,7 @@ const php1C_functions_Collections = array('ВГРАНИЦА(', 'ВСТАВИТЬ
 /*
 * Для Вывода как в 1С
 */
-const php1C_Undefined = "Неопределенно";
+const php1C_Undefined = "Неопределено";
 const php1C_strBool = "Булево";
 const php1C_Number = "Число";
 const php1C_Date = "Дата";
@@ -144,6 +144,7 @@ const php1C_error_UndefineType   = 'Пока тип не определен ';
 const php1C_error_ConvertToNumberBad  = "Преобразование значения к типу Число не может быть выполнено";
 const php1C_error_ConvertToDateBad  = 'Преобразование значения к типу Дата не может быть выполнено';
 
+const php1C_error_VabiableNotDefine = 'Переменная не определена'; //Вася)
 
 
 

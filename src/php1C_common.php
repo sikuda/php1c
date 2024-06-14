@@ -72,26 +72,15 @@ function toString1C($arg): string
  */
 function add1C($arg1, $arg2) {
 
-//	if(is_bool($arg1) || is_numeric($arg1)){
-//		if(is_bool($arg2) || is_numeric($arg2))
-//			if(fPrecision1C) return shrinkLastsZero(bcadd($arg1,$arg2,Scale1C));
-//			else return $arg1+$arg2;
-//        elseif(is_string($arg2)) return $arg1 . $arg2;
-//	}
     if (is_string($arg1)) {
         return $arg1 . $arg2;
     }
-	elseif(is_object($arg1)){
-        switch (get_class($arg1)){
-            case 'php1C\Number1C': return $arg1->add($arg2);
-            case 'php1C\Date1C':
-                if(is_numeric($arg2)){
-                    return $arg1->add($arg2);
-                }
-                break;
-        }
-		//if( (get_class($arg1) === 'php1C\Date1C') && is_numeric($arg2) ) return $arg1->add($arg2);
-	}
+    if ($arg1.is_object(Number1C::class)){
+        if( $arg2 .is_object(Number1C::class) || is_numeric($arg2) )
+            return $arg1->add($arg2);
+    }
+    if($arg1.is_object(Date1C::class)) return $arg1->add($arg2);
+
 	throw new Exception(php1C_error_ConvertToNumberBad);
 }
 
@@ -104,16 +93,8 @@ function add1C($arg1, $arg2) {
  */
 function sub1C($arg1, $arg2){
 
-//	if(is_bool($arg1) || is_numeric($arg1)){
-//		if(is_bool($arg2) || is_numeric($arg2))
-//            //fPrecision1C==true
-//            return shrinkLastsZero(bcsub($arg1,$arg2,Scale1C));
-//			//else return $arg1-$arg2;
-//	}
-	if(is_object($arg1)){
-        if( $arg1.is_object(Number1C::class) && is_numeric($arg2) )
-            return $arg1->sub($arg2);
-		if( $arg1.is_object(Date1C::class) && is_numeric($arg2) )
+	if($arg1.is_object(Number1C::class)){
+        if( $arg2 .is_object(Number1C::class) || is_numeric($arg2) )
             return $arg1->sub($arg2);
 	}	
 	throw new Exception(php1C_error_ConvertToNumberBad );
@@ -128,15 +109,7 @@ function sub1C($arg1, $arg2){
  */
 function mul1C($arg1, $arg2)
 {
-
-//	if((is_bool($arg1) || is_numeric($arg1)) && (is_bool($arg2) || is_numeric($arg2)) )
-//        if(fPrecision1C) {
-//            $scale = scaleLike1C($arg1);
-//            return shrinkLastsZero(bcmul($arg1,$arg2,$scale));
-//        }
-//        else return $arg1*$arg2;
-
-    if( $arg1.is_object(Number1C::class) && is_numeric($arg2) )
+    if( $arg1.is_object(Number1C::class) && ($arg2.is_object(Number1C::class) || is_numeric($arg2)) )
         return $arg1->mul($arg2);
 	throw new Exception(php1C_error_ConvertToNumberBad );
 }
