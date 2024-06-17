@@ -508,22 +508,29 @@ class CodeStream {
 					$curr = '';
 					$this->GetChar();
                     //$this->Factor();
-                    if( $this->Type === TokenStream::type_operator){
+                    if( $this->Type === TokenStream::type_operator ){
 
-						while($this->Index === TokenStream::operation_point){
-							if(!empty($curr)) $context .= '->'.$curr;
-							$this->GetChar();
-							//функция объекта
-							if( $this->Type === TokenStream::type_function ){
-								$curr = $this->splitFunction($key, $this->Look, $this->Index);   		
-							}
-	    					//свойства объекта	
-							elseif($this->Type === TokenStream::type_variable){
-								$curr = $this->Look;
-								$this->GetChar();
-							}
-							$key = ''; //переходи к текущему контексту
-						}	
+                        //Обработка присвоения элемента массива
+                        if( $this->Index === TokenStream::operation_open_sq_bracket){
+                                $this->GetChar();
+                                $curr = $this->Expression7();
+                                $this->MatchOperation(TokenStream::operation_close_sq_bracket, ']');
+                        }
+                        else
+                            while($this->Index === TokenStream::operation_point){
+                                if(!empty($curr)) $context .= '->'.$curr;
+                                $this->GetChar();
+                                //функция объекта
+                                if( $this->Type === TokenStream::type_function ){
+                                    $curr = $this->splitFunction($key, $this->Look, $this->Index);
+                                }
+                                //свойства объекта
+                                elseif($this->Type === TokenStream::type_variable){
+                                    $curr = $this->Look;
+                                    $this->GetChar();
+                                }
+                                $key = ''; //переходи к текущему контексту
+                            }
 
 						if($this->Index === TokenStream::operation_equal){
 					 		//Оператор присвоения переменной
@@ -532,9 +539,10 @@ class CodeStream {
 							//$this->codePHP .= 'v'.$value.'v';
 							if( $this->Type === TokenStream::type_operator && $this->Index === TokenStream::operation_semicolon){
 								if(!empty($curr)){
-									$this->pushCode($context.'->SET("'.$curr.'", '.$value.')');
+									//$this->pushCode($context.'->SET("'.$curr.'", '.$value.')');
+                                    $this->pushCode($context.'->SET('.$curr.', '.$value.')');
 								}
-								else{ 
+								else{
 									$this->code = '$'.$key."=".$value.';';
 									$this->MatchOperation(TokenStream::operation_semicolon, ';');
 									$this->pushCode($this->code);
@@ -543,7 +551,7 @@ class CodeStream {
 							else throw new Exception(php1C_error_Expected.';');
 						}
 						else $this->pushCode($context.'->'.$curr);
-					}	
+					}
 					else throw new Exception(php1C_error_BadNonOperAfterVar.$key);
 					break;
 				case TokenStream::type_function:
@@ -641,7 +649,7 @@ class CodeStream {
 						 		$this->pushCode('$'.$iterator.'<='.$this->code. ';');
 						 		$this->pushCode('$'.$iterator.'=$'.$iterator.'->add(1)){');
 						 		$this->GetChar();
-						 		$this->continueCode(TokenStream::keyword_circle);
+                                $this->continueCode(TokenStream::keyword_circle);
 					 		}
 					 		break;	
 					 	case TokenStream::keyword_end_circle:

@@ -17,7 +17,7 @@ use DateInterval;
 * Массив названий английских функций для работы с датой - соответствует элементам русским функций.
 * @return string[] Массив названий функций работы с датой.
 */
-const php1C_functionsPHP_Date = array('Date(','CurrentDate(', 'Year(', 'Month(','Day(', 'Hour(', 'Minute(', 'Second(', 'BegOfYear(', 'BegOfQuarter(',  'BegOfMonth(', 'BegOfWeek('   ,'BegOfDay(' ,'BegOfHour(' ,'BegOfMinute(', 'EndOfYear(','EndOfQuarter(', 'EndOfMonth(', 'EndOfWeek(',  'EndOfDay(','EndOfHour(','EndOfMinute(','WeekOfYear(', 'DayOfYear(', 'WeekDay(',   'AddMonth(');
+const php1C_functionsPHP_Date = array('Date(','CurrentDate(', 'Year(', 'Month(','Day(', 'Hour(', 'Minute(', 'Second(', 'BegOfYear(', 'BegOfQuarter(',  'BegOfMonth(', 'BegOfWeek('   ,'BegOfDay(' ,'BegOfHour(' ,'BegOfMinute(', 'EndOfYear(','EndOfQuarter(', 'EndOfMonth(', 'EndOfWeek(',  'EndOfDay(','EndOfHour(','EndOfMinute(','WeekOfYear(', 'DayOfYear(', 'WeekDay(',   'AddMonth(', 'CurrentUniversalDateMilliseconds(');
 
 const php1C_Months = array('January','February','March','April','May','June','July','August','September','October','November','December');
 
@@ -464,5 +464,9 @@ function AddMonth(Date1C $date, int $int_month=0 ): Date1C
 	 	$date1C = new Date1C(str_pad($year, 4, "0", STR_PAD_LEFT).str_pad($month+1, 2, "0", STR_PAD_LEFT)."01", -1);
 	 	return new Date1C(date_format($date1C->value,"Y").date_format($date1C->value,"m").date_format($date1C->value,"d").date_format($date->value,"H").date_format($date->value,"i").date_format($date->value,"s"));
 	} 
+}
+
+function CurrentUniversalDateMilliseconds(){
+    return hrtime(true)/1e+6;
 }
 

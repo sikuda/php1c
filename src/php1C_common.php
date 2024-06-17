@@ -93,10 +93,11 @@ function add1C($arg1, $arg2) {
  */
 function sub1C($arg1, $arg2){
 
-	if($arg1.is_object(Number1C::class)){
-        if( $arg2 .is_object(Number1C::class) || is_numeric($arg2) )
+	if($arg1 instanceof Number1C){
+        if( $arg2 instanceof Number1C || is_numeric($arg2) )
             return $arg1->sub($arg2);
-	}	
+	}
+    elseif (is_numeric($arg1) && is_numeric($arg2)) return $arg1-$arg2;
 	throw new Exception(php1C_error_ConvertToNumberBad );
 }
 
