@@ -75,8 +75,8 @@ function add1C($arg1, $arg2) {
     if (is_string($arg1)) {
         return $arg1 . $arg2;
     }
-    if ($arg1.is_object(Number1C::class)){
-        if( $arg2 .is_object(Number1C::class) || is_numeric($arg2) )
+    if ($arg1 instanceof Number1C){
+        if( $arg2 instanceof Number1C || is_numeric($arg2) )
             return $arg1->add($arg2);
     }
     if($arg1.is_object(Date1C::class)) return $arg1->add($arg2);
@@ -124,21 +124,7 @@ function mul1C($arg1, $arg2)
  */
 function div1C($arg1, $arg2){
 
-//	if((is_bool($arg1) || is_numeric($arg1)) && (is_bool($arg2) || is_numeric($arg2)) ){
-//		if(fPrecision1C){
-//			if( bccomp($arg2, "0", Scale1C) === 0) throw new Exception("Деление на 0");
-//			else {
-//                $scale = scaleLike1C($arg1);
-//                return shrinkLastsZero(round1C(bcdiv($arg1,$arg2,$scale+1), $scale));
-//            }
-//		}
-//		else{
-//			if(floatval($arg2) == 0) throw new Exception("Деление на 0");
-//			else return $arg1/$arg2;
-//		}
-//	}
-
-    if( $arg1.is_object(Number1C::class) && $arg2.is_object(Number1C::class)  )
+    if( $arg1 instanceof Number1C && $arg2 instanceof Number1C )
         return $arg1->div($arg2);
     throw new Exception(php1C_error_ConvertToNumberBad );
 }
