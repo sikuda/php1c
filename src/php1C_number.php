@@ -26,12 +26,16 @@ class Number1C
      */
     private string $value;
 
+    /**
+     * @throws Exception
+     */
     function __construct($val) {
         if (is_numeric($val)) { $this->value = strval($val); }
         else throw new Exception(php1C_error_ConvertToNumberBad);
     }
 
-    function getValue() {
+    function getValue(): string
+    {
         return $this->value;
     }
 
@@ -47,6 +51,9 @@ class Number1C
         return new Number1C($this->shrinkLastsZero($res));
     }
 
+    /**
+     * @throws Exception
+     */
     function sub($arg): Number1C {
         $res = bcsub($this->value, strval($arg),Scale1C);
         return new Number1C($this->shrinkLastsZero($res));
@@ -263,7 +270,7 @@ function Exp($val): float
  *
  * @param  $val - число экспоненты
  * @param  $exp - степень экспоненты
- * @return float|int|object|string - результат
+ * @return float|int|Number1C - результат
  * @throws Exception
  */
 function Pow($val, $exp){

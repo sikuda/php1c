@@ -338,18 +338,18 @@ class Map1C{
 		$key = strtoupper($key);
 		if(array_key_exists($key, $this->value)) $this->value[$key] = $val;
 		else throw new Exception("Не найден ключ структуры ".$key);
-	}	
+	}
 }
 
 //----------------------------------------------------------------------------------------------
 
 /**
-* Получение ТаблицыЗначений
-*
-* @param array $args аргументы функции в массиве
-* @return - возвращает новый объект ТаблицаЗначений1С
-*
-*/
+ * Получение ТаблицыЗначений
+ *
+ * @param null $args аргументы функции в массиве
+ * @return ValueTable - возвращает новый объект ТаблицаЗначений1С
+ *
+ */
 function ValueTable($args=null): ValueTable
 {
 	return new ValueTable($args);
@@ -365,7 +365,7 @@ class ValueTable{
 	public ValueTableColumnCollection $COLUMNS; //ValueTableColumnCollection - collection of ValueTableColumn
 	//public $КОЛОНКИ;
 	public $KOLONKI;
-	public $INDEXES; //CollectionIndexes коллекция из CollectionIndex
+	public CollectionIndexes $INDEXES; //CollectionIndexes коллекция из CollectionIndex
 	//public $ИНДЕКСЫ;
 	public $INDEKSYY;
 	
@@ -417,7 +417,12 @@ class ValueTable{
 	}
 
 	//Выгрузка колонки в Array1C
-	function UnloadColumn($col){
+
+    /**
+     * @throws Exception
+     */
+    function UnloadColumn($col): Array1C
+    {
         $array = new Array1C;
 		if(is_int($col)){
 			$col = $this->COLUMNS->cols[$col];
@@ -436,7 +441,11 @@ class ValueTable{
 	}
 
 	//Загрузка колонки из Array1C
-	function LoadColumn($arr, $col){
+
+    /**
+     * @throws Exception
+     */
+    function LoadColumn($arr, $col){
 		if(!is_object($arr) || get_class($arr) !== 'php1C\Array1C')
 			throw new Exception("Первый аргумент должен быть массивом ".$arr);
 		if(isset($col)){
@@ -460,11 +469,11 @@ class ValueTable{
 
 	//Заполним имя всех столбцов
 	function GetAllColumns(){
-		$strcols = '';
+		$strCols = '';
 		foreach ($this->COLUMNS->cols as $val) {
-			$strcols .= $val->NAME.',';
+			$strCols .= $val->NAME.',';
 		}	
-		return substr($strcols,0,-1); //уберем последнюю запятую	
+		return substr($strCols,0,-1); //уберем последнюю запятую
 	}
 
 	//Заполнить значениями таблицу
@@ -502,11 +511,12 @@ class ValueTable{
 	}
 
 	//Возвратить количество строк
-	function Count(){
+	function Count(): int
+    {
 		return count($this->rows);
 	}
 
-	//Найти значение в талцице и возврать строку или Неопределено(null)
+	//Найти значение в таблице и возвращать строку или Неопределено(null)
 	function Find($value, $strcols=null){
 		if(!isset($strcols)) $strcols = $this->GetAllColumns();
 		$keys = explode(',',$strcols);
@@ -566,12 +576,12 @@ class ValueTable{
 		if(is_string($key)){
 			if( fEnglishVariable ) $key = str_replace(php1C_LetterLng, php1C_LetterEng, $key);
 			$key = strtoupper($key);
-			if(($key === 'КОЛОНКИ' || $key === 'COLUMNS') && (is_object($val) && get_class($val) === 'ValueTableColumnCollection')){
+			if(($key === 'КОЛОНКИ' || $key === 'COLUMNS') && (get_class($val) === 'php1C\ValueTableColumnCollection')){
 				$this->COLUMNS = $val;
 				$this->COLUMNS->setValueTable($this);
 			}	
 		}
-		if(is_numeric($key) && (is_object($val) && get_class($val) === 'ValueTableRow')){
+		if(is_numeric($key) && (get_class($val) === 'ValueTableRow')){
 		 	$this->rows[$key] = $val;
 		}
 		throw new Exception("Не найден имя столба ТаблицыЗначений ".$key);
@@ -920,7 +930,7 @@ class CollectionIndexes{
 * Индекс коллекции(пока пустая реальзация для ТаблицыЗначений)
 */
 class CollectionIndex{
-	private string $name;
+	protected string $name;
     function __construct(string $col){
 	 	$this->name = $col;
     }

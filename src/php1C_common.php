@@ -75,11 +75,12 @@ function add1C($arg1, $arg2) {
     if (is_string($arg1)) {
         return $arg1 . $arg2;
     }
+    if (is_numeric($arg1) && is_numeric($arg2))  return $arg1 + $arg2;
     if ($arg1 instanceof Number1C){
         if( $arg2 instanceof Number1C || is_numeric($arg2) )
             return $arg1->add($arg2);
     }
-    if($arg1.is_object(Date1C::class)) return $arg1->add($arg2);
+    if($arg1 instanceof Date1C && is_int($arg2)) return $arg1->add($arg2);
 
 	throw new Exception(php1C_error_ConvertToNumberBad);
 }
@@ -105,12 +106,13 @@ function sub1C($arg1, $arg2){
  * Умножение двух переменных в 1С
  * @param $arg1
  * @param $arg2
- * @return float|int|string - Результат сложение в зависимости от типа переменных (float или исключение)
+ * @return float|int|Number1C - Результат сложение в зависимости от типа переменных (float или исключение)
  * @throws Exception
  */
 function mul1C($arg1, $arg2)
 {
-    if( $arg1.is_object(Number1C::class) && ($arg2.is_object(Number1C::class) || is_numeric($arg2)) )
+    if (is_numeric($arg1) && is_numeric($arg2))  return $arg1 * $arg2;
+    if( $arg1 instanceof Number1C && ($arg2 instanceof Number1C || is_numeric($arg2)) )
         return $arg1->mul($arg2);
 	throw new Exception(php1C_error_ConvertToNumberBad );
 }
@@ -119,11 +121,13 @@ function mul1C($arg1, $arg2)
  * Деление двух переменных в 1С
  * @param $arg1
  * @param $arg2
- * @return float|int|string Результат сложение в зависимости от типа переменных (float или исключение)
+ * @return float|int|Number1C Результат сложение в зависимости от типа переменных (float или исключение)
  * @throws Exception
  */
 function div1C($arg1, $arg2){
-
+    if (is_numeric($arg1) && is_numeric($arg2))
+        if ( $arg2 == 0) throw new Exception(php1C_error_DivideByZero );
+            else return new Number1C($arg1 / $arg2);
     if( $arg1 instanceof Number1C && $arg2 instanceof Number1C )
         return $arg1->div($arg2);
     throw new Exception(php1C_error_ConvertToNumberBad );
@@ -132,13 +136,13 @@ function div1C($arg1, $arg2){
 /**
  * Операция преобразования bool в 0 или 1
  * @param $arg
- * @return float преобразование bool в 0 или 1
+ * @return int преобразование bool в 0 или 1
  * @throws Exception
  */
-function tran_bool($arg): Number1C
+function tran_bool($arg): int
 {
-	if($arg === true) return new Number1C(1);
-	else return Number1C(0);
+	if($arg === true) return 1;
+	else return 0;
 }
 
 /**
@@ -152,6 +156,7 @@ function or1C($arg1, $arg2): bool
 {
 	if(is_bool($arg1)) $arg1 = tran_bool($arg1);
 	if(is_bool($arg2)) $arg2 = tran_bool($arg2);
+    if (is_numeric($arg1) && is_numeric($arg2))  return $arg1 || $arg2;
 	if($arg1 instanceof Number1C && $arg2 instanceof Number1C) return $arg1->or($arg2);
 	throw new Exception(php1C_error_ConvertToNumberBad );
 }
@@ -167,8 +172,8 @@ function and1C($arg1, $arg2): bool
 {
 	if(is_bool($arg1)) $arg1 = tran_bool($arg1);
 	if(is_bool($arg2)) $arg2 = tran_bool($arg2);
+    if (is_numeric($arg1) && is_numeric($arg2))  return $arg1 && $arg2;
     if($arg1 instanceof Number1C && $arg2 instanceof Number1C) return $arg1->and($arg2);
-	//if(isset($arg1) && !is_string($arg1) && !is_object($arg1)) return $arg1 && $arg2;
 	throw new Exception(php1C_error_ConvertToNumberBad );
 }
 
@@ -183,6 +188,7 @@ function less1C($arg1, $arg2): bool
 {
 	if(is_bool($arg1)) $arg1 = tran_bool($arg1);
 	if(is_bool($arg2)) $arg2 = tran_bool($arg2);
+    if (is_numeric($arg1) && is_numeric($arg2))  return $arg1 < $arg2;
     if($arg1 instanceof Date1C && $arg2 instanceof Date1C) return $arg1 < $arg2;
     if($arg1 instanceof Number1C && $arg2 instanceof Number1C) return $arg1->less($arg2);
 	throw new Exception(php1C_error_BadOperTypeEqual);
@@ -199,6 +205,7 @@ function more1C($arg1, $arg2): bool
 {
 	if(is_bool($arg1)) $arg1 = tran_bool($arg1);
 	if(is_bool($arg2)) $arg2 = tran_bool($arg2);
+    if (is_numeric($arg1) && is_numeric($arg2))  return $arg1 > $arg2;
     if($arg1 instanceof Number1C && $arg2 instanceof Number1C) return $arg1->more($arg2);
     if($arg1 instanceof Date1C && $arg2 instanceof Date1C) return $arg1 > $arg2;
 	throw new Exception(php1C_error_BadOperTypeEqual);
@@ -216,7 +223,8 @@ function equal1C($arg1, $arg2): bool
 	if(is_bool($arg1)) $arg1 = tran_bool($arg1);
 	if(is_bool($arg2)) $arg2 = tran_bool($arg2);
 
-    if($arg1 instanceof Number1C) {
+    if (is_numeric($arg1) && is_numeric($arg2))  return $arg1 === $arg2;
+    elseif($arg1 instanceof Number1C) {
         if ($arg2 instanceof Number1C) return $arg1->equal($arg2);
     }
     elseif($arg1 instanceof Date1C) {
@@ -244,7 +252,7 @@ function notequal1C($arg1, $arg2): bool
  */
 function more_equal1C($arg1, $arg2): bool
 {
-    return equal1C($arg1,$arg2) || more1C($arg1, $arg2);
+    return more1C($arg1, $arg2) || equal1C($arg1, $arg2);
 }
 
 /**
@@ -252,7 +260,7 @@ function more_equal1C($arg1, $arg2): bool
  */
 function less_equal1C($arg1, $arg2): bool
 {
-    return equal1C($arg1,$arg2) || less1C($arg1, $arg2);
+    return less1C($arg1, $arg2) || equal1C($arg1, $arg2);
 }
 
 // ---------------------- Общие функции -----------------------------

@@ -140,3 +140,4 @@ const php1C_error_UndefineSymbol   = 'Непонятный символ';
 const php1C_error_UndefineType   = 'Пока тип не определен ';
 
 const php1C_error_ConvertToNumberBad  = "Преобразование значения к типу Число не может быть выполнено";
+const php1C_error_DivideByZero = 'Деление на ноль';

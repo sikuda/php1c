@@ -182,7 +182,8 @@ class CodeStream {
 			if ($this->Type === TokenStream::type_string) $this->code = '"'.$this->Look.'"';
 			if ($this->Type === TokenStream::type_date) $this->code = 'php1C\Date1C("'.$this->Look.'")';
             //fPrecision1C==true
-			if($this->Type=== TokenStream::type_number) $this->code = 'php1C\Number1C("'.$this->Look.'")';
+			//if($this->Type=== TokenStream::type_number) $this->code = 'php1C\Number1C("'.$this->Look.'")';
+            if($this->Type=== TokenStream::type_number) $this->code = $this->Look;
 
 			if($this->Type === TokenStream::type_keyword){
 				switch ($this->Index) {
@@ -647,7 +648,7 @@ class CodeStream {
 								$this->MatchKeyword(TokenStream::keyword_to);
 						 		$this->code = $this->Expression7();
 						 		$this->pushCode('$'.$iterator.'<='.$this->code. ';');
-						 		$this->pushCode('$'.$iterator.'=$'.$iterator.'->add(1)){');
+						 		$this->pushCode('$'.$iterator.'=php1C\add1C($'.$iterator.',1)){');
 						 		$this->GetChar();
                                 $this->continueCode(TokenStream::keyword_circle);
 					 		}

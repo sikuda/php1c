@@ -144,7 +144,7 @@ const php1C_error_UndefineType   = 'Пока тип не определен ';
 const php1C_error_ConvertToNumberBad  = "Преобразование значения к типу Число не может быть выполнено";
 const php1C_error_ConvertToDateBad  = 'Преобразование значения к типу Дата не может быть выполнено';
 
-const php1C_error_VabiableNotDefine = 'Переменная не определена'; //Вася)
+const php1C_error_DivideByZero = 'Деление на ноль';
 
 
 
