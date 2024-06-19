@@ -484,7 +484,7 @@ class CodeStream {
 
 		while($this->Type !== TokenStream::type_end_code){
 			switch ($this->Type) {
-				case TokenStream::type_newline: 
+                case TokenStream::type_newline:
 					$this->pushCode(chr(10));
 					$this->GetChar();
 					break;
@@ -495,12 +495,10 @@ class CodeStream {
 					break;
                 //Пустые операторы
 				case TokenStream::type_operator:
-						if($this->Index === TokenStream::operation_semicolon){
-							$this->pushCode(';');
-							$this->GetChar(); 
-						} 
-						else throw new Exception(php1C_error_UndefineOperator); //Подобно 1С никаких лишних $this->Look;
-						break;
+                    $this->code = ';';
+                    $this->MatchOperation(TokenStream::operation_semicolon, ';');
+                    $this->pushCode($this->code);
+					break;
 				//Переменная или идентификатор - переменная + присвоение или функция
 				case TokenStream::type_variable:
                 case TokenStream::type_identification:
@@ -508,7 +506,6 @@ class CodeStream {
 					$context = '$'.$key;
 					$curr = '';
 					$this->GetChar();
-                    //$this->Factor();
                     if( $this->Type === TokenStream::type_operator ){
 
                         //Обработка присвоения элемента массива
