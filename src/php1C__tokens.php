@@ -436,8 +436,7 @@ class TokenStream {
 					$key = array_search($current, $this->idTypes['lng']);
 					if( $key !== false ) return new Token(self::type_identification, $current, $key);
 					//Нераспознанные переменные
-					if( fEnglishVariable ) return new Token(self::type_variable, str_replace(php1C_LetterLng, php1C_LetterEng, $current));
-					else return new Token(self::type_variable, $current); //Переменная не переводим на английский
+					return new Token(self::type_variable, $current); //Токены на русском и английском
 				} 
 			}
 		}

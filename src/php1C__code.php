@@ -176,7 +176,7 @@ class CodeStream {
 			//$this->pushCode($this->code);
 			$this->code = $this->Look;
 			if($this->Type === TokenStream::type_variable || $this->Type === TokenStream::type_identification){
-				$key = $this->Look;
+                $key = str_replace(php1C_LetterLng, php1C_LetterEng, $this->Look);
 				$this->code = "$".$key; 
 			}	
 			if ($this->Type === TokenStream::type_string) $this->code = '"'.$this->Look.'"';
@@ -258,7 +258,8 @@ class CodeStream {
 			}	
 		}
 		elseif($type === TokenStream::type_variable || $type === TokenStream::type_identification){
-			$key = $look;
+			//$key = $look;
+            $key = str_replace(php1C_LetterLng, php1C_LetterEng, $look);
 			$this->code = "$".$key;
 			//Обработка свойств и функций объекта
 		    while( $this->Type === TokenStream::type_operator &&
@@ -502,7 +503,7 @@ class CodeStream {
 				//Переменная или идентификатор - переменная + присвоение или функция
 				case TokenStream::type_variable:
                 case TokenStream::type_identification:
-					$key = $this->Look;
+					$key = str_replace(php1C_LetterLng, php1C_LetterEng, $this->Look);
 					$context = '$'.$key;
 					$curr = '';
 					$this->GetChar();
@@ -524,7 +525,7 @@ class CodeStream {
                                 }
                                 //свойства объекта
                                 elseif($this->Type === TokenStream::type_variable){
-                                    $curr = $this->Look;
+                                    $curr = str_replace(php1C_LetterLng, php1C_LetterEng, $this->Look);
                                     $this->GetChar();
                                 }
                                 $key = ''; //переходи к текущему контексту
@@ -572,7 +573,6 @@ class CodeStream {
 					 		$this->code = $this->Expression7();
 					 		$this->MatchKeyword(TokenStream::keyword_then);
 					 		$this->pushCode($this->code . '){');
-					 		//$this->code = '';
 					 		$this->continueCode(TokenStream::keyword_then);
 					 		break;
 					 	case TokenStream::keyword_elseif:
@@ -580,7 +580,7 @@ class CodeStream {
 					 			$this->MatchKeyword(TokenStream::keyword_elseif);
 					 			$this->pushCode("elseif(");
 					 			$this->Expression7();
-						 		$this->MatchKeyword(TokenStream::keyword_then);
+                                $this->MatchKeyword(TokenStream::keyword_then);
 						 		$this->pushCode($this->code . "){");
 					 		    //$this->code = '';
 					 			$this->continueCode(TokenStream::keyword_elseif);
@@ -620,11 +620,12 @@ class CodeStream {
 					 			$this->GetChar();
 					 			//Шаблона Для каждого перем ИЗ Чего-то Цикл ... КонецЦикла;
 					 			if($this->Type !== TokenStream::type_variable) throw new Exception(php1C_error_ExpectedNameVar);
-					 			$iterator = $this->Look;
+                                $iterator = str_replace(php1C_LetterLng, php1C_LetterEng, $this->Look);
+					 			//$iterator = $this->Look;
 					 			$this->GetChar();
 							 	$this->MatchKeyword(TokenStream::keyword_from);
 							 	if($this->Type !== TokenStream::type_variable) throw new Exception(php1C_error_ExpectedNameVar);
-							 	$array = $this->Look;
+							 	$array = str_replace(php1C_LetterLng, php1C_LetterEng, $this->Look);
 							 	$this->GetChar();
 							 	$this->MatchKeyword(TokenStream::keyword_circle);
 							 	$this->pushCode("foreach( $".$array."->toArray() as $".$iterator." ){");
@@ -633,7 +634,7 @@ class CodeStream {
 								//Шаблона Для перем=Нач По Кон Цикл ... КонецЦикла;
 								$this->pushCode('for(');
 						 		if($this->Type !== TokenStream::type_variable) throw new Exception(php1C_error_ExpectedNameVar);
-						 		$iterator = $this->Look;
+						 		$iterator = str_replace(php1C_LetterLng, php1C_LetterEng, $this->Look);
 								$this->GetChar();
 								if( $this->Type === TokenStream::type_operator && $this->Index === TokenStream::operation_equal ){
 									$this->pushCode('$'.$iterator.'=');
@@ -644,9 +645,11 @@ class CodeStream {
 								$this->pushCode($this->code . ';');
 								$this->MatchKeyword(TokenStream::keyword_to);
 						 		$this->code = $this->Expression7();
-						 		$this->pushCode('$'.$iterator.'<='.$this->code. ';');
-						 		$this->pushCode('$'.$iterator.'=php1C\add1C($'.$iterator.',1)){');
-						 		$this->GetChar();
+                                $this->code = '$'.$iterator.'<='.$this->code. ';';
+                                $this->pushCode($this->code);
+						 		$this->code = '$'.$iterator.'=php1C\add1C($'.$iterator.',1)){';
+						 		$this->MatchKeyword(TokenStream::keyword_circle);
+                                $this->pushCode($this->code);
                                 $this->continueCode(TokenStream::keyword_circle);
 					 		}
 					 		break;	
@@ -675,7 +678,7 @@ class CodeStream {
 					 	case TokenStream::keyword_var:
 					 		$this->GetChar();
 					 		if($this->Type === TokenStream::type_variable){ 
-					 			$key = $this->Look;
+					 			$key = str_replace(php1C_LetterLng, php1C_LetterEng, $this->Look);
 					 			$this->GetChar();
 					 			$this->MatchOperation(TokenStream::operation_semicolon, ';');
 								$this->pushCode('$'.$key.' = null;');
