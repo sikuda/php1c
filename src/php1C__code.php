@@ -91,6 +91,17 @@ class CodeStream {
 		else throw new Exception(php1C_error_ExpectedOperator.$look);
 	}
 
+    private function MatchOperation2($subtype, $code="", $look = '???')
+    {
+        if( $this->Type === TokenStream::type_operator && $this->Index === $subtype){
+            $this->code = $code;
+            $this->GetChar();
+            $this->pushCode($this->code);
+            $this->code  = '';
+        }
+        else throw new Exception(php1C_error_ExpectedOperator.$look);
+    }
+
     /**
      * Проверка совпадения ключевого слова
      *
@@ -105,6 +116,18 @@ class CodeStream {
 			throw new Exception(php1C_error_Expected.php1C_Keywords[$subtype]);
 		}	
 	}
+
+    private function MatchKeyword2($subtype, $code=""){
+        if( $this->Type === TokenStream::type_keyword && $this->Index === $subtype){
+            $this->code = $code;
+            $this->GetChar();
+            $this->pushCode($this->code);
+            $this->code  = '';
+        }
+        else{
+            throw new Exception(php1C_error_Expected.php1C_Keywords[$subtype]);
+        }
+    }
 
     /**
      * Получить символ из перечисления символов СИМВОЛЫ
@@ -568,11 +591,11 @@ class CodeStream {
 					switch($this->Index){
 						//Если Тогда Иначе
 					 	case TokenStream::keyword_if:
-					 		$this->MatchKeyword(TokenStream::keyword_if);
-					 		$this->pushCode('if(');
+					 		$this->MatchKeyword2(TokenStream::keyword_if, 'if(');
+					 		//->pushCode('if(');
 					 		$this->code = $this->Expression7();
-					 		$this->MatchKeyword(TokenStream::keyword_then);
-					 		$this->pushCode($this->code . '){');
+					 		$this->MatchKeyword2(TokenStream::keyword_then, $this->code.'){');
+					 		//$this->pushCode($this->code . '){');
 					 		$this->continueCode(TokenStream::keyword_then);
 					 		break;
 					 	case TokenStream::keyword_elseif:
@@ -597,19 +620,19 @@ class CodeStream {
                             break;
                         case TokenStream::keyword_endif:
 					 		if($handle===TokenStream::keyword_then || $handle === TokenStream::keyword_elseif || $handle===TokenStream::keyword_else){
-					 			$this->MatchKeyword(TokenStream::keyword_endif);
-					 			$this->MatchOperation(TokenStream::operation_semicolon, ';');
-					 			$this->pushCode("}");
+					 			$this->MatchKeyword2(TokenStream::keyword_endif, '}');
+					 			$this->MatchOperation2(TokenStream::operation_semicolon, '', ';');
+					 			//$this->pushCode("}");
 					 		}
 					 		else throw new Exception(php1C_error_ExpectedConstructionIfThenElseIf);
 					 		break;
 					 	//Циклы
 					 	case TokenStream::keyword_while:
-					 		$this->MatchKeyword(TokenStream::keyword_while);
-					 		$this->pushCode("while(");
-					 		$this->code = $this->Expression7();
-					 		$this->MatchKeyword(TokenStream::keyword_circle);
-					 		$this->pushCode($this->code . "){");
+					 		$this->MatchKeyword2(TokenStream::keyword_while, 'while(');
+					 		//$this->pushCode("while(");
+					 		//$this->code = $this->Expression7();
+					 		$this->MatchKeyword2(TokenStream::keyword_circle, $this->Expression7().'){');
+					 		//$this->pushCode($this->code . "){");
 					 		//$this->code = '';
 					 		$this->continueCode(TokenStream::keyword_circle);
 					 		break;
@@ -655,9 +678,9 @@ class CodeStream {
 					 		break;	
 					 	case TokenStream::keyword_end_circle:
 					 		//if($handle===TokenStream::keyword_circle){
-					 			$this->MatchKeyword(TokenStream::keyword_end_circle);
-					 			$this->MatchOperation(TokenStream::operation_semicolon, ';');
-					 			$this->pushCode("}");
+					 			$this->MatchKeyword2(TokenStream::keyword_end_circle, '}');
+					 			$this->MatchOperation2(TokenStream::operation_semicolon,'', ';');
+					 			//$this->pushCode("}");
 					 			return;	
 					 		//}
                             //break;
