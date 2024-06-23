@@ -76,7 +76,10 @@ function add1C($arg1, $arg2) {
     elseif($arg1 instanceof Date1C) {
         return $arg1->add($arg2);
     }
-    elseif (is_numeric($arg1)) {
+    if(is_bool($arg1)) $arg1 = tran_bool($arg1);
+    if(is_bool($arg2)) $arg2 = tran_bool($arg2);
+
+    if (is_numeric($arg1)) {
         if (is_numeric($arg2)) return $arg1 + $arg2;
         elseif ($arg2 instanceof Number1C) return $arg2->add($arg1);
     }
@@ -96,6 +99,9 @@ function add1C($arg1, $arg2) {
  */
 function sub1C($arg1, $arg2){
 
+    if(is_bool($arg1)) $arg1 = tran_bool($arg1);
+    if(is_bool($arg2)) $arg2 = tran_bool($arg2);
+
     if (is_numeric($arg1) && is_numeric($arg2)) return $arg1 - $arg2;
 	elseif($arg1 instanceof Number1C){
         if( $arg2 instanceof Number1C || is_numeric($arg2) )
@@ -114,6 +120,9 @@ function sub1C($arg1, $arg2){
  */
 function mul1C($arg1, $arg2)
 {
+    if(is_bool($arg1)) $arg1 = tran_bool($arg1);
+    if(is_bool($arg2)) $arg2 = tran_bool($arg2);
+
     if(is_numeric($arg1) && is_numeric($arg2)) return $arg1 * $arg2;
     if( $arg1 instanceof Number1C && ($arg2 instanceof Number1C || is_numeric($arg2)) )
         return $arg1->mul($arg2);
@@ -128,6 +137,9 @@ function mul1C($arg1, $arg2)
  * @throws Exception
  */
 function div1C($arg1, $arg2){
+    if(is_bool($arg1)) $arg1 = tran_bool($arg1);
+    if(is_bool($arg2)) $arg2 = tran_bool($arg2);
+
     if(is_numeric($arg1) && is_numeric($arg2))
         if ($arg2 == 0) throw new Exception(php1C_error_DivideByZero);
         else {
