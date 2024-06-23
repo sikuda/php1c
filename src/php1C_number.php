@@ -67,6 +67,9 @@ class Number1C
         return new Number1C($this->shrinkLastsZero(bcmul($this->value, $arg, $scale)));
     }
 
+    /**
+     * @throws Exception
+     */
     function div($arg): Number1C {
 
         if( bccomp($arg, "0", Scale1C) === 0) throw new Exception("Деление на 0");
@@ -340,8 +343,9 @@ function Format($val, string $str_format): string
 		if($val) return $ar_format['БИ'];
 		else return $ar_format['БЛ'];	
 	}
-	elseif($val instanceof Number1C){
-        $val = $val->getValue();
+	elseif( is_numeric($val) || $val instanceof Number1C){
+        if(is_numeric($val)) $val = strval($val);
+        else $val = $val->getValue();
 		$pr = $ar_format['ЧДЦ'];
 		if(!isset($pr) && !$ar_format['ЧЦ']){
 			$pr = strpos( strval($val), '.');
@@ -384,7 +388,6 @@ function Format($val, string $str_format): string
                 return $val->toFormat($frm);
         }
     }
-
 	return strval($val);
 }
 

@@ -73,14 +73,18 @@ function toString1C($arg): string
 function add1C($arg1, $arg2) {
 
     if (is_string($arg1)) return $arg1 . $arg2;
-    elseif (is_numeric($arg1) && is_numeric($arg2)) return $arg1 + $arg2;
+    elseif($arg1 instanceof Date1C) {
+        return $arg1->add($arg2);
+    }
+    elseif (is_numeric($arg1)) {
+        if (is_numeric($arg2)) return $arg1 + $arg2;
+        elseif ($arg2 instanceof Number1C) return $arg2->add($arg1);
+    }
     elseif ($arg1 instanceof Number1C){
         if( $arg2 instanceof Number1C || is_numeric($arg2) )
             return $arg1->add($arg2);
     }
-    elseif($arg1 instanceof Date1C) return $arg1->add($arg2);
 	throw new Exception(php1C_error_ConvertToNumberBad);
-
 }
 
 /**
@@ -129,7 +133,7 @@ function div1C($arg1, $arg2){
         else {
             $val = $arg1 / $arg2;
             if (is_int($val)) return $val;
-            else return new Number1C($val);
+            else return Number1C($arg1)->div($arg2);
         }
     elseif( $arg1 instanceof Number1C && $arg2 instanceof Number1C )
         return $arg1->div($arg2);

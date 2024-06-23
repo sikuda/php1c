@@ -497,14 +497,18 @@ class ValueTable{
 	}
 
 	//Возвратить итог по колонке
-	function Total($col){
+
+    /**
+     * @throws Exception
+     */
+    function Total($col){
 		if( fEnglishVariable ) $col = str_replace(php1C_LetterLng, php1C_LetterEng, $col);
 		$col = strtoupper($col);
 		$sum = 0;
-		foreach ($this->rows as $key => $value) {
+		foreach ($this->rows as $value) {
 			$val = $value->Get($col);
-			if(is_numeric($val)){
-				$sum += Number1C($val);
+			if(is_numeric($val) || $val instanceof Number1C){
+				$sum = add1C($sum, $val);
 			}	
 		}
 		return $sum;
@@ -747,7 +751,7 @@ class ValueTable{
 }
 
 /**
-* Класс колекции колонок таблицы значений 1С
+* Класс коллекции колонок таблицы значений 1С
 *
 */
 class ValueTableColumnCollection{

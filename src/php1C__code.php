@@ -138,31 +138,29 @@ class CodeStream {
 		$this->GetChar();
 		$this->MatchOperation(TokenStream::operation_point, '.');
 		if($this->Type === TokenStream::type_variable){
-            //$this->Look;
-            if( fEnglishVariable )
-				switch ($this->Look) {
-					case 'VK'  : return 'chr(13)';
-					case 'NPP' : return 'chr(160)';
-					case 'PS'  : return 'chr(10)';
-					case 'PF'  : return 'chr(12)';
-					case 'Tab' : return 'chr(9)';
-                }
-			else	
-				switch ($this->Look) {
-					case 'ВК'  : return 'chr(13)';
-					case 'ВТаб': return 'chr(11)';
-					case 'НПП' : return 'chr(160)';
-					case 'ПС'  : return 'chr(10)';
-					case 'ПФ'  : return 'chr(12)';
-					case 'Таб' : return 'chr(9)';
-                }
             switch ($this->Look) {
-                case 'CR'  : return 'chr(13)';
-                case 'VTab': return 'chr(11)';
-                case 'NBSP': return 'chr(160)';
-                case 'LF'  : return 'chr(10)';
-                case 'FF'  : return 'chr(12)';
-                case 'TAB' : return 'chr(9)';
+                case 'ВК':
+                case 'CR':
+                case 'VK':
+                    return 'chr(13)';
+                case 'ВТаб':
+                case 'VTab':
+                    return 'chr(11)';
+                case 'НПП' :
+                case 'NPP' :
+                case 'NBSP':
+                    return 'chr(160)';
+                case 'ПС':
+                case 'PS':
+                case 'LF':
+                    return 'chr(10)';
+                case 'ПФ':
+                case 'FF'  :
+                    return 'chr(12)';
+                case 'Таб':
+                case 'PF':
+                case 'Tab':
+                     return 'chr(9)';
             }
             throw new Exception(php1C_error_NonSymbol.$this->Look);
 		}
@@ -307,7 +305,8 @@ class CodeStream {
 			    	}
 			    	//свойства объекта	
 					elseif($this->Type === TokenStream::type_variable){
-						$this->code = $this->code.'->Get("'.$this->Look.'")';
+                        $look = str_replace(php1C_LetterLng, php1C_LetterEng, $this->Look);
+						$this->code = $this->code.'->Get("'.$look.'")';
 						$this->GetChar();
 					}	
 					elseif($this->Type === TokenStream::type_number) throw new Exception(php1C_error_BadConstTypeNumber.$this->Look);
@@ -562,7 +561,7 @@ class CodeStream {
 							if( $this->Type === TokenStream::type_operator && $this->Index === TokenStream::operation_semicolon){
 								if(!empty($curr)){
 									//$this->pushCode($context.'->SET("'.$curr.'", '.$value.')');
-                                    $this->pushCode($context.'->SET('.$curr.', '.$value.')');
+                                    $this->pushCode($context.'->SET("'.$curr.'", '.$value.')');
 								}
 								else{
 									$this->code = '$'.$key."=".$value.';';
