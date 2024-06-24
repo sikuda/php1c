@@ -559,9 +559,11 @@ class CodeStream {
 					 		$value = $this->Expression7();
 							//$this->codePHP .= 'v'.$value.'v';
 							if( $this->Type === TokenStream::type_operator && $this->Index === TokenStream::operation_semicolon){
-								if(!empty($curr)){
-									//$this->pushCode($context.'->SET("'.$curr.'", '.$value.')');
-                                    $this->pushCode($context.'->SET("'.$curr.'", '.$value.')');
+								if($curr !== ''){
+                                    if( substr($curr, 0, 1)=== '$')
+									    $this->pushCode($context.'->SET('.$curr.', '.$value.')');
+                                    else
+                                        $this->pushCode($context.'->SET("'.$curr.'", '.$value.')');
 								}
 								else{
 									$this->code = '$'.$key."=".$value.';';

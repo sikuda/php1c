@@ -57,7 +57,7 @@ function Array1C($args): Array1C
 */
 class Array1C{
 
-	private array $value; //array of PHP
+	public array $value; //array of PHP
 
 	function __construct($counts=null, $copy=null){
 
@@ -137,8 +137,9 @@ class Array1C{
 
 	function Set($index, $val){
         $index = $this->intIndex($index);
-		$this->value[$index] = $val;
+        $this->value[$index] = $val;
 	}
+
 
     private function intIndex($index):int{
         if($index instanceof Number1C) $index = intval($index->getValue());
