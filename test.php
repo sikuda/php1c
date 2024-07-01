@@ -73,32 +73,40 @@ $REZULTAT=php1C\sub1C($VREMYAOKONCHANIYA,$VREMYANACHALA);echo '<--------->';
 echo $REZULTAT;
 
 ////---------------------------------------------------------------------
-//
-//$N=5000;
-//$МАССИВ=php1C\Array1C(array());
-//
-//$МАССИВ->Add(false);$МАССИВ->Add(false);
-//for($INDEKS=2 ;$INDEKS<=$N;$INDEKS=$INDEKS+1){
-//    $МАССИВ->Add(true);
-//}
-//$VREMYANACHALA=php1C\CurrentUniversalDateMilliseconds();
-//for($INDEKS=2 ;$INDEKS<=$N;$INDEKS=$INDEKS+1){
-//    if($МАССИВ->GET($INDEKS) ){
-//        $KVADRAT=$INDEKS*$INDEKS;
-//        if($KVADRAT <= $N){
-//            $M=$KVADRAT;
-//            while($M < $N){
-//                $МАССИВ->SET($M, false);
-//                $M=$M + $INDEKS;
-//            }
-//        }
-//    }
-//}
-//$VREMYAOKONCHANIYA=php1C\CurrentUniversalDateMilliseconds();
-//$REZULTAT=php1C\sub1C($VREMYAOKONCHANIYA,$VREMYANACHALA);
-//echo '<--------->';
-//echo $REZULTAT;
+$N=5000;
+$MASSIV=php1C\Array1C(array());
 
+$MASSIV->SET("0", false);
+$MASSIV->SET("1", false);
+
+for($INDEKS=2 ;$INDEKS<=$N;$INDEKS=php1C\add1C($INDEKS,1)){
+    $MASSIV->SET($INDEKS, true);
+}
+
+$VREMYANACHALA=php1C\CurrentUniversalDateMilliseconds();
+for($INDEKS=2 ;$INDEKS<=$N;$INDEKS=php1C\add1C($INDEKS,1)){
+//for($INDEKS=2 ; $INDEKS<=$N; $INDEKS +=1){
+    //if( $MASSIV->GET($INDEKS) ){
+    if( $MASSIV->value[$INDEKS] ){
+        $KVADRAT=php1C\mul1C($INDEKS,$INDEKS);
+        //$KVADRAT= $INDEKS * $INDEKS;
+        if( php1C\less_equal1C($KVADRAT,$N)){
+        //if($KVADRAT <= $N){
+            $M=$KVADRAT;
+            while(  php1C\less_equal1C($M,$N)){
+            //while( is_numeric($M) && is_numeric($N) && $M <= $N ){
+            //while( $M <= $N ){
+                $MASSIV->SET($M, false);
+                //$MASSIV->value[$M] = false;
+                $M =php1C\add1C($M,$INDEKS);
+                //$M += $INDEKS;
+            }
+        }
+    }
+}
+$VREMYAOKONCHANIYA=php1C\CurrentUniversalDateMilliseconds();
+$REZULTAT=php1C\sub1C($VREMYAOKONCHANIYA,$VREMYANACHALA);echo '<--------->';
+echo $REZULTAT;
 
 //Скорость эратосфена (миллисекунды) (5000)
 //- 1С 16
