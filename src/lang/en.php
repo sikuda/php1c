@@ -39,7 +39,7 @@ const php1C_Keywords = array(
 	'ENDFUNCTION',      //keyword_endfunction = 20; 
 	'ENDPROCEDURE',     //keyword_endprocedure = 21;
 	'RETURN',           //keyword_return  = 22;
-	'VAR',              //keyword_var     = 23;
+	'VAR',              //k0.3eyword_var     = 23;
 	'CHARS',            //keyword_chars   = 24;
 	'EXPORT',           //keyword_export  = 25; 
 	'VAL');             //keyword_val     =26;
@@ -54,6 +54,7 @@ const php1C_type_New = 'NEW';
 * Массив названий английских типов для работы с коллекциями
 */
 const php1C_types_Collection = array('ARRAY','STRUCTURE','MAP','VALUETABLE');
+const php1C_types_File = array('FILE', 'TEXTREADER', 'TETXTWRITER');
 
 /**
 * Массив названий английских функций для общей работы с 1С. Соответствует элементам русским функций.
@@ -91,6 +92,7 @@ const php1C_MonthsLang = array('January','February','March','April','May','June'
 * Массив названий английских функций для работы с датой. Соответствует элементам русским функций.
 */   
 const php1C_functions_Collections = array('UBOUND(', 'INSERT(', 'ADD(', 'COUNT(', 'FIND(', 'CLEAR(' , 'GET(', 'DEL(', 'SET(', 'PROPERTY(','LOADCOLUMN(', 'UNLOADCOLUMN(', 'FILLVALUES(', 'INDEXOF(','TOTAL(','FIND(','FINDROWS(', 'CLEAR(', 'GROUPBY(', 'MOVE(','COPY(','COPYCOLUMNS(','SORT(','DEL(');
+const php1C_functions_File = array('EXIST(','ISFILE(','ISDIRECTORY(','SIZE(','OPEN(', 'CLOSE(', 'READ(', 'READLINE(', 'WRITE(','WRITELINE(');
 
 /*
 * Константы для Вывода как в 1С

@@ -43,7 +43,8 @@ class undefined1C
 */  
 function toString1C($arg): string
 {
-	if(!isset($arg)) return php1C_Undefined;
+	//if(!isset($arg)) return php1C_Undefined;
+    if(!isset($arg) || $arg  instanceof undefined1C) return "";
 	if(is_bool($arg)){
 		if($arg === true ) return php1C_Bool[0]; //"Да";
 		else return php1C_Bool[1]; //"Нет";
@@ -238,6 +239,7 @@ function more1C($arg1, $arg2): bool
  */
 function equal1C($arg1, $arg2): bool
 {
+    if(is_null($arg1) || is_null($arg2)) return false;
 	if(is_bool($arg1)) $arg1 = tran_bool($arg1);
 	if(is_bool($arg2)) $arg2 = tran_bool($arg2);
     if (is_numeric($arg1) && is_numeric($arg2)) return $arg1 == $arg2;
@@ -254,7 +256,7 @@ function equal1C($arg1, $arg2): bool
  * @return bool Результат операции Равно
  * @throws Exception
  */
-function notequal1C($arg1, $arg2): bool
+function not_equal1C($arg1, $arg2): bool
 {
     return !equal1C($arg1, $arg2);
 }

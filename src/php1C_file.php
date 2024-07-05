@@ -10,13 +10,13 @@
 * @version 0.3
 */
 namespace php1C;
+use Exception;
+
 require_once( 'php1C_date.php');
 
-const php1C_typesPHP_File = array('File1C');
-
-//const php1C_functionsPHP_Collections = array();
-
-
+const php1C_typesPHP_File = array('File1C', 'TextReader1C', 'TextWriter1C');
+const php1C_functionsPHP_File = array('Exist(','IsFile(','IsDirectory(','Size(','Open(', 'Close(', 'Read(', 'ReadLine(', 'Write(','WriteLine(');
+//
 /**
  * Файл на сервере
  */
@@ -132,8 +132,8 @@ class File1C {
 	function SetModificationUniversalTime (Date1C $date){
         touch($this->fileName, $date->value->getOffset());
 	}
-    //s ize of file
-    function size(){
+    //size of file
+    function Size(){
         $size = filesize($this->fileName);
         if($size === false) return 0;
         else return $size;
@@ -168,9 +168,17 @@ class TextReader1C{
     }
 }
 
-function TextReader1C(string $name): TextReader1C
+/**
+ * @throws Exception
+ */
+function TextReader1C(array $value): TextReader1C
 {
-    return new TextReader1C($name);
+    if (sizeof($value) == 0 || !is_string($value[0]))  throw new Exception("Неправильный тип первого параметра");
+    if(!file_exists($value[0])) throw new Exception("Ошибка при вызове конструктора (ЧтениеТекста): Файл не обнаружен '".$value[0]."'");
+
+    $reader = new TextReader1C($value[0]);
+    $reader->Open();
+    return $reader;
 }
 
 /*
@@ -196,7 +204,11 @@ class TextWriter1C{
     }
 }
 
-function TextWriter1C(string $name): TextWriter1C
+function TextWriter1C(array $value): TextWriter1C
 {
-    return new TextWriter1C($name);
+    if (sizeof($value) == 0 || !is_string($value[0]))  throw new Exception("Неправильный тип первого параметра");
+
+    $writer = new TextWriter1C($value[0]);
+    $writer->Open();
+    return $writer;
 }

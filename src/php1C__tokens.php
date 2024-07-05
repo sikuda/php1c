@@ -158,6 +158,7 @@ class TokenStream {
 		$this->indexFuncNum  = $this->AddModule( php1C_functions_Number,  php1C_functionsPHP_Number);
 		$this->indexFuncDate = $this->AddModule( php1C_functions_Date, php1C_functionsPHP_Date);
 		$this->indexFuncColl = $this->AddModule( php1C_functions_Collections, php1C_functionsPHP_Collections);
+        $this->indexFuncColl = $this->AddModule( php1C_functions_File, php1C_functionsPHP_File);
 	}
 
 	/**
@@ -167,12 +168,23 @@ class TokenStream {
 	*/
 	private function AddTypes(): int
     {
+        //Collection
         foreach (php1C_types_Collection as $value) {
             $this->idTypes['lng'][] = mb_strtoupper($value);
         }
         foreach (php1C_typesPHP_Collection as $value) {
             $this->idTypes['php'][] = $value;
         }
+
+        //File
+        foreach (php1C_types_File as $value) {
+            $this->idTypes['lng'][] = mb_strtoupper($value);
+        }
+        foreach (php1C_typesPHP_File as $value) {
+            $this->idTypes['php'][] = $value;
+        }
+
+
 		return count($this->idTypes['php']);
 
 	}
