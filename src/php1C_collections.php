@@ -57,14 +57,13 @@ function Array1C($args): Array1C
 */
 class Array1C{
 
-	private array $value; //array of PHP
+	public array $value; //array of PHP
 
 	function __construct($counts=null, $copy=null){
 
 		if(is_array($copy)) $this->value = $copy;
 		else{	
 			$this->value = array();
-			$cnt = 0;
 			if(is_array($counts) && (count($counts)>0)){
 				if( count($counts) > 1 ) throw new Exception("Многомерные массивы пока не поддерживаются");
 				$cnt = $counts[0];
@@ -91,7 +90,11 @@ class Array1C{
 	}
 
 	function Insert($index, $val){
-		$this->value[$index] = $val;
+        $index = $this->intIndex($index);
+        if( isset($this->value[$index])){
+            array_splice($this->value, $index, 0, $val);
+        }
+		else $this->value[$index] = $val;
 	}
 
 	function Add($val): Array1C
@@ -105,10 +108,16 @@ class Array1C{
 		return count($this->value);
 	}
 
-	function Find($val){
+    /**
+     * @throws Exception
+     */
+    function Find($val){
 		$key = array_search($val, $this->value);
 		if($key === FALSE) return new undefined1C();
-		else return $key;
+		else {
+            if(is_numeric($key)) return new Number1C(strval($key));
+            else return $key;
+        }
 	}
 
 	function Clear(){
@@ -117,17 +126,25 @@ class Array1C{
 	}
 
 	function Get($index){
+        $index = $this->intIndex($index);
 		return $this->value[$index];
 	}
 
 	function Del($index){
+        $index = $this->intIndex($index);
 		unset($this->value[$index]);
 	}
 
 	function Set($index, $val){
-		$this->value[$index] = $val;
+        $index = $this->intIndex($index);
+        $this->value[$index] = $val;
 	}
 
+
+    private function intIndex($index):int{
+        if($index instanceof Number1C) $index = intval($index->getValue());
+        return $index;
+    }
 }
 
 //------------------------------------------------------------------------------------------
@@ -322,18 +339,18 @@ class Map1C{
 		$key = strtoupper($key);
 		if(array_key_exists($key, $this->value)) $this->value[$key] = $val;
 		else throw new Exception("Не найден ключ структуры ".$key);
-	}	
+	}
 }
 
 //----------------------------------------------------------------------------------------------
 
 /**
-* Получение ТаблицыЗначений
-*
-* @param array $args аргументы функции в массиве
-* @return - возвращает новый объект ТаблицаЗначений1С
-*
-*/
+ * Получение ТаблицыЗначений
+ *
+ * @param null $args аргументы функции в массиве
+ * @return ValueTable - возвращает новый объект ТаблицаЗначений1С
+ *
+ */
 function ValueTable($args=null): ValueTable
 {
 	return new ValueTable($args);
@@ -349,7 +366,7 @@ class ValueTable{
 	public ValueTableColumnCollection $COLUMNS; //ValueTableColumnCollection - collection of ValueTableColumn
 	//public $КОЛОНКИ;
 	public $KOLONKI;
-	public $INDEXES; //CollectionIndexes коллекция из CollectionIndex
+	public CollectionIndexes $INDEXES; //CollectionIndexes коллекция из CollectionIndex
 	//public $ИНДЕКСЫ;
 	public $INDEKSYY;
 	
@@ -401,7 +418,12 @@ class ValueTable{
 	}
 
 	//Выгрузка колонки в Array1C
-	function UnloadColumn($col){
+
+    /**
+     * @throws Exception
+     */
+    function UnloadColumn($col): Array1C
+    {
         $array = new Array1C;
 		if(is_int($col)){
 			$col = $this->COLUMNS->cols[$col];
@@ -420,7 +442,11 @@ class ValueTable{
 	}
 
 	//Загрузка колонки из Array1C
-	function LoadColumn($arr, $col){
+
+    /**
+     * @throws Exception
+     */
+    function LoadColumn($arr, $col){
 		if(!is_object($arr) || get_class($arr) !== 'php1C\Array1C')
 			throw new Exception("Первый аргумент должен быть массивом ".$arr);
 		if(isset($col)){
@@ -444,11 +470,11 @@ class ValueTable{
 
 	//Заполним имя всех столбцов
 	function GetAllColumns(){
-		$strcols = '';
+		$strCols = '';
 		foreach ($this->COLUMNS->cols as $val) {
-			$strcols .= $val->NAME.',';
+			$strCols .= $val->NAME.',';
 		}	
-		return substr($strcols,0,-1); //уберем последнюю запятую	
+		return substr($strCols,0,-1); //уберем последнюю запятую
 	}
 
 	//Заполнить значениями таблицу
@@ -472,25 +498,30 @@ class ValueTable{
 	}
 
 	//Возвратить итог по колонке
-	function Total($col){
+
+    /**
+     * @throws Exception
+     */
+    function Total($col){
 		if( fEnglishVariable ) $col = str_replace(php1C_LetterLng, php1C_LetterEng, $col);
 		$col = strtoupper($col);
 		$sum = 0;
-		foreach ($this->rows as $key => $value) {
+		foreach ($this->rows as $value) {
 			$val = $value->Get($col);
-			if(is_numeric($val)){
-				$sum += toNumber1C($val);
+			if(is_numeric($val) || $val instanceof Number1C){
+				$sum = add1C($sum, $val);
 			}	
 		}
 		return $sum;
 	}
 
 	//Возвратить количество строк
-	function Count(){
+	function Count(): int
+    {
 		return count($this->rows);
 	}
 
-	//Найти значение в талцице и возврать строку или Неопределено(null)
+	//Найти значение в таблице и возвращать строку или Неопределено(null)
 	function Find($value, $strcols=null){
 		if(!isset($strcols)) $strcols = $this->GetAllColumns();
 		$keys = explode(',',$strcols);
@@ -550,12 +581,12 @@ class ValueTable{
 		if(is_string($key)){
 			if( fEnglishVariable ) $key = str_replace(php1C_LetterLng, php1C_LetterEng, $key);
 			$key = strtoupper($key);
-			if(($key === 'КОЛОНКИ' || $key === 'COLUMNS') && (is_object($val) && get_class($val) === 'ValueTableColumnCollection')){
+			if(($key === 'КОЛОНКИ' || $key === 'COLUMNS') && (get_class($val) === 'php1C\ValueTableColumnCollection')){
 				$this->COLUMNS = $val;
 				$this->COLUMNS->setValueTable($this);
 			}	
 		}
-		if(is_numeric($key) && (is_object($val) && get_class($val) === 'ValueTableRow')){
+		if(is_numeric($key) && (get_class($val) === 'ValueTableRow')){
 		 	$this->rows[$key] = $val;
 		}
 		throw new Exception("Не найден имя столба ТаблицыЗначений ".$key);
@@ -721,7 +752,7 @@ class ValueTable{
 }
 
 /**
-* Класс колекции колонок таблицы значений 1С
+* Класс коллекции колонок таблицы значений 1С
 *
 */
 class ValueTableColumnCollection{
@@ -904,7 +935,7 @@ class CollectionIndexes{
 * Индекс коллекции(пока пустая реальзация для ТаблицыЗначений)
 */
 class CollectionIndex{
-	private string $name;
+	protected string $name;
     function __construct(string $col){
 	 	$this->name = $col;
     }

@@ -67,11 +67,12 @@ function TrimLR(string $arg ): string
 * Возвращает строку в количестве $arg2 левых элементов строки $arg1
 *
 * @param  $arg1 string
-* @param  $arg2 int - количество элементов строки
+* @param  $arg2 int|Number1C - количество элементов строки
 * @return string строка  
 */
-function Left(string $arg1, int $arg2 ): string
+function Left(string $arg1, $arg2 ): string
 {
+    if ($arg2 instanceof Number1C) $arg2 = intval($arg2->getValue());
 	return mb_substr($arg1, 0, $arg2);
 }
 
@@ -79,10 +80,11 @@ function Left(string $arg1, int $arg2 ): string
 * Возвращает строку в количестве $arg2 правых элементов строки $arg1
 *
 * @param  $arg1 string
-* @param  $arg2 int количество элементов строки 
+* @param  $arg2 int|Number1C количество элементов строки
 * @return string строка  
 */
-function Right(string $arg1, int $arg2 ):string {
+function Right(string $arg1, $arg2 ):string {
+    if ($arg2 instanceof Number1C) $arg2 = intval($arg2->getValue());
 	return mb_substr($arg1, mb_strlen($arg1)-$arg2, $arg2);
 }
 
@@ -90,13 +92,15 @@ function Right(string $arg1, int $arg2 ):string {
 * Возвращает строку начиная с $arg2(счет с 1) в количестве $arg3 элементов строки $arg1
 *
 * @param  $arg1 string
-* @param  $arg2 int позиция первого элемента начиная с 1 
-* @param  $arg3 int количество элементов 
+* @param  $arg2 int|Number1C позиция первого элемента начиная с 1
+* @param  $arg3 int|Number1C количество элементов
 * @return string строка  
 */
-function Mid(string $arg1, int $arg2, int $arg3 ): string
+function Mid(string $arg1, $arg2, $arg3 ): string
 {
-	if($arg2<=0) $arg2 = 1;
+    if ($arg2 instanceof Number1C) $arg2 = intval($arg2->getValue());
+    if ($arg3 instanceof Number1C) $arg3 = intval($arg3->getValue());
+    if($arg2<=0) $arg2 = 1;
 	return mb_substr($arg1, $arg2-1, $arg3);
 }
 
@@ -112,8 +116,12 @@ function Mid(string $arg1, int $arg2, int $arg3 ): string
  * @return int найденная позиция в подстроке начиная с 1, если не нашел то 0
  * @throws Exception
  */
-function StrFind(string $arg1, string $arg2, int $arg3=0, int $arg4=0, int $arg5=0): int
+function StrFind(string $arg1, string $arg2, $arg3=0, $arg4=0, $arg5=0): int
 {
+    if ($arg3 instanceof Number1C) $arg3 = intval($arg3->getValue());
+    if ($arg4 instanceof Number1C) $arg4 = intval($arg4->getValue());
+    if ($arg5 instanceof Number1C) $arg5 = intval($arg5->getValue());
+
     if ($arg3 <> 0 || $arg4 <> 0 || $arg5 <> 0) throw new Exception("Еще не реализовано");
 	$res = mb_strpos($arg1, $arg2);
 	if($res === false) return 0;
@@ -163,25 +171,29 @@ function Title(string $str ): string
 }
 
 /**
+ * Символ
 * Возвращает строку из кода символа
 *
 * @param  $dec int код символа
 * @return string строка 
 */
-function Char(int $dec ): string
+function Char($dec ): string
 {
+    if ($dec instanceof Number1C) $dec = intval($dec->getValue());
     return mb_chr($dec);
 }
 
 /**
+ * КодСимвола
  * Возвращает код символа из буквы строки
  *
  * @param string $str входящая строка
  * @param int $num_letter
  * @return int код символа
  */
-function CharCode(string $str, int $num_letter=1): int
+function CharCode(string $str, $num_letter=1): int
 {
+    if ($num_letter instanceof Number1C) $num_letter = intval($num_letter->getValue());
     if($num_letter<1 || $num_letter>mb_strlen($str)) return -1;
     $character = mb_substr($str, $num_letter-1);
     return mb_ord($character);
@@ -226,11 +238,12 @@ function StrLineCount(string $str): int
 * Возвращает num(начиная с 1) строку из общей строки
 *
 * @param string $str str входящая строка
-* @param int $num num номер строки в общей строке
+* @param int|Number1C num номер строки в общей строке
 * @return string получившая строка 
 */
-function StrGetLine(string $str, int $num): string
+function StrGetLine(string $str, $num): string
 {
+    if ($num instanceof Number1C) $num = intval($num->getValue());
 	while($num>1){
 		$pos = mb_strpos($str, chr(10));
 		$str = mb_substr($str, $pos+1);

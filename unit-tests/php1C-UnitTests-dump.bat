@@ -1,0 +1,1 @@
+"C:\Program Files\1cv8\8.3.22.2283\bin\1cv8" DESIGNER /DumpExternalDataProcessorOrReportToFiles "./php1C-UnitTests" "php1C-UnitTests.epf" 

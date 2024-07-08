@@ -1,4 +1,4 @@
-<?php /** @noinspection PhpUnused */
+<?php
 
 /**
 * Модуль работы датой 1С
@@ -17,7 +17,7 @@ use DateInterval;
 * Массив названий английских функций для работы с датой - соответствует элементам русским функций.
 * @return string[] Массив названий функций работы с датой.
 */
-const php1C_functionsPHP_Date = array('Date(','CurrentDate(', 'Year(', 'Month(','Day(', 'Hour(', 'Minute(', 'Second(', 'BegOfYear(', 'BegOfQuarter(',  'BegOfMonth(', 'BegOfWeek('   ,'BegOfDay(' ,'BegOfHour(' ,'BegOfMinute(', 'EndOfYear(','EndOfQuarter(', 'EndOfMonth(', 'EndOfWeek(',  'EndOfDay(','EndOfHour(','EndOfMinute(','WeekOfYear(', 'DayOfYear(', 'WeekDay(',   'AddMonth(');
+const php1C_functionsPHP_Date = array('Date(','CurrentDate(', 'Year(', 'Month(','Day(', 'Hour(', 'Minute(', 'Second(', 'BegOfYear(', 'BegOfQuarter(',  'BegOfMonth(', 'BegOfWeek('   ,'BegOfDay(' ,'BegOfHour(' ,'BegOfMinute(', 'EndOfYear(','EndOfQuarter(', 'EndOfMonth(', 'EndOfWeek(',  'EndOfDay(','EndOfHour(','EndOfMinute(','WeekOfYear(', 'DayOfYear(', 'WeekDay(',   'AddMonth(', 'CurrentUniversalDateMilliseconds(');
 
 const php1C_Months = array('January','February','March','April','May','June','July','August','September','October','November','December');
 
@@ -100,36 +100,37 @@ class Date1C {
  * Основная функция создания даты из строки или из последовательности чисел
  *
  * @param string|Date1C $str - год
- * @param int $month - номер месяца с 1
- * @param int $day - дата в месяце
- * @param int $hour - час
- * @param int $minute - минуты
- * @param int $second - секунды
+ * @param int|Number1C $month - номер месяца с 1
+ * @param int|Number1C $day - дата в месяце
+ * @param int|Number1C $hour - час
+ * @param int|Number1C $minute - минуты
+ * @param int|Number1C $second - секунды
  *
  * @return Date1C Возвращает класс Date1C или вызывается исключение
  * @throws Exception
  */
-function Date1C($str, int $month=0, int $day=0, int $hour=0, int $minute=0, int $second=0): Date1C
+function Date1C($str, $month=0,  $day=0, $hour=0, $minute=0, $second=0): Date1C
 {
-//	if(is_string($str)){
-//		if(mb_strlen($str)==8 || mb_strlen($str)==12 || mb_strlen($str)==14) return new Date1C($str);
-//		else throw new Exception('Преобразование значения к типу Дата не может быть выполнено. Длина строки не 8, не 12 и не 14');
-//	}
-//	else
-    if (is_object($str) && get_class($str) == "php1C\Date1C") return $str;
+    if ($str instanceof Date1C) return $str;
 
-    if(is_numeric($str)){
-
+    if($str instanceof Number1C || is_numeric($str)){
         if(is_string($str))
-    		if(mb_strlen($str)==8 || mb_strlen($str)==12 || mb_strlen($str)==14) return new Date1C($str);
+            if(mb_strlen($str)==8 || mb_strlen($str)==12 || mb_strlen($str)==14) return new Date1C($str);
 
-		$check_date = checkdate( $month, $day, $str ) && ($hour >= 0) && ($hour < 60) && ($minute >=0) && ($minute < 60) && ($second >= 0) && ($second < 60);
-		$str = str_pad($str,4,"0",STR_PAD_LEFT).str_pad($month,2,"0",STR_PAD_LEFT).str_pad($day,2,"0",STR_PAD_LEFT).str_pad($hour,2,"0",STR_PAD_LEFT).str_pad($minute,2,"0",STR_PAD_LEFT).str_pad($second,2,"0",STR_PAD_LEFT);
-		
-		if( $check_date ) return new Date1C($str);
-		throw new Exception('Преобразование значения к типу Дата не может быть выполнено');	
-	}
-    throw new Exception('Преобразование значения к типу Дата не может быть выполнено');
+        if($str instanceof Number1C) $str = intval($str->getValue());
+        if($month instanceof Number1C) $month = intval($month->getValue());
+        if($day instanceof Number1C) $day = intval($day->getValue());
+        if($hour instanceof Number1C) $hour = intval($hour->getValue());
+        if($minute instanceof Number1C) $minute = intval($minute->getValue());
+        if($second instanceof Number1C) $second = intval($second->getValue());
+
+        $check_date = checkdate( $month, $day, $str ) && ($hour >= 0) && ($hour < 60) && ($minute >=0) && ($minute < 60) && ($second >= 0) && ($second < 60);
+        $str = str_pad($str,4,"0",STR_PAD_LEFT).str_pad($month,2,"0",STR_PAD_LEFT).str_pad($day,2,"0",STR_PAD_LEFT).str_pad($hour,2,"0",STR_PAD_LEFT).str_pad($minute,2,"0",STR_PAD_LEFT).str_pad($second,2,"0",STR_PAD_LEFT);
+
+        if( $check_date ) return new Date1C($str);
+        throw new Exception(php1C_error_ConvertToDateBad);
+    }
+    throw new Exception(php1C_error_ConvertToDateBad);
 }
 
 /**
@@ -140,7 +141,6 @@ function Date1C($str, int $month=0, int $day=0, int $hour=0, int $minute=0, int 
  */
 function CurrentDate(): Date1C
 {
-    //return new Date1C(date("YmdHis"));
     return new Date1C(new DateTime("now"));
 }
 
@@ -464,5 +464,12 @@ function AddMonth(Date1C $date, int $int_month=0 ): Date1C
 	 	$date1C = new Date1C(str_pad($year, 4, "0", STR_PAD_LEFT).str_pad($month+1, 2, "0", STR_PAD_LEFT)."01", -1);
 	 	return new Date1C(date_format($date1C->value,"Y").date_format($date1C->value,"m").date_format($date1C->value,"d").date_format($date->value,"H").date_format($date->value,"i").date_format($date->value,"s"));
 	} 
+}
+
+/*
+ * Функция для расчета времени выполнения
+ */
+function CurrentUniversalDateMilliseconds(){
+    return hrtime(true)/1e+6;
 }
 

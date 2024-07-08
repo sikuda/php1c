@@ -39,7 +39,7 @@ const php1C_Keywords = array(
 	'ENDFUNCTION',      //keyword_endfunction = 20; 
 	'ENDPROCEDURE',     //keyword_endprocedure = 21;
 	'RETURN',           //keyword_return  = 22;
-	'VAR',              //keyword_var     = 23;
+	'VAR',              //k0.3eyword_var     = 23;
 	'CHARS',            //keyword_chars   = 24;
 	'EXPORT',           //keyword_export  = 25; 
 	'VAL');             //keyword_val     =26;
@@ -54,6 +54,7 @@ const php1C_type_New = 'NEW';
 * Массив названий английских типов для работы с коллекциями
 */
 const php1C_types_Collection = array('ARRAY','STRUCTURE','MAP','VALUETABLE');
+const php1C_types_File = array('FILE', 'TEXTREADER', 'TETXTWRITER');
 
 /**
 * Массив названий английских функций для общей работы с 1С. Соответствует элементам русским функций.
@@ -91,6 +92,7 @@ const php1C_MonthsLang = array('January','February','March','April','May','June'
 * Массив названий английских функций для работы с датой. Соответствует элементам русским функций.
 */   
 const php1C_functions_Collections = array('UBOUND(', 'INSERT(', 'ADD(', 'COUNT(', 'FIND(', 'CLEAR(' , 'GET(', 'DEL(', 'SET(', 'PROPERTY(','LOADCOLUMN(', 'UNLOADCOLUMN(', 'FILLVALUES(', 'INDEXOF(','TOTAL(','FIND(','FINDROWS(', 'CLEAR(', 'GROUPBY(', 'MOVE(','COPY(','COPYCOLUMNS(','SORT(','DEL(');
+const php1C_functions_File = array('EXIST(','ISFILE(','ISDIRECTORY(','SIZE(','OPEN(', 'CLOSE(', 'READ(', 'READLINE(', 'WRITE(','WRITELINE(');
 
 /*
 * Константы для Вывода как в 1С
@@ -103,6 +105,7 @@ const php1C_error_NonSymbol2  = 'Expacted symbol from list, but not ';
 const php1C_Undefined = 'Undefined';
 const php1C_strBool = "Boolean";
 const php1C_Number =  "Number";
+const php1C_Date = "Date";
 const php1C_String  = "String";
 const php1C_Bool = array('Yes','No');
 const php1C_double_quotes  = "\" (double quote)";
@@ -124,21 +127,19 @@ const php1C_error_BadNonOperAfterVar ='Неизвестный не операт�
 const php1C_error_BadOperTypeEqual = "Операции сравнения равно допустима только для значений совпадающих примитивных типов (Булево-Число, Строка, Дата)";
 const php1C_error_DoubleOper = 'Двойной оператор ';
 const php1C_error_LostSymbol = 'Пропущен символ ';
-const php1C_error_Expected = "Ожидается -";
 const php1C_error_ExpectedComma = 'Ожидается запятая , ';
 const php1C_error_ExpectedConstructionIfThen = 'Ожидается конструкция Если ... Тогда';
 const php1C_error_ExpectedConstructionIfThenElseIf = 'Ожидается конструкция Если ... Тогда(ИначеЕсли)';
 const php1C_error_ExpectedConstructionWhileDo = 'Ожидается конструкции Пока(Для) ... Цикл';
-const php1C_error_ExpectedIdentType = 'Ожидается идентификатор типа, а не ';
 const php1C_error_ExpectedFunctionObject = 'Предполагается функция объекта ';
 const php1C_error_ExpectedNameVar = 'Ожидается имя переменной';
 const php1C_error_ExpectedNameFunction ='Ожидается название функции или процедуры';
-const php1C_error_ExpectedOperator = "Ожидается оператор";
 const php1C_error_NonKeyword = 'Нет соответствия ключевому слову ';
-const php1C_error_NonSymbol = "Неопределенный символ "; //Из Массива Символы
-const php1C_error_NonSymbol2  = 'Ожидается символ из перечисления, а не ';
 const php1C_error_OperBadLevel  = 'Операция не принадлежит этому уровню ';
 const php1C_error_UndefineFunction = 'Непонятная функция';
 const php1C_error_UndefineOperator = 'Неопознанный оператор ';
 const php1C_error_UndefineSymbol   = 'Непонятный символ';
 const php1C_error_UndefineType   = 'Пока тип не определен ';
+
+const php1C_error_ConvertToNumberBad  = "Преобразование значения к типу Число не может быть выполнено";
+const php1C_error_DivideByZero = 'Деление на ноль';
