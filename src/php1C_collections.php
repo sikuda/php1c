@@ -113,7 +113,7 @@ class Array1C{
      */
     function Find($val){
 		$key = array_search($val, $this->value);
-		if($key === FALSE) return new undefined1C();
+		if($key === FALSE) return php1C_UndefinedType;
 		else {
             if(is_numeric($key)) return new Number1C(strval($key));
             else return $key;
