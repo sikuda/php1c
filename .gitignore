@@ -8,4 +8,5 @@ js/*
 question/*
 output.php
 *.epf
+unit-tests/php1C-UnitTests/*
 

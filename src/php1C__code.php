@@ -212,7 +212,7 @@ class CodeStream {
 						$this->code = '';
 						return;
 				 	case TokenStream::keyword_undefined:
-				 		$this->code = 'php1C_UndefinedType';
+				 		$this->code = '\php1C\php1C_UndefinedType';
 				 		break;
 					case TokenStream::keyword_true: 
 					    $this->code = 'true'; 
@@ -705,7 +705,7 @@ class CodeStream {
 					 			$key = str_replace(php1C_LetterLng, php1C_LetterEng, $this->Look);
 					 			$this->GetChar();
 					 			$this->MatchOperation(TokenStream::operation_semicolon, ';');
-								$this->pushCode('$'.$key.' = php1C_UndefinedType;');
+								$this->pushCode('$'.$key.' = php1C\php1C_UndefinedType;');
 							}
 					 		else throw new Exception(php1C_error_ExpectedNameVar );
 					 		break;

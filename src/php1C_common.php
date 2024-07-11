@@ -240,16 +240,13 @@ function more1C($arg1, $arg2): bool
 function equal1C($arg1, $arg2): bool
 {
     if($arg1 === $arg2) return true;
-	if(is_bool($arg1)) $arg1 = tran_bool($arg1);
+    if( $arg1 === php1C_UndefinedType || $arg2 === php1C_UndefinedType ) return false;
+    if(is_bool($arg1)) $arg1 = tran_bool($arg1);
 	if(is_bool($arg2)) $arg2 = tran_bool($arg2);
     if (is_numeric($arg1) && is_numeric($arg2)) return $arg1 == $arg2;
     elseif($arg1 instanceof Number1C && $arg2 instanceof Number1C) return $arg1->equal($arg2);
     elseif($arg1 instanceof Date1C && $arg2 instanceof Date1C) return $arg1 === $arg2;
     elseif(is_string($arg1) && is_string($arg2)) return strcmp($arg1, $arg2) === 0;
-//    elseif($arg1  instanceof undefined1C){
-//        if($arg2  instanceof undefined1C) return true;
-//        else return false;
-//    }
 	throw new Exception(php1C_error_BadOperTypeEqual);
 }
 
