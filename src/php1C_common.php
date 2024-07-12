@@ -29,7 +29,8 @@ require_once('php1C_file.php');
 */   
 const php1C_functionsPHP_Com = array('Message(','Find(','ValueIsFilled(','Type(','TypeOf(','toString1C(','toNumber1C(');
 
-const php1C_UndefinedType = php1C_Undefined.'B1l-l%@Sevg4=5iP+5(iSl,oh;Ampo0j/Mp5lX<c?Q:(lz>+@|{|c&b6l3*E{~Nq';
+const php1C_UndefinedType = 'Undefined-B1l-l%@Sevg4=5iP+5(iSl,oh;Ampo0j/Mp5lX<c?Q:(lz>+@|{|c&b6l3*E{~Nq';
+const php1C_NullType = 'Null-B1l-l%@Sevg4=5iP+5(iSl,oh;Ampo0j/Mp5lX<c?Q:(lz>+@|{|c&b6l3*E{~Nq';
 //class undefined1C
 //{
 //    function __toString(){
@@ -44,7 +45,7 @@ const php1C_UndefinedType = php1C_Undefined.'B1l-l%@Sevg4=5iP+5(iSl,oh;Ampo0j/Mp
 */  
 function toString1C($arg): string
 {
-	if(!isset($arg) || $arg === php1C_UndefinedType) return "";
+	if(!isset($arg) || $arg === php1C_UndefinedType || $arg === php1C_NullType) return "";
     if(is_bool($arg)){
 		if($arg === true ) return php1C_Bool[0]; //"Да";
 		else return php1C_Bool[1]; //"Нет";
@@ -240,12 +241,12 @@ function more1C($arg1, $arg2): bool
 function equal1C($arg1, $arg2): bool
 {
     if($arg1 === $arg2) return true;
-    if( $arg1 === php1C_UndefinedType || $arg2 === php1C_UndefinedType ) return false;
     if(is_bool($arg1)) $arg1 = tran_bool($arg1);
 	if(is_bool($arg2)) $arg2 = tran_bool($arg2);
     if (is_numeric($arg1) && is_numeric($arg2)) return $arg1 == $arg2;
     elseif($arg1 instanceof Number1C && $arg2 instanceof Number1C) return $arg1->equal($arg2);
     elseif($arg1 instanceof Date1C && $arg2 instanceof Date1C) return $arg1 === $arg2;
+    elseif( $arg1 === php1C_UndefinedType || $arg2 === php1C_UndefinedType || $arg1 === php1C_NullType || $arg2 === php1C_NullType) return false;
     elseif(is_string($arg1) && is_string($arg2)) return strcmp($arg1, $arg2) === 0;
 	throw new Exception(php1C_error_BadOperTypeEqual);
 }

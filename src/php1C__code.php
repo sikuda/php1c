@@ -214,6 +214,9 @@ class CodeStream {
 				 	case TokenStream::keyword_undefined:
 				 		$this->code = '\php1C\php1C_UndefinedType';
 				 		break;
+                    case TokenStream::keyword_null:
+                        $this->code = '\php1C\php1C_NullType';
+                        break;
 					case TokenStream::keyword_true: 
 					    $this->code = 'true'; 
 					    break;

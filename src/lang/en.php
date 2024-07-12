@@ -39,10 +39,11 @@ const php1C_Keywords = array(
 	'ENDFUNCTION',      //keyword_endfunction = 20; 
 	'ENDPROCEDURE',     //keyword_endprocedure = 21;
 	'RETURN',           //keyword_return  = 22;
-	'VAR',              //k0.3eyword_var     = 23;
+	'VAR',              //k0.3eyword_var  = 23;
 	'CHARS',            //keyword_chars   = 24;
 	'EXPORT',           //keyword_export  = 25; 
-	'VAL');             //keyword_val     =26;
+	'VAL',              //keyword_val     =26;
+    'NULL');            //keyword_null    =27;
 
 /**
 * Ключевое слово Новый

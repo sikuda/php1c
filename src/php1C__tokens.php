@@ -117,9 +117,11 @@ class TokenStream {
 	const keyword_var     = 23; 
 	const keyword_chars   = 24; 
 	const keyword_export  = 25; 
-	const keyword_val     =26;
+	const keyword_val     = 26;
+    const keyword_null    = 27;
 
-	//Идентификаторы типов - type_identification
+
+    //Идентификаторы типов - type_identification
 	public array $idTypes = array(
 		"lng" => array(), // типы на языке в верхнем регистре для поиска	
         "php" => array()  // типы по-английски как будет в коде			

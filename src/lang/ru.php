@@ -44,7 +44,8 @@ const php1C_Keywords = array(
 	'ПЕРЕМ',           //keyword_var     = 23;
 	'СИМВОЛЫ',         //keyword_chars   = 24;
 	'ЭКСПОРТ',         //keyword_export  = 25;
-	'ЗНАЧ');           //keyword_val     =26;
+	'ЗНАЧ',            //keyword_val     =26;
+    'NULL');           //keyword_null    =27;
 
 /**
 * Ключевое слово Новый
