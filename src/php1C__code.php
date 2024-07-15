@@ -239,13 +239,17 @@ class CodeStream {
 				$func = $this->Look;
 				$this->code = $this->splitFunction( null, $func);
 				return;
-			}	
+			}
+
+
 			$type = $this->Type;
 			$look = $this->Look;
 			$index = $this->Index;
-			$this->GetChar();
-			$this->ForwardOperation($type, $look, $index);	
-		} 
+            if(!($type === TokenStream::type_operator && $index === TokenStream::operation_not)){
+                $this->GetChar();
+                $this->ForwardOperation($type, $look, $index);
+            }
+		}
 	}
 
     /**
@@ -265,10 +269,13 @@ class CodeStream {
 				$this->code = '-'.$this->code;
 			}elseif($index === TokenStream::operation_plus) {
 				$this->Factor();
-			}elseif($index === TokenStream::operation_not) {
-				$this->Factor();
-				$this->code = '!'.$this->code;
 			}
+//            elseif($index === TokenStream::operation_not) {
+//                $this->i_token -= 2;
+//                $this->GetChar();
+//				$this->Factor();
+//				$this->code = '!'.$this->code;
+//			}
 			//Оператор Новый и тип
 			elseif($index === TokenStream::operation_new) {
 				if( $this->Type === TokenStream::type_identification){
@@ -360,17 +367,17 @@ class CodeStream {
      */
 	public function Expression7($level=7): string
     {
-		if($level > 2) $this->Expression7($level-1);
+		if($level > 1) $this->Expression7($level-1);
 		switch ($level) {
-			case 2: // Базовые операции
+			case 1: // Базовые операции
 				$this->Factor();
 				break;
-			case 3: // Умножение или деление (* /)
+			case 2: // Умножение или деление (* /)
 		        while( $this->Type === TokenStream::type_operator && ($this->Index === TokenStream::operation_multi || $this->Index === TokenStream::operation_div)){
 		        	$this->codeStack[] = $this->code;
 		        	$index = $this->Index;
 		        	$this->GetChar();
-					$this->Expression7(2);
+					$this->Expression7(1);
 					if( $index === TokenStream::operation_multi ){
 						$this->code = 'php1C\mul1C('.array_pop($this->codeStack).','.$this->code.')';
 					}else{
@@ -378,12 +385,12 @@ class CodeStream {
 					}
 				}
 				break;
-			case 4: //Сложение или вычитание (+ -)
+			case 3: //Сложение или вычитание (+ -)
 				while( $this->Type === TokenStream::type_operator && ($this->Index === TokenStream::operation_plus || $this->Index === TokenStream::operation_minus)){
 					$this->codeStack[] = $this->code;
 					$index = $this->Index;
 					$this->GetChar();
-					$this->Expression7(3);
+					$this->Expression7(2);
 					if( $index === TokenStream::operation_plus ){
 						$this->code = 'php1C\add1C('.array_pop($this->codeStack).','.$this->code.')';
 					}else{
@@ -391,7 +398,7 @@ class CodeStream {
 					}	
 				}
 				break;
-			case 5: //Больше меньше или равно (< <= = <> > >=)
+			case 4: //Больше меньше или равно (< <= = <> > >=)
 				while( $this->Type === TokenStream::type_operator && 
 					   ($this->Index === TokenStream::operation_less || $this->Index === TokenStream::operation_less_equal
                            || $this->Index === TokenStream::operation_equal || $this->Index === TokenStream::operation_notequal
@@ -399,7 +406,7 @@ class CodeStream {
 					$this->codeStack[] = $this->code;
 					$index = $this->Index; 
 					$this->GetChar();
-					$this->Expression7(4);
+					$this->Expression7(3);
 					switch ($index) {
 						case TokenStream::operation_less:
 							$this->code = 'php1C\less1C('.array_pop($this->codeStack).','.$this->code.')';
@@ -423,6 +430,15 @@ class CodeStream {
 						 	throw new Exception(php1C_error_OperBadLevel.$this->Look);
 					}
 				}
+                break;
+            case 5:
+                //Унарный НЕ
+                while($this->Type === TokenStream::type_operator && $this->Index === TokenStream::operation_not) {
+                    //$this->codeStack[] = $this->code;
+				    $this->GetChar();
+                    $this->Expression7(4);
+				    $this->code = '!('.$this->code.')';
+                }
                 break;
 			case 6: //И
 				while( $this->Type === TokenStream::type_operator && $this->Index === TokenStream::operation_and){

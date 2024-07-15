@@ -244,7 +244,8 @@ function equal1C($arg1, $arg2): bool
     if(is_bool($arg1)) $arg1 = tran_bool($arg1);
 	if(is_bool($arg2)) $arg2 = tran_bool($arg2);
     if (is_numeric($arg1) && is_numeric($arg2)) return $arg1 == $arg2;
-    elseif($arg1 instanceof Number1C && $arg2 instanceof Number1C) return $arg1->equal($arg2);
+    elseif($arg1 instanceof Number1C && ($arg2 instanceof Number1C || is_numeric($arg2))) return $arg1->equal($arg2);
+    elseif($arg2 instanceof Number1C && is_numeric($arg1)) return Number1C($arg1)->equal($arg2);
     elseif($arg1 instanceof Date1C && $arg2 instanceof Date1C) return $arg1 === $arg2;
     elseif( $arg1 === php1C_UndefinedType || $arg2 === php1C_UndefinedType || $arg1 === php1C_NullType || $arg2 === php1C_NullType) return false;
     elseif(is_string($arg1) && is_string($arg2)) return strcmp($arg1, $arg2) === 0;
