@@ -29,14 +29,9 @@ require_once('php1C_file.php');
 */   
 const php1C_functionsPHP_Com = array('Message(','Find(','ValueIsFilled(','Type(','TypeOf(','toString1C(','toNumber1C(');
 
-const php1C_UndefinedType = 'Undefined-B1l-l%@Sevg4=5iP+5(iSl,oh;Ampo0j/Mp5lX<c?Q:(lz>+@|{|c&b6l3*E{~Nq';
-const php1C_NullType = 'Null-B1l-l%@Sevg4=5iP+5(iSl,oh;Ampo0j/Mp5lX<c?Q:(lz>+@|{|c&b6l3*E{~Nq';
-//class undefined1C
-//{
-//    function __toString(){
-//        return php1C_Undefined;
-//    }
-//}
+//id уникальные от oscript
+const php1C_UndefinedType = 'Undefined-783CE532-8CE0-4C59-BEF4-835AEFB715E4';
+const php1C_NullType = 'Null-26D78088-915A-4294-97E1-FB39E70187A6';
 
 /**
 * Выводит данные в представлении 1С (на установленном языке)
@@ -104,8 +99,11 @@ function sub1C($arg1, $arg2){
     if(is_bool($arg1)) $arg1 = tran_bool($arg1);
     if(is_bool($arg2)) $arg2 = tran_bool($arg2);
 
-    if (is_numeric($arg1) && is_numeric($arg2)) return $arg1 - $arg2;
-	elseif($arg1 instanceof Number1C){
+    if (is_numeric($arg1)) {
+        if (is_numeric($arg2)) return $arg1 - $arg2;
+        elseif ($arg2 instanceof Number1C) return Number1C($arg1)->sub($arg2);
+    }
+    elseif($arg1 instanceof Number1C){
         if( $arg2 instanceof Number1C || is_numeric($arg2) )
             return $arg1->sub($arg2);
 	}
@@ -117,7 +115,7 @@ function sub1C($arg1, $arg2){
  * Умножение двух переменных в 1С
  * @param $arg1
  * @param $arg2
- * @return float|int|string - Результат сложение в зависимости от типа переменных (float или исключение)
+ * @return float|int|Number1C - Результат сложение в зависимости от типа переменных (float или исключение)
  * @throws Exception
  */
 function mul1C($arg1, $arg2)
@@ -125,9 +123,14 @@ function mul1C($arg1, $arg2)
     if(is_bool($arg1)) $arg1 = tran_bool($arg1);
     if(is_bool($arg2)) $arg2 = tran_bool($arg2);
 
-    if(is_numeric($arg1) && is_numeric($arg2)) return $arg1 * $arg2;
-    if( $arg1 instanceof Number1C && ($arg2 instanceof Number1C || is_numeric($arg2)) )
-        return $arg1->mul($arg2);
+    if (is_numeric($arg1)) {
+        if (is_numeric($arg2)) return $arg1 * $arg2;
+        elseif ($arg2 instanceof Number1C) return $arg2->mul($arg1);
+    }
+    elseif($arg1 instanceof Number1C){
+        if( $arg2 instanceof Number1C || is_numeric($arg2) )
+            return $arg1->mul($arg2);
+    }
 	throw new Exception(php1C_error_ConvertToNumberBad );
 }
 
@@ -135,22 +138,28 @@ function mul1C($arg1, $arg2)
  * Деление двух переменных в 1С
  * @param $arg1
  * @param $arg2
- * @return float|int|string Результат сложение в зависимости от типа переменных (float или исключение)
+ * @return float|int|Number1C Результат сложение в зависимости от типа переменных (float или исключение)
  * @throws Exception
  */
 function div1C($arg1, $arg2){
     if(is_bool($arg1)) $arg1 = tran_bool($arg1);
     if(is_bool($arg2)) $arg2 = tran_bool($arg2);
 
-    if(is_numeric($arg1) && is_numeric($arg2))
-        if ($arg2 == 0) throw new Exception(php1C_error_DivideByZero);
-        else {
-            $val = $arg1 / $arg2;
-            if (is_int($val)) return $val;
-            else return Number1C($arg1)->div($arg2);
+    if (is_numeric($arg1)) {
+        if (is_numeric($arg2)){
+            if ($arg2 == 0) throw new Exception(php1C_error_DivideByZero);
+            else {
+                $val = $arg1 / $arg2;
+                if (is_int($val)) return $val;
+                else return Number1C($arg1)->div($arg2);
+            }
         }
-    elseif( $arg1 instanceof Number1C && $arg2 instanceof Number1C )
-        return $arg1->div($arg2);
+        elseif ($arg2 instanceof Number1C) return Number1C($arg1)->div($arg2);
+    }
+    elseif($arg1 instanceof Number1C){
+        if( $arg2 instanceof Number1C || is_numeric($arg2) )
+            return $arg1->div($arg2);
+    }
     throw new Exception(php1C_error_ConvertToNumberBad );
 }
 
@@ -176,8 +185,14 @@ function or1C($arg1, $arg2): bool
 {
 	if(is_bool($arg1)) $arg1 = tran_bool($arg1);
 	if(is_bool($arg2)) $arg2 = tran_bool($arg2);
-    if (is_numeric($arg1) && is_numeric($arg2)) return $arg1 || $arg2;
-	if($arg1 instanceof Number1C && $arg2 instanceof Number1C) return $arg1->or($arg2);
+    if (is_numeric($arg1)) {
+        if (is_numeric($arg2)) return $arg1 || $arg2;
+        elseif ($arg2 instanceof Number1C) return Number1C($arg1)->or($arg2);
+    }
+    elseif($arg1 instanceof Number1C){
+        if( $arg2 instanceof Number1C || is_numeric($arg2) )
+            return $arg1->or($arg2);
+    }
 	throw new Exception(php1C_error_ConvertToNumberBad );
 }
 
@@ -192,8 +207,14 @@ function and1C($arg1, $arg2): bool
 {
 	if(is_bool($arg1)) $arg1 = tran_bool($arg1);
 	if(is_bool($arg2)) $arg2 = tran_bool($arg2);
-    if (is_numeric($arg1) && is_numeric($arg2)) return $arg1 && $arg2;
-    if($arg1 instanceof Number1C && $arg2 instanceof Number1C) return $arg1->and($arg2);
+    if (is_numeric($arg1)) {
+        if (is_numeric($arg2)) return $arg1 && $arg2;
+        elseif ($arg2 instanceof Number1C) return Number1C($arg1)->and($arg2);
+    }
+    elseif($arg1 instanceof Number1C){
+        if( $arg2 instanceof Number1C || is_numeric($arg2) )
+            return $arg1->and($arg2);
+    }
 	throw new Exception(php1C_error_ConvertToNumberBad );
 }
 
@@ -208,8 +229,14 @@ function less1C($arg1, $arg2): bool
 {
 	if(is_bool($arg1)) $arg1 = tran_bool($arg1);
 	if(is_bool($arg2)) $arg2 = tran_bool($arg2);
-    if (is_numeric($arg1) && is_numeric($arg2)) return $arg1 < $arg2;
-    if($arg1 instanceof Date1C && $arg2 instanceof Date1C) return $arg1 < $arg2;
+    if (is_numeric($arg1)) {
+        if (is_numeric($arg2)) return $arg1 < $arg2;
+        elseif ($arg2 instanceof Number1C) return Number1C($arg1)->less($arg2);
+    }
+    elseif($arg1 instanceof Number1C){
+        if( $arg2 instanceof Number1C || is_numeric($arg2) )
+            return $arg1->less($arg2);
+    }
     if($arg1 instanceof Number1C && $arg2 instanceof Number1C) return $arg1->less($arg2);
 	throw new Exception(php1C_error_BadOperTypeEqual);
 }
@@ -225,9 +252,15 @@ function more1C($arg1, $arg2): bool
 {
 	if(is_bool($arg1)) $arg1 = tran_bool($arg1);
 	if(is_bool($arg2)) $arg2 = tran_bool($arg2);
-    if (is_numeric($arg1) && is_numeric($arg2)) return $arg1 > $arg2;
-    if($arg1 instanceof Number1C && $arg2 instanceof Number1C) return $arg1->more($arg2);
-    if($arg1 instanceof Date1C && $arg2 instanceof Date1C) return $arg1 > $arg2;
+    if (is_numeric($arg1)) {
+        if (is_numeric($arg2)) return $arg1 > $arg2;
+        elseif ($arg2 instanceof Number1C) return Number1C($arg1)->more($arg2);
+    }
+    elseif($arg1 instanceof Number1C){
+        if( $arg2 instanceof Number1C || is_numeric($arg2) )
+            return $arg1->more($arg2);
+    }
+    elseif($arg1 instanceof Date1C && $arg2 instanceof Date1C) return $arg1 > $arg2;
 	throw new Exception(php1C_error_BadOperTypeEqual);
 }
 
@@ -243,9 +276,14 @@ function equal1C($arg1, $arg2): bool
     if($arg1 === $arg2) return true;
     if(is_bool($arg1)) $arg1 = tran_bool($arg1);
 	if(is_bool($arg2)) $arg2 = tran_bool($arg2);
-    if (is_numeric($arg1) && is_numeric($arg2)) return $arg1 == $arg2;
-    elseif($arg1 instanceof Number1C && ($arg2 instanceof Number1C || is_numeric($arg2))) return $arg1->equal($arg2);
-    elseif($arg2 instanceof Number1C && is_numeric($arg1)) return Number1C($arg1)->equal($arg2);
+    if (is_numeric($arg1)) {
+        if (is_numeric($arg2)) return $arg1 == $arg2;
+        elseif ($arg2 instanceof Number1C) return Number1C($arg1)->equal($arg2);
+    }
+    elseif($arg1 instanceof Number1C){
+        if (is_numeric($arg2)) return Number1C($arg2)->equal($arg1);
+        elseif( $arg2 instanceof Number1C ) return $arg1->equal($arg2);
+    }
     elseif($arg1 instanceof Date1C && $arg2 instanceof Date1C) return $arg1 === $arg2;
     elseif( $arg1 === php1C_UndefinedType || $arg2 === php1C_UndefinedType || $arg1 === php1C_NullType || $arg2 === php1C_NullType) return false;
     elseif(is_string($arg1) && is_string($arg2)) return strcmp($arg1, $arg2) === 0;
@@ -356,6 +394,7 @@ function TypeOf($val): Type1C
 	elseif(is_string($val)) $str = php1C_String;
 	elseif($val instanceof Date1C) $str = php1C_Date;
     elseif ($val instanceof Number1C) $str = php1C_Number;
+    elseif (is_numeric($val)) $str = php1C_Number;
     return new Type1C($str);
 }
 
