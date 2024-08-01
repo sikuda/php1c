@@ -15,10 +15,10 @@ require_once('php1C__tokens.php');
 /**
 * Массив названий типов для работы с коллекциями переименовании
 */
-const php1C_typesPHP_Collection = array('Array1C','Structure1C','Map1C','ValueTable');
+const php1C_typesPHP_Collection = array('Array1C','Structure1C','Map1C','ValueTable', 'FixedArray1C');
 
 /**
-* Массив названий английских функций для работы с датой. Соответстует элементам русским функций.
+* Массив названий английских функций для работы с датой. Соответствует элементам русским функций.
 * @return string[] Массив названий функций работы с датой.
 */   
 const php1C_functionsPHP_Collections = array('UBound(',   'Insert(',   'Add(',      'Count(',      'Find(',  'Clear('  , 'Get(',      'Del(',    'Set(',       'Property(','LoadColumn(',     'UnloadColumn(',      'FillValues(',      'IndexOf(','Total(','Find(','FindRows(',    'Clear(',   'GroupBy(',  'Move(',    'Copy(',       'CopyColumns(',          'Sort(',       'Del(');
@@ -28,13 +28,14 @@ const php1C_functionsPHP_Collections = array('UBound(',   'Insert(',   'Add(',  
  *
  * @param string $key строка в названии функции со скобкой
  * @param array $arguments аргументы функции в массиве
- * @return Structure1C|Map1C|Array1C|ValueTable результат функции или выбрасывает исключение
+ * @return Structure1C|Map1C|Array1C|ValueTable|FixedArray1C результат функции или выбрасывает исключение
  * @throws Exception
  */
 function callCollectionType(string $key, array $arguments)
 {
     switch($key) {
         case 'Array1C': return Array1C($arguments);
+        case 'FixedArray1C': return FixedArray1C($arguments);
         case 'Structure1C': return Structure1C($arguments);
         case 'Map1C': return Map1C($arguments);
         case 'ValueTable': return ValueTable($arguments);
@@ -43,103 +44,149 @@ function callCollectionType(string $key, array $arguments)
 }
 
 //---------------------------------------------------------------------------------------------------------
+
+/**
+ * Базовый класс коллекций 1С
+ */
+class BaseCollection1C{
+    public array $value;
+
+    function getItem($key, $value){
+        return $value;
+    }
+    function getKeyOrigin($key){
+        return $this->value[$key];
+    }
+    function toArray(): array{
+        return $this->value;
+    }
+    function Count(): int
+    {
+        return count($this->value);
+    }
+}
+
+
 /**
  * @throws Exception
  */
-function Array1C($args): Array1C
+function FixedArray1C($args): FixedArray1C
 {
-	return new Array1C($args);
+    return new FixedArray1C($args);
 }
 
-/**
-* Класс для работы с массивом 1С
-*
-*/
-class Array1C{
+class FixedArray1C extends BaseCollection1C {
 
-	public array $value; //array of PHP
+    /**
+     * @throws Exception
+     */
+    function __construct($array1C=null){
+        if (is_null($array1C)) return;
+        elseif(isset($array1C[0]) && $array1C[0] instanceof Array1C) $this->value = $array1C[0]->toArray();
+        else throw new Exception("Неправильный конструктор ФиксированногоМассива");
+    }
 
-	function __construct($counts=null, $copy=null){
-
-		if(is_array($copy)) $this->value = $copy;
-		else{	
-			$this->value = array();
-			if(is_array($counts) && (count($counts)>0)){
-				if( count($counts) > 1 ) throw new Exception("Многомерные массивы пока не поддерживаются");
-				$cnt = $counts[0];
-				if( is_numeric($cnt) && $cnt > 0 ){
-					for ($i=0; $i < $cnt; $i++) $this->value[$i] = null;
-				}
-			} 
-		}
-	}
-
-	function __toString(){
-		return "Массив";
-	}
-
-	function toArray(): array
+    function __toString(): string
     {
-		return $this->value;
-	}
+        return "ФиксированныйМассив";
+    }
 
-	function UBound(): int
+    function UBound(): int
     {
-		$key = count($this->value);
+        $key = count($this->value);
         return $key-1;
-	}
-
-	function Insert($index, $val){
-        $index = $this->intIndex($index);
-        if( isset($this->value[$index])){
-            array_splice($this->value, $index, 0, $val);
-        }
-		else $this->value[$index] = $val;
-	}
-
-	function Add($val): Array1C
-    {
-		$this->value[] = $val;
-		return $this;
-	}
-
-	function Count(): int
-    {
-		return count($this->value);
-	}
+    }
 
     /**
      * @throws Exception
      */
     function Find($val){
-		$key = array_search($val, $this->value);
-		if($key === FALSE) return php1C_UndefinedType;
-		else {
+        $key = array_search($val, $this->value);
+        if($key === FALSE) return php1C_UndefinedType;
+        else {
             if(is_numeric($key)) return new Number1C(strval($key));
             else return $key;
         }
-	}
+    }
 
-	function Clear(){
-		unset($this->value);
-		$this->value = array();
-	}
-
-	function Get($index){
+    function Get($index){
         $index = $this->intIndex($index);
-		return $this->value[$index];
-	}
+        return $this->value[$index];
+    }
+    private function intIndex($index):int{
+        if($index instanceof Number1C) $index = intval($index->getValue());
+        return $index;
+    }
+}
 
-	function Del($index){
+/**
+ * @throws Exception
+ */
+function Array1C($args): Array1C
+{
+    return new Array1C($args);
+}
+
+/**
+ * Класс для работы с массивом 1С
+ *
+ */
+class Array1C extends FixedArray1C {
+
+    function __construct($counts=null, $copy=null){
+
+        parent::__construct();
+        if(is_array($copy)) $this->value = $copy;
+        else{
+            $this->value = array();
+            if(is_array($counts) && (count($counts)>0)){
+                if( count($counts) > 1 ) throw new Exception("Многомерные массивы пока не поддерживаются");
+                $cnt = $counts[0];
+                if( is_numeric($cnt) && $cnt > 0 ){
+                    for ($i=0; $i < $cnt; $i++) $this->value[$i] = null;
+                }
+            }
+        }
+    }
+
+    function __toString(): string
+    {
+        return "Массив";
+    }
+
+//    function toArray(): array
+//    {
+//        return $this->value;
+//    }
+
+    function Insert($index, $val){
         $index = $this->intIndex($index);
-		unset($this->value[$index]);
-	}
+        if( isset($this->value[$index])){
+            array_splice($this->value, $index, 0, $val);
+        }
+        else $this->value[$index] = $val;
+    }
 
-	function Set($index, $val){
+    function Add($val): Array1C
+    {
+        $this->value[] = $val;
+        return $this;
+    }
+
+    function Clear(){
+        unset($this->value);
+        $this->value = array();
+    }
+
+    function Del($index){
+        $index = $this->intIndex($index);
+        unset($this->value[$index]);
+    }
+
+    function Set($index, $val){
         $index = $this->intIndex($index);
         $this->value[$index] = $val;
-	}
-
+    }
 
     private function intIndex($index):int{
         if($index instanceof Number1C) $index = intval($index->getValue());
@@ -148,27 +195,55 @@ class Array1C{
 }
 
 //------------------------------------------------------------------------------------------
+function KeyAndValue1C( $key, $value): KeyAndValue1C
+{
+    return new KeyAndValue1C($key, $value);
+}
+
+class KeyAndValue1C{
+    public  $key;
+    public  $value;
+
+    function __construct($key=php1C_UndefinedType,$value=php1C_UndefinedType){
+        $this->key = $key;
+        $this->value = $value;
+    }
+
+    /**
+     * Возвращает ключ или значение
+     * @throws Exception
+     */
+    function Get($key){
+        switch ($key){
+            case "КЛЮЧ":
+            case "KLYUCH":
+            case "KEY": return $this->key;
+            case "ЗНАЧЕНИЕ":
+            case "ZNACHENIE":
+            case "VALUE": return $this->value;
+        }
+        throw new Exception("Не найден ключ или значение".$key);
+
+    }
+}
 
 /**
-* Получение структуры 1С 
-*
-* @param array $cnt аргументы функции в массиве
-* @return - возвращает новый объект массива 1С
-*
-*/
-function Structure1C($args=null): Structure1C
+ * Получение структуры 1С
+ *
+ * @param array|null $args аргументы функции в массиве
+ * @return Structure1C - возвращает новый объект массива 1С
+ *
+ */
+function Structure1C(array $args=null): Structure1C
 {
-	return new Structure1C($args);
+    return new Structure1C($args);
 }
 
 /**
 * Класс для работы со структурой 1С
 */
-class Structure1C{
-	/**
-	* @var array внутренее хранение массива
-	*/
-	private array $value; //array of PHP
+class Structure1C extends BaseCollection1C {
+	private array $keysOrigin;
 
 	function __construct($args=null,$copy=null){
 
@@ -178,61 +253,75 @@ class Structure1C{
 			if( (count($args) > 0) && is_string($args[0])){
 				$keys = explode(',',$args[0]);
 				for ($i=0; $i < count($keys); $i++) {
-					$k = mb_strtoupper(trim ($keys[$i]));
-					if( fEnglishVariable ) $k = str_replace(php1C_LetterLng, php1C_LetterEng, $k);
-					if(!isset($args[$i+1])) $this->value[$k] = null;
-					else $this->value[$k] = $args[$i+1];
-				}
+                    $k = mb_strtoupper(trim ($keys[$i]));
+                    if( fEnglishVariable ) $k = str_replace(php1C_LetterLng, php1C_LetterEng, $k);
+					if(!isset($args[$i+1]))
+                        $this->value[$k] = php1C_UndefinedType;
+                    else
+                        $this->value[$k] = $args[$i+1];
+                    $this->keysOrigin[$k] = $keys[$i];
+                }
 			}
 		}
 	}
 
-	function toArray(): array
+	function getKeyOrigin($key){
+        return $this->keysOrigin[$key];
+    }
+    function getItem($key, $value): KeyAndValue1C
     {
-		return $this->value;
-	}
+        return new KeyAndValue1C($this->keysOrigin[$key], $value);
+    }
 
 	function __toString(){
 		return "Структура";
 	}
 
 	function Insert($key, $val=null){
-		if( fEnglishVariable ) $key = str_replace(php1C_LetterLng, php1C_LetterEng, $key);
-		$this->value[mb_strtoupper($key)] = $val;
-	}
-
-	function Count(){
-		return count($this->value);
+        $key2 = $key;
+        if(is_string($key)){
+            if( fEnglishVariable ) $key2 = str_replace(php1C_LetterLng, php1C_LetterEng, $key);
+            $key2 = trim(mb_strtoupper($key2));
+        }
+        $this->value[$key2] = $val;
+        $this->keysOrigin[$key2] = $key;
 	}
 
     /**
-     * @param $key
-     * @param $value
-     * @return bool
+     * Есть свойство
+     * @param $key - ключ
+     * @param $value - значение
+     * @return bool - Истина если ключ(значение) существует
      */
-    function Property($key, &$value=null): bool
-    {
-		if( fEnglishVariable ) $key = str_replace(php1C_LetterLng, php1C_LetterEng, $key);
-		$key = mb_strtoupper($key);
+    function Property($key, &$value=null): bool{
+        if (is_string($key)) {
+            $key = mb_strtoupper($key);
+            if (fEnglishVariable) $key = str_replace(php1C_LetterLng, php1C_LetterEng, $key);
+        }
 		$value = $this->value[$key];
 		return array_key_exists($key, $this->value);
 	}
 
 	function Clear(){
 		unset($this->value);
+        unset($this->keysOrigin);
 		$this->value = array();
+        $this->keysOrigin = array();
 	}
 
 	function Del($key){
 		if( fEnglishVariable ) $key = str_replace(php1C_LetterLng, php1C_LetterEng, $key);
 		$key = mb_strtoupper($key);
 		unset($this->value[$key]);
+        unset($this->keysOrigin[$key]);
 	}
 
 	//Для получения данных через точку
 	function Get($key){
-		if( fEnglishVariable ) $key = str_replace(php1C_LetterLng, php1C_LetterEng, $key);
-		$key = mb_strtoupper($key);
+        if(is_string($key)){
+            if( fEnglishVariable ) $key = str_replace(php1C_LetterLng, php1C_LetterEng, $key);
+            $key = mb_strtoupper($key);
+        }
 		return $this->value[$key];
 	}
 
@@ -242,13 +331,18 @@ class Structure1C{
      * @throws Exception
      */
     function Set($key, $val=null){
-		if( fEnglishVariable ) $key = str_replace(php1C_LetterLng, php1C_LetterEng, $key);
-		$key = mb_strtoupper($key);
-		if(array_key_exists($key, $this->value)) $this->value[$key] = $val;
+        $key2 = $key;
+        if(is_string($key)) {
+            $key2 = mb_strtoupper($key2);
+            if (fEnglishVariable) $key2 = str_replace(php1C_LetterLng, php1C_LetterEng, $key);
+        }
+		if(array_key_exists($key2, $this->value)){
+            $this->value[$key2] = $val;
+            $this->keysOrigin[$key2] = $key;
+        }
 		else throw new Exception("Не найден ключ структуры ".$key);
-	}	
+	}
 }
-
 
 //------------------------------------------------------------------------------------------
 
@@ -360,7 +454,7 @@ function ValueTable($args=null): ValueTable
 * Класс для работы с таблицей значений 1С8
 *
 */
-class ValueTable{
+class ValueTable extends BaseCollection1C {
 	
 	private array $rows;   //array of ValueTableRow
 	public ValueTableColumnCollection $COLUMNS; //ValueTableColumnCollection - collection of ValueTableColumn
@@ -393,6 +487,10 @@ class ValueTable{
     {
 		return $this->rows;
 	}
+
+    function getKeyOrigin($key){
+        return $this->rows[$key];
+    }
 
 	//Добавить новую строку в таблицу
 	function Add(): ValueTableRow
@@ -536,7 +634,8 @@ class ValueTable{
 	}
 
 	//Поиск по структуре возврат Array1C
-	function FindRows($filter){
+	function FindRows($filter): Array1C
+    {
 		if(!is_object($filter) || get_class($filter) !== 'php1C\Structure1C'){
 			throw new Exception("Аргумент функции должен быть структурой ".$filter);
 		} 
@@ -683,7 +782,7 @@ class ValueTable{
 	/** 
 	* Скопировать пустые колонки ТаблицуЗначений в новую ТаблицуЗначений
 	*
-	* @param string $strcols строка перечисления колонок
+	* @param mixed $strcols строка перечисления колонок
 	* @return - возвращает новый объект ТаблицаЗначений1С
 	*/
 	function CopyColumns($strcols){
@@ -849,7 +948,11 @@ class ValueTableRow{
 	}
 
 	//Для получения данных через точку
-	function Get($key){
+
+    /**
+     * @throws Exception
+     */
+    function Get($key){
 		if(is_string($key)){
 			if( fEnglishVariable ) $key = str_replace(php1C_LetterLng, php1C_LetterEng, $key);
 			$key = strtoupper($key);
@@ -863,7 +966,11 @@ class ValueTableRow{
 	}
 
 	//Для установки данных через точку
-	function Set($key, $value=null){
+
+    /**
+     * @throws Exception
+     */
+    function Set($key, $value=null){
 		if(is_string($key)){
 			if( fEnglishVariable ) $key = str_replace(php1C_LetterLng, php1C_LetterEng, $key);
 			$key = strtoupper($key);
@@ -932,7 +1039,7 @@ class CollectionIndexes{
 }
 
 /**
-* Индекс коллекции(пока пустая реальзация для ТаблицыЗначений)
+* Индекс коллекции(пока пустая реализация для ТаблицыЗначений)
 */
 class CollectionIndex{
 	protected string $name;

@@ -186,9 +186,7 @@ class TokenStream {
             $this->idTypes['php'][] = $value;
         }
 
-
-		return count($this->idTypes['php']);
-
+        return count($this->idTypes['php']);
 	}
 
     /**

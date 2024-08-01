@@ -91,6 +91,9 @@ class CodeStream {
 		else throw new Exception(php1C_error_ExpectedOperator.$look);
 	}
 
+    /**
+     * @throws Exception
+     */
     private function MatchOperation2($subtype, $code="", $look = '???')
     {
         if( $this->Type === TokenStream::type_operator && $this->Index === $subtype){
@@ -117,6 +120,9 @@ class CodeStream {
 		}	
 	}
 
+    /**
+     * @throws Exception
+     */
     private function MatchKeyword2($subtype, $code=""){
         if( $this->Type === TokenStream::type_keyword && $this->Index === $subtype){
             $this->code = $code;
@@ -192,9 +198,6 @@ class CodeStream {
 			$this->MatchOperation(TokenStream::operation_close_bracket, ')');
 		}
 		else{
-			
-			//$this->codePHP .= 'f'.$this->Look.'-'.$this->Type.'f';
-			//$this->pushCode($this->code);
 			$this->code = $this->Look;
 			if($this->Type === TokenStream::type_variable || $this->Type === TokenStream::type_identification){
                 $key = str_replace(php1C_LetterLng, php1C_LetterEng, $this->Look);
@@ -202,8 +205,6 @@ class CodeStream {
 			}	
 			if ($this->Type === TokenStream::type_string) $this->code = '"'.$this->Look.'"';
 			if ($this->Type === TokenStream::type_date) $this->code = 'php1C\Date1C("'.$this->Look.'")';
-            //fPrecision1C==true
-			//if($this->Type=== TokenStream::type_number) $this->code = 'php1C\Number1C("'.$this->Look.'")';
             if($this->Type=== TokenStream::type_number) $this->code = $this->Look;
 
 			if($this->Type === TokenStream::type_keyword){
@@ -270,17 +271,10 @@ class CodeStream {
 			}elseif($index === TokenStream::operation_plus) {
 				$this->Factor();
 			}
-//            elseif($index === TokenStream::operation_not) {
-//                $this->i_token -= 2;
-//                $this->GetChar();
-//				$this->Factor();
-//				$this->code = '!'.$this->code;
-//			}
 			//Оператор Новый и тип
 			elseif($index === TokenStream::operation_new) {
 				if( $this->Type === TokenStream::type_identification){
 					$this->code = $this->getNewType();
-					//$this->GetChar();
 				} 
 				else throw new Exception(php1C_error_ExpectedIdentType.$this->Look);
 			}
@@ -289,7 +283,6 @@ class CodeStream {
 			}	
 		}
 		elseif($type === TokenStream::type_variable || $type === TokenStream::type_identification){
-			//$key = $look;
             $key = str_replace(php1C_LetterLng, php1C_LetterEng, $look);
 			$this->code = "$".$key;
 			//Обработка свойств и функций объекта
@@ -671,9 +664,14 @@ class CodeStream {
 							 	$array = str_replace(php1C_LetterLng, php1C_LetterEng, $this->Look);
 							 	$this->GetChar();
 							 	$this->MatchKeyword(TokenStream::keyword_circle);
-							 	$this->pushCode("foreach( $".$array."->toArray() as $".$iterator." ){");
-							 	$this->continueCode(TokenStream::keyword_circle);
-							}else{
+							 	//$this->pushCode("foreach( $".$array."->toArray() as $".$iterator." ){");
+                                //Структура и Соответствие выдают КлючИЗначение, остальные значения
+                                $uniqStr = uniqid();
+                                //$this->pushCode("$"."ClassName".$uniqStr."=get_class((object)$".$array.");");
+                                $this->pushCode("foreach( $".$array."->toArray() as $"."key".$uniqStr." => $"."value".$uniqStr." ){");
+                                //$this->pushCode( "\n$".$iterator."=php1C\KeyAndValue1C($".$array."->getKeyOrigin($"."key".$uniqStr."), $"."value".$uniqStr.");\n");
+                                $this->pushCode( " $".$iterator."=$".$array."->getItem($"."key".$uniqStr.", $"."value".$uniqStr.");\n");
+                             }else{
 								//Шаблона Для перем=Нач По Кон Цикл ... КонецЦикла;
 								$this->pushCode('for(');
 						 		if($this->Type !== TokenStream::type_variable) throw new Exception(php1C_error_ExpectedNameVar);
@@ -693,9 +691,9 @@ class CodeStream {
 						 		$this->code = '$'.$iterator.'=php1C\add1C($'.$iterator.',1)){';
 						 		$this->MatchKeyword(TokenStream::keyword_circle);
                                 $this->pushCode($this->code);
-                                $this->continueCode(TokenStream::keyword_circle);
-					 		}
-					 		break;	
+                            }
+                            $this->continueCode(TokenStream::keyword_circle);
+                            break;
 					 	case TokenStream::keyword_end_circle:
 					 		//if($handle===TokenStream::keyword_circle){
 					 			$this->MatchKeyword2(TokenStream::keyword_end_circle, '}');

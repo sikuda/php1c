@@ -3,7 +3,7 @@
 * Module English lang for get code PHP from 1С
 * 
 * @author  sikuda@yandex.ru
-* @version 0.2
+* @version 0.3
 */
 namespace php1C;
 
@@ -54,7 +54,7 @@ const php1C_type_New = 'NEW';
 /**
 * Массив названий английских типов для работы с коллекциями
 */
-const php1C_types_Collection = array('ARRAY','STRUCTURE','MAP','VALUETABLE');
+const php1C_types_Collection = array('ARRAY','STRUCTURE','MAP','VALUETABLE','FIXEDARRAY');
 const php1C_types_File = array('FILE', 'TEXTREADER', 'TETXTWRITER');
 
 /**

@@ -69,7 +69,7 @@ function toString1C($arg): string
  */
 function add1C($arg1, $arg2) {
 
-    if (is_string($arg1)) return $arg1 . $arg2;
+    if (is_string($arg1)) return $arg1.toString1C($arg2);
     elseif($arg1 instanceof Date1C) {
         return $arg1->add($arg2);
     }
