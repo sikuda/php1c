@@ -1,7 +1,7 @@
 <?php
 // Установка языка программирования
 //- ru - default setting
-//- enм
+//- en
 if (!defined('Language1C')) define('Language1C', 'ru');
 
 //true - Использовать только латинские переменные в PHP (false - переменные не переводятся)

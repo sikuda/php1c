@@ -664,12 +664,9 @@ class CodeStream {
 							 	$array = str_replace(php1C_LetterLng, php1C_LetterEng, $this->Look);
 							 	$this->GetChar();
 							 	$this->MatchKeyword(TokenStream::keyword_circle);
-							 	//$this->pushCode("foreach( $".$array."->toArray() as $".$iterator." ){");
-                                //Структура и Соответствие выдают КлючИЗначение, остальные значения
+                                //Структура и Соответствие выдают КлючИЗначение, остальные выдают значения
                                 $uniqStr = uniqid();
-                                //$this->pushCode("$"."ClassName".$uniqStr."=get_class((object)$".$array.");");
                                 $this->pushCode("foreach( $".$array."->toArray() as $"."key".$uniqStr." => $"."value".$uniqStr." ){");
-                                //$this->pushCode( "\n$".$iterator."=php1C\KeyAndValue1C($".$array."->getKeyOrigin($"."key".$uniqStr."), $"."value".$uniqStr.");\n");
                                 $this->pushCode( " $".$iterator."=$".$array."->getItem($"."key".$uniqStr.", $"."value".$uniqStr.");\n");
                              }else{
 								//Шаблона Для перем=Нач По Кон Цикл ... КонецЦикла;
