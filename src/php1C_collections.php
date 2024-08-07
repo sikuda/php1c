@@ -84,15 +84,13 @@ class FixedArray1C extends BaseCollection1C {
         else throw new Exception("Неправильный конструктор ФиксированногоМассива");
     }
 
-    function __toString(): string
-    {
-        return "ФиксированныйМассив";
+    function __toString(): string {
+        return php1C_strFixedArray1C;
     }
 
     function UBound(): int
     {
-        $key = count($this->value);
-        return $key-1;
+        return max(array_keys($this->value));
     }
 
     /**
@@ -147,15 +145,9 @@ class Array1C extends FixedArray1C {
         }
     }
 
-    function __toString(): string
-    {
-        return "Массив";
+    function __toString(): string {
+        return php1C_strArray1C;
     }
-
-//    function toArray(): array
-//    {
-//        return $this->value;
-//    }
 
     function Insert($index, $val){
         $index = $this->intIndex($index);
@@ -250,6 +242,9 @@ class FixedStructure1C extends BaseCollection1C{
             }
         }
     }
+    function __toString(){
+        return php1C_strFixedStructure1C;
+    }
     function getItem($key, $value): KeyAndValue1C
     {
         return new KeyAndValue1C($this->keysOrigin[$key], $value);
@@ -282,7 +277,7 @@ function Structure1C(array $args=null): Structure1C
 class Structure1C extends FixedStructure1C {
 
 	function __toString(){
-		return "Структура";
+		return php1C_strStructure1C;
 	}
 
 	function Insert($key, $val=null){
@@ -362,7 +357,7 @@ class FixedMap1C extends BaseCollection1C{
     }
 
     function __toString(){
-        return "ФиксированноеСоответствие";
+        return php1C_strFixedMap1C;
     }
     /*
      * Для получения данных через точку
@@ -391,7 +386,7 @@ function Map1C($args=null): Map1C
 class Map1C extends FixedMap1C {
 
 	function __toString(){
-		return "Соответствие";
+		return php1C_strMap1C;
 	}
 
 	function Insert($key, $val=null){
@@ -473,8 +468,7 @@ class ValueTable {
 	}
 
 	function __toString(){
-		if (fEnglishTypes) return "ValueTable";
-		else return "ТаблицаЗначений";
+		return php1C_strValueTable1C;
 	}
 
 	function toArray(): array{
@@ -894,7 +888,7 @@ class ValueTableColumnCollection{
 	}
 
 	function __toString(){
-		return "КоллекцияКолонокТаблицыЗначений";
+		return php1C_strColumnsValueTable1C;
 	}
 
     /**
@@ -910,7 +904,8 @@ class ValueTableColumnCollection{
 		else  throw new Exception("Имя колонки должно быть строкой");
 	}
 
-	function Count(){
+	function Count(): int
+    {
 		return count($this->cols);
 	}
 
@@ -934,7 +929,7 @@ class ValueTableColumn{
 	}
 
 	function __toString(){
-		return "КолонкаТаблицыЗначений";
+		return php1C_strColumnValueTable1C;
 	}
 
 }
@@ -957,7 +952,7 @@ class ValueTableRow{
 	}
 
 	function __toString(){
-		return "СтрокаТаблицыЗначений";
+		return php1C_strRowValueTable1C;
 	}
 
 	function setValueTable($parent){
@@ -1014,7 +1009,7 @@ class CollectionIndexes{
 	}
 
 	function __toString(){
-	 	return "ИндексыКоллекции";
+	 	return php1C_strIndexesCollection1C;
 	}
 
 	function toArray(): array
@@ -1066,6 +1061,6 @@ class CollectionIndex{
     }
 
 	function __toString(){
-	 	return "ИндексКоллекции";
+	 	return php1C_strIndexCollection1C;
 	}	
 }

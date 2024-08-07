@@ -144,3 +144,24 @@ const php1C_error_UndefineType   = 'Пока тип не определен ';
 
 const php1C_error_ConvertToNumberBad  = "Преобразование значения к типу Число не может быть выполнено";
 const php1C_error_DivideByZero = 'Деление на ноль';
+
+//----------------------------- Collections ----------------------------------------
+const php1C_strFixedArray1C ="ФиксированныйМассив";
+const php1C_strArray1C = "Массив";
+
+const php1C_strFixedStructure1C ="ФиксированнаяСтруктура";
+const php1C_strStructure1C = "Структура";
+
+const php1C_strFixedMap1C ="ФиксированноеСоответствие";
+const php1C_strMap1C = "Соответствие";
+
+const php1C_strValueTable1C = "ТаблицаЗначений";
+
+const php1C_strColumnsValueTable1C = "КоллекцияКолонокТаблицыЗначений";
+
+const php1C_strColumnValueTable1C = "КолонкаТаблицыЗначений";
+
+const php1C_strRowValueTable1C = "КолонкаТаблицыЗначений";
+
+const php1C_strIndexesCollection1C = "ИндексыКоллекции";
+const php1C_strIndexCollection1C = "ИндексКоллекции";
