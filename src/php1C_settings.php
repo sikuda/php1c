@@ -19,6 +19,6 @@ const Scale1C_Int = 27;
 const Regional_grouping = false;
 
 //Если неправильно определяется пояс - поставим вручную (для IIS который дает UTC)
-if (date_default_timezone_get() == 'UTC')
-    date_default_timezone_set('Europe/Moscow');
+//if (date_default_timezone_get() == 'UTC')
+//    date_default_timezone_set('Europe/Moscow');
 

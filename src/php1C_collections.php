@@ -538,7 +538,7 @@ class ValueTable {
      * @throws Exception
      */
     function LoadColumn($arr, $col){
-		if(!is_object($arr) || get_class($arr) !== 'php1C\Array1C')
+		if($arr instanceof Array1C)
 			throw new Exception("Первый аргумент должен быть массивом ".$arr);
 		if(isset($col)){
 			if(is_int($col)){
@@ -547,7 +547,7 @@ class ValueTable {
 
 				$col = $this->COLUMNS->cols[strtoupper($col)];
 			}	
-			if(is_object($col) && get_class($col) === 'php1C\ValueTableColumn'){
+			if($col instanceof ValueTableColumn){
 				$k = 0;
 				foreach ($this->rows as $key => $value) {
 					$value->Set($col->NAME, $arr[$k]);
@@ -634,7 +634,7 @@ class ValueTable {
      */
     function FindRows($filter): Array1C
     {
-		if(!is_object($filter) || get_class($filter) !== 'php1C\Structure1C'){
+		if($filter instanceof Structure1C){
 			throw new Exception("Аргумент функции должен быть структурой ".$filter);
 		} 
 		$array_filter = $filter->toArray();
@@ -696,8 +696,11 @@ class ValueTable {
 		throw new Exception("Не найден имя столба ТаблицыЗначений ".$key);
 	}
 
-	//Группируем данные таблицы значений 
-	function GroupBy(string $colGr, string $colSum){
+	//Группируем данные таблицы значений
+    /**
+     * @throws Exception
+     */
+    function GroupBy(string $colGr, string $colSum){
 		if( fEnglishVariable ) $colGr = str_replace(php1C_LetterLng, php1C_LetterEng, $colGr);
 		if( fEnglishVariable ) $colSum = str_replace(php1C_LetterLng, php1C_LetterEng, $colSum);
         $grKeys = explode(',',$colGr);
@@ -753,8 +756,6 @@ class ValueTable {
 		}
         $row_int = intval($row);
         $offset_int = intval($offset);
-		//if(!is_float($row) && !is_int($row)) throw new Exception("Первый параметр должен быть числом или строкой ТаблицыЗначений");
-		//if(!is_float($offset) && !is_int($offset)) throw new Exception("Второй параметр должен быть числом");
 		$row_object = $this->rows[$row_int];
 		array_splice($this->rows,$row_int,1);
 		array_splice($this->rows,$row_int+$offset_int,0,array($row_object));
@@ -810,7 +811,7 @@ class ValueTable {
      * Отсортировать таблицу значений по стоке с колонками
      *
      * @param string $strolls @strcols string строка перечислений колонов и порядка сортировки ("Товар, Цена Убыв")
-     * @param @cmp_object объект сортировки //TODO
+     * @param @cmp_object объект сортировки
      * @throws Exception
      */
 	function Sort(string $strolls, $cmp_object=null){
@@ -820,23 +821,24 @@ class ValueTable {
 		if(!isset($strolls)) $strolls = $this->GetAllColumns();
 		if( fEnglishVariable ) $strolls = str_replace(php1C_LetterLng, php1C_LetterEng, $strolls);
 		if(!is_string($strolls)) throw new Exception("Первый параметр должен быть обязаельно заполнен наименованиями колонок");
-		$this->sort = array();
-		$this->sortdir = array();
-		$pairs = explode(',',$strolls);
+        $Sort = array();
+        $Sorted = array();
+        $pairs = explode(',',$strolls);
 		foreach ($pairs as $pair) {
 		 	$keys = explode(' ',$pair);
-		  	$col = strtoupper(trim($keys[0]));
-			$coldir = strtoupper(trim($keys[1]));
-			//echo $coldir;
-			if($coldir==='УБЫВ' || $coldir==="DESC") $this->sortdir[] =-1;
-			else $this->sortdir[] = 1;
-			$this->sort[] = $col;
+            if ($keys[0] === false) $col = "";
+		  	else $col = strtoupper(trim($keys[0]));
+            if ($keys[1] === false) $colder = "";
+			else $colder = strtoupper(trim($keys[1]));
+			if($colder==='УБЫВ' || $colder==="DESC") $Sorted[] =-1;
+			else $Sorted[] = 1;
+			$Sort[] = $col;
 		}
-		usort($this->rows, function($a, $b){
-			for($i=0;$i<count($this->sort);$i++){
-				$vala = $a->Get($this->sort[$i]);
-				$valb = $b->Get($this->sort[$i]);
-				if($vala !== $valb) return $this->sortdir[$i] *(($vala < $valb) ? -1 : 1);
+		usort($this->rows, function($a, $b) use ($Sorted, $Sort) {
+			for($i=0;$i<count($Sort);$i++){
+				$vala = $a->Get($Sort[$i]);
+                $vale = $b->Get($Sort[$i]);
+				if($vala !== $vale) return $Sorted[$i] *(($vala < $vale) ? -1 : 1);
 			}
 			return 0;
 		});
@@ -872,14 +874,15 @@ class ValueTableColumnCollection{
 	* @var array коллекция ValueTableColumn
 	*/
 	private $ValueTable;
-	public $cols; 
+	public array $cols;
 
 	function __construct($parent){
 		$this->ValueTable = &$parent;
 		$this->cols = array();
 	}
 
-	function toArray(){
+	function toArray(): array
+    {
 		return $this->cols;
 	}
 
@@ -904,11 +907,9 @@ class ValueTableColumnCollection{
 		else  throw new Exception("Имя колонки должно быть строкой");
 	}
 
-	function Count(): int
-    {
+	function Count(): int {
 		return count($this->cols);
 	}
-
 }
 
 /**
