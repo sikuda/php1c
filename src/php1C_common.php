@@ -7,7 +7,7 @@
 * 
 * @author  sikuda@yandex.ru
 */
-namespace php1C;
+namespace Sikuda\Php1c;
 use Exception;
 
 require_once('php1C_settings.php');

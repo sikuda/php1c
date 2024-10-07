@@ -1,11 +1,1 @@
-*.sublime*
-*.settings
-old/*
-modalshow/*
-js/*
-question/*
-output.php
-*.epf
-
-
 /vendor/

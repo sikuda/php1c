@@ -7,7 +7,7 @@
 * @author  sikuda@yandex.ru
 * @version 0.3
 */
-namespace php1C;
+namespace Sikuda\Php1c;
 use Exception;
 
 

@@ -1,0 +1,27 @@
+{
+  "name": "sikuda/php1c",
+  "description": "translate code 1C to code php",
+  "type": "library",
+  "license": "MPL-2.0",
+  "authors": [
+    {
+      "name": "Sergey Kudashkin",
+      "email": "sikuda@yandex.ru"
+    }
+  ],
+  "keywords": [
+    "1c",
+    "php1c"
+  ],
+  "minimum-stability": "dev",
+  "require": {
+    "php": ">=7.4",
+    "ext-bcmath": "*",
+    "ext-mbstring": "*"
+  },
+    "require-dev": {
+        "php": ">=7.4",
+        "ext-bcmath": "*",
+        "ext-mbstring": "*"
+    }
+}

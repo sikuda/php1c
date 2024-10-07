@@ -8,7 +8,7 @@
 * @author  sikuda@yandex.ru
 * @version 0.3
 */
-namespace php1C;
+namespace Sikuda\Php1c;
 use Exception;
 require_once('php1C__tokens.php');
 
@@ -363,7 +363,7 @@ function ValueTable($args=null): ValueTable
 class ValueTable{
 	
 	private array $rows;   //array of ValueTableRow
-	public ValueTableColumnCollection $COLUMNS; //ValueTableColumnCollection - collection of ValueTableColumn
+	public $COLUMNS; //ValueTableColumnCollection - collection of ValueTableColumn
 	//public $КОЛОНКИ;
 	public $KOLONKI;
 	public CollectionIndexes $INDEXES; //CollectionIndexes коллекция из CollectionIndex
@@ -432,7 +432,7 @@ class ValueTable{
 			$col = $this->COLUMNS->cols[strtoupper($col)];
 		}
 		else throw new Exception("Не задана колонка для выгрузки ".$col);
-		if(is_object($col) && get_class($col) === 'php1C\ValueTableColumn'){
+		if(is_object($col) && get_class($col) === 'ValueTableColumn'){
 			foreach ($this->rows as $key => $value) {
 				$val = $value->Get($col->NAME);
 				$array->Add($val);
@@ -447,7 +447,7 @@ class ValueTable{
      * @throws Exception
      */
     function LoadColumn($arr, $col){
-		if(!is_object($arr) || get_class($arr) !== 'php1C\Array1C')
+		if(!is_object($arr) || get_class($arr) !== 'Array1C')
 			throw new Exception("Первый аргумент должен быть массивом ".$arr);
 		if(isset($col)){
 			if(is_int($col)){
@@ -456,7 +456,7 @@ class ValueTable{
 
 				$col = $this->COLUMNS->cols[strtoupper($col)];
 			}	
-			if(is_object($col) && get_class($col) === 'php1C\ValueTableColumn'){
+			if(is_object($col) && get_class($col) === 'ValueTableColumn'){
 				$k = 0;
 				foreach ($this->rows as $key => $value) {
 					$value->Set($col->NAME, $arr[$k]);
@@ -537,7 +537,7 @@ class ValueTable{
 
 	//Поиск по структуре возврат Array1C
 	function FindRows($filter){
-		if(!is_object($filter) || get_class($filter) !== 'php1C\Structure1C'){
+		if(!is_object($filter) || get_class($filter) !== 'Structure1C'){
 			throw new Exception("Аргумент функции должен быть структурой ".$filter);
 		} 
 		$array_filter = $filter->toArray();
@@ -577,11 +577,11 @@ class ValueTable{
 	}
 
 	//Для установки данных через точку
-	function Set($key, \php1C\ValueTableColumnCollection $val){
+	function Set($key, ValueTableColumnCollection $val){
 		if(is_string($key)){
 			if( fEnglishVariable ) $key = str_replace(php1C_LetterLng, php1C_LetterEng, $key);
 			$key = strtoupper($key);
-			if(($key === 'КОЛОНКИ' || $key === 'COLUMNS') && (get_class($val) === 'php1C\ValueTableColumnCollection')){
+			if(($key === 'КОЛОНКИ' || $key === 'COLUMNS') && (get_class($val) === 'ValueTableColumnCollection')){
 				$this->COLUMNS = $val;
 				$this->COLUMNS->setValueTable($this);
 			}	
@@ -644,7 +644,7 @@ class ValueTable{
 
 	//Сдвинуть строку $row на $offset
 	function Move($row, $offset){
-		if(is_object($row) && get_class($row) === 'php1C\ValueTableRow'){
+		if(is_object($row) && get_class($row) === 'ValueTableRow'){
 			$row = $this->IndexOf($row);
 		}
         $row_int = intval($row);
@@ -664,7 +664,7 @@ class ValueTable{
 	* @return - возвращает новый объект ТаблицаЗначений1С
 	*/
 	function Copy($rows=null, $strcols=null){
-		if(isset($row) && (!is_object($rows) || get_class($rows) !== 'php1C\Array1C')) throw new Exception("Первый параметр должен быть массивом строк или пустым");
+		if(isset($row) && (!is_object($rows) || get_class($rows) !== 'Array1C')) throw new Exception("Первый параметр должен быть массивом строк или пустым");
 		if(!isset($strcols)) $strcols = $this->GetAllColumns();
 		if( fEnglishVariable ) $strcols = str_replace(php1C_LetterLng, php1C_LetterEng, $strcols);
 		$array = $this->CopyColumns($strcols);
