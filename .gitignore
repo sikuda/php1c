@@ -1,5 +1,3 @@
-test*
-test.php
 *.sublime*
 *.settings
 old/*
@@ -9,3 +7,5 @@ question/*
 output.php
 *.epf
 
+
+/vendor/

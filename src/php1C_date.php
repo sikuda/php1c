@@ -469,7 +469,8 @@ function AddMonth(Date1C $date, int $int_month=0 ): Date1C
 /*
  * Функция для расчета времени выполнения
  */
-function CurrentUniversalDateMilliseconds(){
+function CurrentUniversalDateMilliseconds(): float
+{
     return hrtime(true)/1e+6;
 }
 

@@ -116,7 +116,7 @@ function sub1C($arg1, $arg2){
  * Умножение двух переменных в 1С
  * @param $arg1
  * @param $arg2
- * @return float|int|string - Результат сложение в зависимости от типа переменных (float или исключение)
+ * @return Number1C|float|int - Результат сложение в зависимости от типа переменных (float или исключение)
  * @throws Exception
  */
 function mul1C($arg1, $arg2)
@@ -134,7 +134,7 @@ function mul1C($arg1, $arg2)
  * Деление двух переменных в 1С
  * @param $arg1
  * @param $arg2
- * @return float|int|string Результат сложение в зависимости от типа переменных (float или исключение)
+ * @return Number1C|float|int Результат сложение в зависимости от типа переменных (float или исключение)
  * @throws Exception
  */
 function div1C($arg1, $arg2){
