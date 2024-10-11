@@ -13,7 +13,7 @@
     "1c",
     "php1c"
   ],
-  "minimum-stability": "dev",
+  "minimum-stability": "stable",
   "require": {
     "php": ">=7.4",
     "ext-bcmath": "*",
