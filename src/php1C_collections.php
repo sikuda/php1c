@@ -59,7 +59,10 @@ class Array1C{
 
 	public array $value; //array of PHP
 
-	function __construct($counts=null, $copy=null){
+    /**
+     * @throws Exception
+     */
+    function __construct($counts=null, $copy=null){
 
 		if(is_array($copy)) $this->value = $copy;
 		else{	
@@ -150,13 +153,13 @@ class Array1C{
 //------------------------------------------------------------------------------------------
 
 /**
-* Получение структуры 1С 
-*
-* @param array $cnt аргументы функции в массиве
-* @return - возвращает новый объект массива 1С
-*
-*/
-function Structure1C($args=null): Structure1C
+ * Получение структуры 1С
+ *
+ * @param array|null $args
+ * @return Structure1C - возвращает новый объект массива 1С
+ *
+ */
+function Structure1C(array $args=null): Structure1C
 {
 	return new Structure1C($args);
 }
@@ -201,7 +204,8 @@ class Structure1C{
 		$this->value[mb_strtoupper($key)] = $val;
 	}
 
-	function Count(){
+	function Count(): int
+    {
 		return count($this->value);
 	}
 
@@ -307,12 +311,13 @@ class Map1C{
 		return count($this->value);
 	}
 
-	function Property($key, $value=null): bool
+	function Property(string $key, $value=null): bool
     {
 		if( fEnglishVariable ) $key = str_replace(php1C_LetterLng, php1C_LetterEng, $key);
 		$key = strtoupper($key);
-		$value = $this->value[$key];
-		return array_key_exists($key, $this->value);
+        $exist = array_key_exists($key, $this->value);
+		if(isset($value)) return ($exist && $value === $this->value[$key]);
+		else return $exist;
 	}
 
 	function Clear(){
@@ -369,8 +374,12 @@ class ValueTable{
 	public CollectionIndexes $INDEXES; //CollectionIndexes коллекция из CollectionIndex
 	//public $ИНДЕКСЫ;
 	public $INDEKSYY;
-	
-	function __construct($args=null,$copy=null){
+
+    /**
+     * @param $args
+     * @param $copy
+     */
+    function __construct($args=null, $copy=null){
 
 		if(is_array($copy)) $this->rows = $copy;
 		else{	
@@ -536,7 +545,11 @@ class ValueTable{
 	}
 
 	//Поиск по структуре возврат Array1C
-	function FindRows($filter){
+
+    /**
+     * @throws Exception
+     */
+    function FindRows($filter){
 		if(!is_object($filter) || get_class($filter) !== 'Structure1C'){
 			throw new Exception("Аргумент функции должен быть структурой ".$filter);
 		} 

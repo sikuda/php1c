@@ -5,7 +5,7 @@
 * @author  sikuda@yandex.ru
 * @version 0.2
 */
-namespace php1C;
+namespace Sikuda\Php1c;
 
 const php1C_lang = "en";
 const php1C_Identifiers = '/^[_A-Za-z][_0-9A-Za-z]*/u';

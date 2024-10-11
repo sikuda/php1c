@@ -1,4 +1,6 @@
 <?php
+
+namespace Sikuda\Php1c;
 // Установка языка программирования
 //- ru - default setting
 //- en

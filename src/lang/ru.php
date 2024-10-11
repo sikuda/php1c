@@ -5,7 +5,7 @@
 * @author  sikuda admin@sikuda.ru
 * @version 0.3
 */
-namespace php1C;
+namespace Sikuda\Php1c;
 
 const php1C_lang = "ru";
 

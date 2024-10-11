@@ -91,6 +91,9 @@ class CodeStream {
 		else throw new Exception(php1C_error_ExpectedOperator.$look);
 	}
 
+    /**
+     * @throws Exception
+     */
     private function MatchOperation2($subtype, $code="", $look = '???')
     {
         if( $this->Type === TokenStream::type_operator && $this->Index === $subtype){
@@ -117,6 +120,9 @@ class CodeStream {
 		}	
 	}
 
+    /**
+     * @throws Exception
+     */
     private function MatchKeyword2($subtype, $code=""){
         if( $this->Type === TokenStream::type_keyword && $this->Index === $subtype){
             $this->code = $code;
@@ -653,8 +659,7 @@ class CodeStream {
 							 	$this->GetChar();
 							 	$this->MatchKeyword(TokenStream::keyword_circle);
 							 	$this->pushCode("foreach( $".$array."->toArray() as $".$iterator." ){");
-							 	$this->continueCode(TokenStream::keyword_circle);
-							}else{
+                            }else{
 								//Шаблона Для перем=Нач По Кон Цикл ... КонецЦикла;
 								$this->pushCode('for(');
 						 		if($this->Type !== TokenStream::type_variable) throw new Exception(php1C_error_ExpectedNameVar);
@@ -674,9 +679,9 @@ class CodeStream {
 						 		$this->code = '$'.$iterator.'=php1C\add1C($'.$iterator.',1)){';
 						 		$this->MatchKeyword(TokenStream::keyword_circle);
                                 $this->pushCode($this->code);
-                                $this->continueCode(TokenStream::keyword_circle);
-					 		}
-					 		break;	
+                            }
+                            $this->continueCode(TokenStream::keyword_circle);
+                            break;
 					 	case TokenStream::keyword_end_circle:
 					 		//if($handle===TokenStream::keyword_circle){
 					 			$this->MatchKeyword2(TokenStream::keyword_end_circle, '}');
@@ -792,7 +797,7 @@ class CodeStream {
 }
 
 /**
-* Запуск получения кода PHP
+* Основная функция получения кода PHP
 *
 * @param string $buffer строка код для преобразования
 * @param string|null $name_var имя переменной для вывода результата выполнения кода
