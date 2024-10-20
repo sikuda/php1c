@@ -1,4 +1,6 @@
 <?php
+
+namespace Php1c;
 // Установка языка программирования
 //- ru - default setting
 //- en

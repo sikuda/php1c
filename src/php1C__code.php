@@ -7,7 +7,7 @@
 * @author  sikuda@yandex.ru
 * @version 0.3
 */
-namespace php1C;
+namespace Php1c;
 use Exception;
 require_once( 'php1C__tokens.php');
 require_once( 'php1C_common.php');
