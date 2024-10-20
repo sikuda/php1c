@@ -1,4 +1,5 @@
 vendor
+unit-tests/php1C-UnitTests
 test*
 test.php
 *.sublime*
