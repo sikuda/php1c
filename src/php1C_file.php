@@ -9,7 +9,7 @@
 * @author  sikuda admin@sikuda.ru
 * @version 0.3
 */
-namespace Sikuda\Php1c;
+namespace Php1c;
 use Exception;
 
 require_once( 'php1C_date.php');

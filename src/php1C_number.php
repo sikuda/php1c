@@ -7,7 +7,7 @@
 * @author  sikuda@yandex.ru
 * @version 0.3
 */
-namespace Sikuda\Php1c;
+namespace Php1c;
 use Exception;
 
 
@@ -150,7 +150,11 @@ class Number1C
     }
 }
 
-function Number1C($arg){
+/**
+ * @throws Exception
+ */
+function Number1C($arg): Number1C
+{
     return new Number1C($arg);
 }
 
@@ -271,14 +275,16 @@ function Exp($val): float
 /**
  * Возвращает e в степени число
  *
- * @param  $val - число экспоненты
- * @param  $exp - степень экспоненты
+ * @param  $val float|int|Number1C  - число экспоненты
+ * @param  $exp float|int|Number1C - степень экспоненты
  * @return float|int|Number1C - результат
  * @throws Exception
  */
 function Pow($val, $exp){
-    if($val instanceof Number1C && $exp instanceof Number1C)
-        return new Number1C(bcpow($val->getValue(), $exp->getValue(), Scale1C));
+    if($val instanceof Number1C)
+        if($exp instanceof Number1C)
+            return new Number1C(bcpow($val->getValue(), $exp->getValue(), Scale1C));
+        elseif (is_numeric($exp)) return new Number1C(bcpow($val->getValue(), strval($exp), Scale1C));
     return \pow($val, $exp);
 }
 
@@ -287,6 +293,7 @@ function Pow($val, $exp){
  * Возвращает e в степени число
  *
  * @param  $val - параметр корня
+ * @throws Exception
  */
 function Sqrt($val){
     if($val instanceof Number1C) return new Number1C(bcsqrt($val->getValue(), Scale1C));
@@ -394,8 +401,8 @@ function Format($val, string $str_format): string
 /**
 * Представление числа прописью.
 *
-* @param  string|Number1C
-* @param  string $frm форматная строка
+* @param  string|Number1C $val
+ * string $frm форматная строка
 * @return string - результат  
 */
 function NumberInWords($val, string $frm=""): string{
@@ -407,7 +414,7 @@ function NumberInWords($val, string $frm=""): string{
  * Число прописью
 * Функция заглушка, возвращает русскую строку или самому строчку
 *
-* @param  string $str Строки на разных языках, разделенные символом ";" (точка с запятой).
+* @param  string|Number1C $str Строки на разных языках, разделенные символом ";" (точка с запятой).
  * Строка на одном языке состоит из кода языка, указанного в метаданных,
  * символа "=" (равно) и собственно строки текста на данном языке в одинарных кавычках,
  * двойных кавычках или без кавычек (когда указывается только один язык).
@@ -444,30 +451,30 @@ function PeriodPresentation(Date1C $date1, Date1C $date2, string $frm=""): strin
 * Функция заглушка, возвращает русскую строку или самому строчку
 *
 * @param string $str строка шаблон для вывода
-* @param  $val1 - string|Number1C
-* @param  $val2 - число
-* @param  $val3 - число
-* @param  $val4 - число
-* @param  $val5 - число
-* @param  $val6 - число
-* @param  $val7 - число
-* @param  $val8 - число
-* @param  $val9 - число
-* @param  $val10 - число
+* @param  string|Number1C $val1
+* @param  string|Number1C $val2
+* @param  string|Number1C $val3
+* @param  string|Number1C $val4
+* @param  string|Number1C $val5
+* @param  string|Number1C $val6
+* @param  string|Number1C $val7
+* @param  string|Number1C $val8
+* @param  string|Number1C $val9
+* @param  string|Number1C $val10
 * @return string - результат  
 */
 function StrTemplate(string $str, $val1="", $val2="", $val3="", $val4="", $val5="", $val6="", $val7="", $val8="", $val9="", $val10=""): string
 {
     if($val1 instanceof Number1C) $val1 = $val1->getValue();
-    if($val2 instanceof Number1C) $val1 = $val2->getValue();
-    if($val3 instanceof Number1C) $val1 = $val3->getValue();
-    if($val4 instanceof Number1C) $val1 = $val4->getValue();
-    if($val5 instanceof Number1C) $val1 = $val5->getValue();
-    if($val6 instanceof Number1C) $val1 = $val6->getValue();
-    if($val7 instanceof Number1C) $val1 = $val7->getValue();
-    if($val8 instanceof Number1C) $val1 = $val8->getValue();
-    if($val9 instanceof Number1C) $val1 = $val9->getValue();
-    if($val10 instanceof Number1C) $val1 = $val10->getValue();
+    if($val2 instanceof Number1C) $val2 = $val2->getValue();
+    if($val3 instanceof Number1C) $val3 = $val3->getValue();
+    if($val4 instanceof Number1C) $val4 = $val4->getValue();
+    if($val5 instanceof Number1C) $val5 = $val5->getValue();
+    if($val6 instanceof Number1C) $val6 = $val6->getValue();
+    if($val7 instanceof Number1C) $val7 = $val7->getValue();
+    if($val8 instanceof Number1C) $val8 = $val8->getValue();
+    if($val9 instanceof Number1C) $val9 = $val9->getValue();
+    if($val10 instanceof Number1C) $val10 = $val10->getValue();
 
 	return 'Еще не реализовано'.$str.$val1.$val2.$val3.$val4.$val5.$val6.$val7.$val8.$val9.$val10;
 }
@@ -476,7 +483,7 @@ function StrTemplate(string $str, $val1="", $val2="", $val3="", $val4="", $val5=
 * Функция заглушка, Представление строки числа в требуемой форме.
 *
 * @param  string $str str строка шаблон для вывода
-* @param  $val - string|Number1C
+* @param  string|Number1C $val
 * @param  string $prm параметры
 * @return string - результат  
 */

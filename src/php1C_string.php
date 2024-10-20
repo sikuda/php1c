@@ -8,7 +8,7 @@
 * @author  sikuda@yandex.ru
 * @version 0.3
 */
-namespace Sikuda\Php1c;
+namespace Php1c;
 use Exception;
 require_once('php1C_collections.php'); //для функций СтрРазделить, СтрСоединить
 

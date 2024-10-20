@@ -1,3 +1,14 @@
 vendor
-/unit-tests/php1C-UnitTests
+unit-tests/php1C-UnitTests
+test*
+test.php
+*.sublime*
+*.settings
+old/*
+modalshow/*
+js/*
+question/*
+output.php
+*.epf
+unit-tests/php1C-UnitTests/*
 

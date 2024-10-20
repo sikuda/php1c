@@ -5,7 +5,7 @@
 * @author  sikuda admin@sikuda.ru
 * @version 0.3
 */
-namespace Sikuda\Php1c;
+namespace Php1c;
 
 const php1C_lang = "ru";
 
@@ -44,7 +44,8 @@ const php1C_Keywords = array(
 	'ПЕРЕМ',           //keyword_var     = 23;
 	'СИМВОЛЫ',         //keyword_chars   = 24;
 	'ЭКСПОРТ',         //keyword_export  = 25;
-	'ЗНАЧ');           //keyword_val     =26;
+	'ЗНАЧ',            //keyword_val     =26;
+    'NULL');           //keyword_null    =27;
 
 /**
 * Ключевое слово Новый
@@ -55,7 +56,7 @@ const php1C_type_New = 'НОВЫЙ';
 * Массив названий русских типов для работы с коллекциями
 * @return array of string - Массив названий функций работы с коллекциями.
 */
-const php1C_types_Collection = array('МАССИВ','СТРУКТУРА','СООТВЕТСТВИЕ','ТАБЛИЦАЗНАЧЕНИЙ');
+const php1C_types_Collection = array('МАССИВ','СТРУКТУРА','СООТВЕТСТВИЕ','ТАБЛИЦАЗНАЧЕНИЙ', 'ФИКСИРОВАННЫЙМАССИВ');
 const php1C_types_File = array('ФАЙЛ', 'ЧТЕНИЕТЕКСТА', 'ЗАПИСЬТЕКСТА');
 
 /**
@@ -148,6 +149,23 @@ const php1C_error_ConvertToDateBad  = 'Преобразование значен
 
 const php1C_error_DivideByZero = 'Деление на ноль';
 
+//----------------------------- Collections ----------------------------------------
+const php1C_strFixedArray1C ="ФиксированныйМассив";
+const php1C_strArray1C = "Массив";
 
+const php1C_strFixedStructure1C ="ФиксированнаяСтруктура";
+const php1C_strStructure1C = "Структура";
 
+const php1C_strFixedMap1C ="ФиксированноеСоответствие";
+const php1C_strMap1C = "Соответствие";
 
+const php1C_strValueTable1C = "ТаблицаЗначений";
+
+const php1C_strColumnsValueTable1C = "КоллекцияКолонокТаблицыЗначений";
+
+const php1C_strColumnValueTable1C = "КолонкаТаблицыЗначений";
+
+const php1C_strRowValueTable1C = "КолонкаТаблицыЗначений";
+
+const php1C_strIndexesCollection1C = "ИндексыКоллекции";
+const php1C_strIndexCollection1C = "ИндексКоллекции";

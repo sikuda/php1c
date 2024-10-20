@@ -3,9 +3,9 @@
 * Module English lang for get code PHP from 1С
 * 
 * @author  sikuda@yandex.ru
-* @version 0.2
+* @version 0.3
 */
-namespace Sikuda\Php1c;
+namespace Php1c;
 
 const php1C_lang = "en";
 const php1C_Identifiers = '/^[_A-Za-z][_0-9A-Za-z]*/u';
@@ -39,10 +39,11 @@ const php1C_Keywords = array(
 	'ENDFUNCTION',      //keyword_endfunction = 20; 
 	'ENDPROCEDURE',     //keyword_endprocedure = 21;
 	'RETURN',           //keyword_return  = 22;
-	'VAR',              //k0.3eyword_var     = 23;
+	'VAR',              //k0.3eyword_var  = 23;
 	'CHARS',            //keyword_chars   = 24;
 	'EXPORT',           //keyword_export  = 25; 
-	'VAL');             //keyword_val     =26;
+	'VAL',              //keyword_val     =26;
+    'NULL');            //keyword_null    =27;
 
 /**
 * Ключевое слово Новый
@@ -53,7 +54,7 @@ const php1C_type_New = 'NEW';
 /**
 * Массив названий английских типов для работы с коллекциями
 */
-const php1C_types_Collection = array('ARRAY','STRUCTURE','MAP','VALUETABLE');
+const php1C_types_Collection = array('ARRAY','STRUCTURE','MAP','VALUETABLE','FIXEDARRAY');
 const php1C_types_File = array('FILE', 'TEXTREADER', 'TETXTWRITER');
 
 /**
@@ -143,3 +144,24 @@ const php1C_error_UndefineType   = 'Пока тип не определен ';
 
 const php1C_error_ConvertToNumberBad  = "Преобразование значения к типу Число не может быть выполнено";
 const php1C_error_DivideByZero = 'Деление на ноль';
+
+//----------------------------- Collections ----------------------------------------
+const php1C_strFixedArray1C ="ФиксированныйМассив";
+const php1C_strArray1C = "Массив";
+
+const php1C_strFixedStructure1C ="ФиксированнаяСтруктура";
+const php1C_strStructure1C = "Структура";
+
+const php1C_strFixedMap1C ="ФиксированноеСоответствие";
+const php1C_strMap1C = "Соответствие";
+
+const php1C_strValueTable1C = "ТаблицаЗначений";
+
+const php1C_strColumnsValueTable1C = "КоллекцияКолонокТаблицыЗначений";
+
+const php1C_strColumnValueTable1C = "КолонкаТаблицыЗначений";
+
+const php1C_strRowValueTable1C = "КолонкаТаблицыЗначений";
+
+const php1C_strIndexesCollection1C = "ИндексыКоллекции";
+const php1C_strIndexCollection1C = "ИндексКоллекции";
